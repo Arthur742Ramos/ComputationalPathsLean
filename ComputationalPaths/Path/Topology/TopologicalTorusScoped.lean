@@ -82,6 +82,79 @@ theorem coordinate_product_eq (γ : Loop) :
   funext t
   rfl
 
+theorem coordinateFst_trans (γ δ : Loop) :
+    coordinateFst (γ.trans δ) = (coordinateFst γ).trans (coordinateFst δ) := by
+  simp [coordinateFst]
+
+theorem coordinateSnd_trans (γ δ : Loop) :
+    coordinateSnd (γ.trans δ) = (coordinateSnd γ).trans (coordinateSnd δ) := by
+  simp [coordinateSnd]
+
+theorem winding_trans (γ δ : Loop) :
+    winding (γ.trans δ) =
+      ((winding γ).1 + (winding δ).1,
+        (winding γ).2 + (winding δ).2) := by
+  apply Prod.ext
+  · change windingPath (coordinateFst (γ.trans δ)) = _
+    rw [coordinateFst_trans, windingPath_trans]
+    rfl
+  · change windingPath (coordinateSnd (γ.trans δ)) = _
+    rw [coordinateSnd_trans, windingPath_trans]
+    rfl
+
+noncomputable def firstFactorLoop (m : ℤ) : Loop :=
+  (CircleTopologicalRealization.standardLoop m).prod
+    (_root_.Path.refl (0 : TopologicalCircle))
+
+noncomputable def secondFactorLoop (n : ℤ) : Loop :=
+  (_root_.Path.refl (0 : TopologicalCircle)).prod
+    (CircleTopologicalRealization.standardLoop n)
+
+noncomputable def sequentialLoop (m n : ℤ) : Loop :=
+  (firstFactorLoop m).trans (secondFactorLoop n)
+
+theorem winding_firstFactorLoop (m : ℤ) :
+    winding (firstFactorLoop m) = (m, 0) := by
+  apply Prod.ext
+  · change windingPath (coordinateFst (firstFactorLoop m)) = m
+    rw [show coordinateFst (firstFactorLoop m) =
+      CircleTopologicalRealization.standardLoop m by
+        apply _root_.Path.ext
+        funext t
+        rfl]
+    exact windingPath_standardLoop m
+  · change windingPath (coordinateSnd (firstFactorLoop m)) = 0
+    rw [show coordinateSnd (firstFactorLoop m) =
+      _root_.Path.refl (0 : TopologicalCircle) by
+        apply _root_.Path.ext
+        funext t
+        rfl]
+    exact windingPath_refl
+
+theorem winding_secondFactorLoop (n : ℤ) :
+    winding (secondFactorLoop n) = (0, n) := by
+  apply Prod.ext
+  · change windingPath (coordinateFst (secondFactorLoop n)) = 0
+    rw [show coordinateFst (secondFactorLoop n) =
+      _root_.Path.refl (0 : TopologicalCircle) by
+        apply _root_.Path.ext
+        funext t
+        rfl]
+    exact windingPath_refl
+  · change windingPath (coordinateSnd (secondFactorLoop n)) = n
+    rw [show coordinateSnd (secondFactorLoop n) =
+      CircleTopologicalRealization.standardLoop n by
+        apply _root_.Path.ext
+        funext t
+        rfl]
+    exact windingPath_standardLoop n
+
+@[simp] theorem winding_sequentialLoop (m n : ℤ) :
+    winding (sequentialLoop m n) = (m, n) := by
+  rw [sequentialLoop, winding_trans, winding_firstFactorLoop,
+    winding_secondFactorLoop]
+  simp
+
 theorem standardLoop_homotopic (γ : Loop) :
     (standardLoop (winding γ).1 (winding γ).2).Homotopic γ := by
   have hfst := CircleTopologicalRealization.standardLoop_homotopic
@@ -93,6 +166,11 @@ theorem standardLoop_homotopic (γ : Loop) :
   have hprod := _root_.Path.Homotopic.prodHomotopy hfst hsnd
   rw [coordinate_product_eq γ] at hprod
   exact ⟨hprod⟩
+
+theorem standardLoop_homotopic_sequentialLoop (m n : ℤ) :
+    (standardLoop m n).Homotopic (sequentialLoop m n) := by
+  simpa only [winding_sequentialLoop] using
+    (standardLoop_homotopic (sequentialLoop m n))
 
 abbrev LoopQuot : Type :=
   _root_.Path.Homotopic.Quotient base base

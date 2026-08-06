@@ -5,6 +5,8 @@ paper.  The checked Lean implementation is in
 `ComputationalPaths/Path/Topology/ScopedGeometricRewrite*.lean`, together with
 the weighted-realization bridge in
 `ComputationalPaths/Path/Topology/WeightedConcatenation.lean` and the
+finite-generator presentation data in
+`ComputationalPaths/Path/Topology/FiniteCircleTorusPresentation.lean`, and the
 Hawaiian-earring transfer module
 `ComputationalPaths/Path/Topology/ScopedGeometricRewriteHawaiianEarring.lean`,
 and is imported by `ComputationalPaths.lean`.
@@ -30,16 +32,24 @@ The strengthened artifact additionally checks:
   ordinary-pullback theorem;
 - `ScopedGeometricNormalFormCertificate` and its completeness theorem;
 - the based circle normal-form certificate; and
-- the genuine product-torus winding equivalence in
-  `TopologicalTorusScoped.lean`.
+- the finite one-generator/two-generator trace-code completion certificates
+  and the sound torus commuting square;
+- the genuine product-torus winding equivalence and the
+  simultaneous/sequential representative bridge in
+  `TopologicalTorusScoped.lean`; and
 - the quotient-obstruction transfer from an externally supplied Fabel-style
   non-quotient product theorem to failure of ordinary-pullback compatibility
   and discontinuity of ordinary multiplication.
 
 The manuscript's main mathematical example uses finite oriented circle and
-torus generators.  The integer-indexed circle module is the completed normal
-form presentation used for compact formal certificates; it does not replace
-the finite-generator argument in the main text.
+torus generators.  The finite-generator module now records those alphabets,
+their integer or integer-pair trace codes, the torus commuting-square
+soundness, and explicit completion certificates.  The integer-indexed circle
+module remains a separate completed presentation, and the ordinary torus
+module remains a quotient classification of genuine continuous loops.  The
+minimal cancellation-only circle derivation and the commutation-generated
+torus normalizer are still mathematical presentation-level arguments rather
+than claims that the completed modules reproduce the entire scoped derivation.
 
 ## Reproduce
 
@@ -62,6 +72,7 @@ lake build ComputationalPaths.Path.Topology.ScopedGeometricRewriteFundamental
 lake build ComputationalPaths.Path.Topology.ScopedGeometricRewriteHawaiianEarring
 lake build ComputationalPaths.Path.Topology.ScopedGeometricRewriteCircle
 lake build ComputationalPaths.Path.Topology.TopologicalTorusScoped
+lake build ComputationalPaths.Path.Topology.FiniteCircleTorusPresentation
 ```
 
 Declaration-level audits for the new implementation are:
@@ -69,7 +80,8 @@ Declaration-level audits for the new implementation are:
 ```text
 rg -n '^[[:space:]]*(sorry|admit|axiom)' \
   ComputationalPaths/Path/Topology/ScopedGeometricRewrite*.lean \
-  ComputationalPaths/Path/Topology/WeightedConcatenation.lean
+  ComputationalPaths/Path/Topology/WeightedConcatenation.lean \
+  ComputationalPaths/Path/Topology/FiniteCircleTorusPresentation.lean
 git diff --check
 ```
 
@@ -89,7 +101,7 @@ latexmk -pdf -interaction=nonstopmode -halt-on-error main.tex
 ```
 
 The checked output is published at
-`output/pdf/topological-computational-paths.pdf`.
+`output/pdf/topological-computational-paths-v14.pdf`.
 
 The exact source snapshot for the released Lean artifact is the immutable tag
 `topological-paper-v3` in

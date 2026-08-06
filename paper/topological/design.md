@@ -23,7 +23,7 @@ The mathematics, not the formalization, is the principal contribution. The
 Lean development is an appendix-level verification and a reproducible artifact.
 The strengthened result package includes a compact-Hausdorff positive
 ordinary-pullback theorem, a discrete finite-presentation corollary, an
-effective normal-form completeness criterion, a finite-generator circle
+normal-form completeness criterion, a finite-generator circle
 calculation, and the genuine product torus calculation.
 
 ## 2. Scope and non-goals
@@ -322,7 +322,7 @@ rewrite traces. Its multiplication is understood through the unconditional
 final-domain construction; no ordinary-pullback assumption is part of the
 completion claim.
 
-### Theorem E' (effective normal forms)
+### Theorem E' (normal forms)
 
 An explicit normalizer into proof-irrelevant normal-form codes, together with
 (i) a scoped derivation from every raw path to the chosen representative of
@@ -347,8 +347,11 @@ cancellation; its normal forms are derived integer powers and its based loop
 quotient is \(\mathbb Z\). The actual torus is presented from two coordinate
 generators, inverse cancellation, and the commuting square; its based loop
 quotient is \(\mathbb Z^2\). Both completeness proofs use the corresponding
-covering-space winding invariants. The Lean artifact records the completed
-circle normal-form certificate and the genuine product-torus certificate.
+covering-space winding invariants. The Lean artifact records the finite-generator
+presentation data, the completed circle normal-form certificate, the sound torus
+commuting square, and the genuine product-torus certificate. The minimal
+cancellation/commutation derivations remain mathematical presentation-level
+proofs.
 
 ## 6. Terminology contract
 
@@ -431,10 +434,11 @@ The current Lean artifact checks the dependency chain as follows.
 | Hawaiian-earring obstruction transfer | `QuotientObstructionTransfer`, `QuotientObstructionTransfer.external_isQuotientMap_of_source_isQuotientMap`, `QuotientObstructionTransfer.not_isQuotientMap_quotientMap`, `MultiplicationComparison`, `MultiplicationComparison.not_source_continuous_of_not_external_continuous`, `ScopedGeometricRewrite.not_productQuotientCompatibility_of_transfer`, `ScopedGeometricRewrite.not_final_topology_agreement_of_transfer` |
 | Realized fundamental-groupoid bridge | `RealizedFundamentalArrow`, `realizedFundamentalArrowHomeomorph`, `PresentedRealizedFundamentalArrow`, `realizedFundamentalGroupoidArrow`, `RealizedFundamentalGroupoidCertificate`, `presentedRealizedFundamentalArrow_identity_mem`, `presentedRealizedFundamentalArrow_reversal_mem`, `presentedRealizedFundamentalArrow_composition_mem`, `universalRealizedFundamentalArrowHomeomorph` |
 | Presentation functoriality | `PresentationMap`, `mapClass`, `ScopedPresentationFunctorCertificate`, `scopedPresentationFunctorCertificate_of_compatibility`, `PresentationFunctorIdentityCertificate`, `PresentationFunctorCompositionCertificate` |
-| Circle instance | `circleLoopStepSystem`, `circleLoopRule`, `circleLoopRule_sound`, `circleTrace_normalizes`, `circleLoopPresentation`, `circleBasedNormalCode`, `circleBasedNormalRepresentative`, `circleBasedNormalCode_scoped`, `circleBasedNormalCode_eq_of_homotopic`, `circleBasedNormalFormCertificate`, `circleFinalTopologicalGroupoidCertificate`, `circleOrdinaryFinalCompatibility_iff`, `circleLoopEquivInt`, `circleScoped_nontrivial`, `CircleScopedNondegeneracyCertificate`, `circleLoopToScoped_range_iff` |
-| Actual topological torus | `TopologicalTorus.standardLoop`, `TopologicalTorus.winding`, `TopologicalTorus.standardLoop_homotopic`, `TopologicalTorus.equivIntProd`, `TopologicalTorus.certificate` |
+| Finite-generator presentation data | `FiniteCircleTorusPresentation.circleStepSystem`, `FiniteCircleTorusPresentation.circleFinitePresentation`, `FiniteCircleTorusPresentation.circleCompletionEquivInt`, `FiniteCircleTorusPresentation.torusStepSystem`, `FiniteCircleTorusPresentation.torusFinitePresentation`, `FiniteCircleTorusPresentation.torusCompletionEquivIntProd`, `FiniteCircleTorusPresentation.torusFiniteCommutingSquare` |
+| Completed circle instance | `circleLoopStepSystem`, `circleLoopRule`, `circleLoopRule_sound`, `circleTrace_normalizes`, `circleLoopPresentation`, `circleBasedNormalFormCertificate`, `circleFinalTopologicalGroupoidCertificate`, `circleLoopEquivInt` |
+| Actual topological torus | `TopologicalTorus.standardLoop`, `TopologicalTorus.winding`, `TopologicalTorus.standardLoop_homotopic`, `TopologicalTorus.standardLoop_homotopic_sequentialLoop`, `TopologicalTorus.equivIntProd`, `TopologicalTorus.certificate` |
 
-The root import hub includes all nine topological modules, and the complete
+The root import hub includes the topological modules, and the complete
 repository build checks them together. The implementation uses no custom
 axiom declarations and no unfinished proofs. Every new module also contains
 an explicit computational `Path` or `RwEq` witness, so the topology layer is
@@ -458,8 +462,9 @@ met.
 - At least one result upgrades an abstract equivalence to a homeomorphism.
 - Compact-Hausdorff compatibility and the discrete finite-presentation
   corollary are proved as a positive ordinary-pullback class.
-- The effective normal-form criterion is proved and instantiated by the
-  finite-generator circle and torus reductions.
+- The normal-form criterion is proved; finite-generator trace-code and
+  commuting-square certificates are checked, while the minimal circle and
+  torus reductions are presented mathematically.
 - The circle and genuine torus examples include covering-space winding
   classifications and explicit nondegeneracy/completeness witnesses.
 
@@ -520,12 +525,12 @@ The Phase 0 contract has now been carried through its implementation baseline:
 - comparison preserves the groupoid operations and is continuous;
 - compact-Hausdorff and discrete positive ordinary-pullback theorems are
   checked;
-- the effective normal-form certificate is checked and instantiated on the
-  based circle fiber;
+- the normal-form certificate is checked and instantiated on the based circle
+  fiber, with a separate finite-generator trace-code completion;
 - the comparison is explicitly bridged to a realized fundamental-groupoid
   arrow carrier, and the universal presentation is homeomorphic to it;
 - the topological-circle loop example has explicit zero/add/neg rewrite rules,
-  generator soundness, induction normalization, an effective based normal-form
+  generator soundness, induction normalization, a based normal-form
   certificate, a continuous arrow-space map, an integer winding normal form,
   a proved nondegeneracy theorem, and an unconditional final-domain groupoid
   certificate;
@@ -533,6 +538,9 @@ The Phase 0 contract has now been carried through its implementation baseline:
   a path-level round-trip certificate.
 
 The standalone manuscript source is now `main.tex` and has been compiled from
-this directory. The reproducible Lean artifact and the manuscript PDF are
-packaged separately; independent mathematical review remains an external
-submission step, not an unresolved Lean theorem.
+this directory. The preceding public Lean artifact is tagged
+`topological-paper-v3` and archived at DOI `10.5281/zenodo.21816790`; the
+finite-generator and torus-bridge additions in this revision require a new
+immutable snapshot before submission. The reproducible Lean artifact and the
+manuscript PDF are packaged separately; independent mathematical review
+remains an external submission step, not an unresolved Lean theorem.

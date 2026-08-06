@@ -61,6 +61,7 @@ import ComputationalPaths.Path.Topology.ScopedGeometricRewriteFunctor
 import ComputationalPaths.Path.Topology.ScopedGeometricRewriteHawaiianEarring
 import ComputationalPaths.Path.Topology.ScopedGeometricRewriteCircle
 import ComputationalPaths.Path.Topology.TopologicalTorusScoped
+import ComputationalPaths.Path.Topology.FiniteCircleTorusPresentation
 import ComputationalPaths.Path.OmegaGroupoidCompPaths
 import ComputationalPaths.Path.Rewriting
 import ComputationalPaths.Path.Transport

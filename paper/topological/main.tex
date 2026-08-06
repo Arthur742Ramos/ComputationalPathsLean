@@ -61,7 +61,7 @@
 
 \renewcommand{\shortauthors}{Ramos et al.}
 
-\subjclass[2020]{Primary 03B38, 18N10, 54B30; Secondary 55Q05, 68V15}
+\subjclass[2020]{Primary 22A22, 54B15; Secondary 03B38, 55Q05, 68V20, 54B30}
 \keywords{computational paths, rewriting, fundamental groupoid, quotient topology, topological groupoid}
 
 \begin{document}
@@ -91,10 +91,11 @@ The realization map to geometric homotopy classes is continuous and faithful
 exactly under geometric completeness.  A continuous section identifies the
 universal coherent-path quotient with the usual quotient-topologized
 fundamental groupoid.  Normal-form certificates reduce completeness to
-terminating normalization plus semantic separation.  As validation,
+normalization plus semantic separation.  As validation,
 finite-generator based-loop presentations for the circle and torus recover
-$\mathbb Z$ and $\mathbb Z^2$.  A Lean 4.24.0 development checks the theorem
-package; the mathematical presentation is independent of the implementation.
+$\mathbb Z$ and $\mathbb Z^2$.  A Lean 4.24.0 development checks the general
+semantic framework and finite-generator presentation data; the mathematical
+winding reductions are stated independently of the implementation.
 \end{abstract}
 
 \maketitle
@@ -109,6 +110,7 @@ Tiago M. L. de Veras: Departamento de Matem\'atica, Universidade Federal
 Rural de Pernambuco, Brazil; \texttt{tiago.veras@ufrpe.br}\\[2pt]
 \emph{Corresponding author: Arthur Freitas Ramos}
 \end{center}
+\enlargethispage{7pt}
 
 \section{Introduction}
 
@@ -222,15 +224,16 @@ The contributions are grouped conceptually as follows.
   compact-Hausdorff and discrete results give positive cases, while the
   Hawaiian earring gives a strict negative case.
 \item We prove functoriality, the realization comparison, the universal
-  presentation theorem, and an effective normal-form criterion for geometric
+  presentation theorem, and a normal-form criterion for geometric
   completeness.  The comparison preserves the final composable-domain
   operation, not only a set-level map on arrows.
 \item We apply the normal-form criterion on the based-loop fibers of the
   additive circle and the genuine topological torus, obtaining $\Z$ and
   $\Z^2$ classifications from winding normal forms.  These are validation
   cases for the semantic framework, not new calculations of the classical
-  fundamental groups.  A Lean 4.24.0 artifact checks the theorem package while
-  the mathematical arguments remain independent of the implementation.
+  fundamental groups.  The Lean 4.24.0 artifact checks the general semantic
+  interfaces and finite-generator presentation data; the winding arguments
+  remain independent of the implementation.
 \end{enumerate}
 
 Our earlier work supplies the ingredients that this paper organizes into a
@@ -547,7 +550,8 @@ given homotopies at the common breakpoint $1/2$ gives
 \]
 Combining these homotopies proves the claim when all weights are positive.
 If a weight is zero, first use the assumed endpoint-fixed homotopy to replace
-the corresponding factor by the constant path at its endpoint; the stated
+the corresponding factor by the constant path at its endpoint.  Such a factor
+has coinciding endpoints by the zero-slot hypothesis, so the stated
 convention then deletes that constant factor.  When the zero/nonzero status
 changes between the two sides, this replacement inserts or removes the factor
 up to endpoint-fixed homotopy.  The remaining positive-weight factors are
@@ -567,7 +571,8 @@ witness.  Symmetry and transitivity use symmetry and vertical composition of
 endpoint-fixed homotopies.  In the concatenation-congruence case, apply the
 weighted concatenation invariance lemma to the two inductive homotopies and
 the four trace lengths; this accounts for rewrites that change word length.
-For reversal, reverse the homotopy parameter.  Unit, associativity,
+For reversal, reverse the path parameter, replacing a homotopy $H(s,t)$ by
+$H(s,1-t)$.  Unit, associativity,
 double-reversal, and reversal of a composite are literal equalities for the
 flat word realization, hence use reflexive homotopies.  The two
 inverse-cancellation cases use the standard
@@ -794,31 +799,6 @@ chosen representative quotient, so the failure of the ordinary product
 remains visible.  No general identification of these two remedies is claimed.
 \end{remark}
 
-\begin{figure}[ht]
-\centering
-\[
-\begin{array}{ccc}
- T^{(2)} & \xrightarrow{\ q_{\Fin}^{(2)}\ } &
- G_{\mathcal P}^{(2),\Fin}\\[3pt]
- \bigg\downarrow {q_{\Ord}^{(2)}} & &
- \bigg\downarrow {j}\\[3pt]
- G_{\mathcal P}^{(2),\Ord} & = & G_{\mathcal P}^{(2),\Ord}
-\end{array}
-\]
-The map $j$ is always continuous; it is a homeomorphism exactly under the
-equivalent conditions of Theorem~4.2, which are also exactly the conditions
-under which the reverse identity $G_{\mathcal P}^{(2),\Ord}\to
-G_{\mathcal P}^{(2),\Fin}$ is continuous.  The upper quotient is therefore
-the unconditional composition domain, while the lower pullback is the
-ordinary topological-groupoid domain.
-\caption{Final versus ordinary composable-pair topologies.}
-% Alt text: A commutative square compares the quotient of explicitly composable
-% representatives with the ordinary pullback of quotient arrows.  The upper
-% quotient maps to the lower pullback through the canonical map j.
-\label{fig:final-ordinary}
-\end{figure}
-\FloatBarrier
-
 \begin{proof}
 Since $q_{\Fin}^{(2)}$ is quotient and
 $q_{\Ord}^{(2)}=j\circ q_{\Fin}^{(2)}$, the composite $q_{\Ord}^{(2)}$ is
@@ -835,6 +815,31 @@ underlying set.  Finally, when these conditions hold, multiplication is
 continuous by the quotient criterion applied to its continuous
 representative-level concatenation.
 \end{proof}
+
+\begin{figure}[p]
+\centering
+\[
+\begin{array}{ccc}
+ T^{(2)} & \xrightarrow{\ q_{\Fin}^{(2)}\ } &
+ G_{\mathcal P}^{(2),\Fin}\\[3pt]
+ \bigg\downarrow {q_{\Ord}^{(2)}} & &
+ \bigg\downarrow {j}\\[3pt]
+ G_{\mathcal P}^{(2),\Ord} & = & G_{\mathcal P}^{(2),\Ord}
+\end{array}
+\]
+The map $j$ is always continuous; it is a homeomorphism exactly under the
+equivalent conditions of Theorem~4.3, which are also exactly the conditions
+under which the reverse identity $G_{\mathcal P}^{(2),\Ord}\to
+G_{\mathcal P}^{(2),\Fin}$ is continuous.  The upper quotient is therefore
+the unconditional composition domain, while the lower pullback is the
+ordinary topological-groupoid domain.
+\caption{Final versus ordinary composable-pair topologies.}
+% Alt text: A commutative square compares the quotient of explicitly composable
+% representatives with the ordinary pullback of quotient arrows.  The upper
+% quotient maps to the lower pullback through the canonical map j.
+\label{fig:final-ordinary}
+\end{figure}
+\FloatBarrier
 
 \begin{proposition}[open-map criterion]
 If the bijection from the final composable quotient to the ordinary pair space
@@ -959,6 +964,9 @@ Let $\mathcal P$ and $\mathcal Q$ be presentations on $(X,E)$ and $(Y,F)$.
 A presentation map consists of a continuous map $f:X\to Y$, a continuous
 step map preserving endpoints and realizations, and a proof that every named
 rule of $\mathcal P$ maps to a scoped derivation in $\mathcal Q$.
+Presentation maps form a category: the identity has the identity space and step
+maps, and composition is the composite of the corresponding space and step
+maps, with the scoped-derivation proofs composed by induction.
 
 \begin{theorem}[functoriality]
 Every presentation map $F:\mathcal P\to\mathcal Q$ induces a continuous map
@@ -1089,8 +1097,8 @@ Since $h$ is quotient and $q$ is continuous, $S$ is continuous.  The two
 composites are identity maps by quotient induction.
 \end{proof}
 
-\begin{definition}[effective normal-form certificate]
-An effective normal-form certificate for $\mathcal P$ consists of a set
+\begin{definition}[normal-form certificate]
+A normal-form certificate for $\mathcal P$ consists of a set
 $\mathsf{NF}$ of proof-irrelevant normal-form codes, a representative map
 $\nu:\mathsf{NF}\to T$, and a normalizer $N:T\to\mathsf{NF}$ such that,
 for all raw coherent paths $u,v$,
@@ -1108,7 +1116,7 @@ rewrite equivalence.
 \end{definition}
 
 \begin{theorem}[normal-form completeness criterion]
-An effective normal-form certificate implies geometric completeness.  Therefore
+A normal-form certificate implies geometric completeness.  Therefore
 the realization comparison is faithful and is a homeomorphism on arrow spaces.
 \end{theorem}
 
@@ -1235,7 +1243,7 @@ realization
 The formal reversal supplies $a^{-1}$; no integer-indexed primitive step is
 assumed.  A based trace is therefore a finite signed word in $a$ and
 $a^{-1}$.  No additional cancellation generator is needed: the structural
-inverse coherences in Definition~2.4 instantiate to
+inverse coherences in Definition~2.6 instantiate to
 \(a;a^{-1}\RwEq1_0\) and \(a^{-1};a\RwEq1_0\), and are closed under the
 scoped congruence.
 
@@ -1276,7 +1284,7 @@ For example, the cancellation mechanism gives the concrete scoped reduction
 The first step cancels the initial $a;a^{-1}$ pair and the second cancels the
 remaining $a^{-1};a$ pair.
 
-The reduction lemma is the effective normal-form certificate from
+The reduction lemma is the normal-form certificate from
 Section~6: the reduction derivation gives clause (a), and the lifted endpoint
 gives clause (b).  Thus the
 minimal circle presentation is geometrically complete on its based loop
@@ -1298,6 +1306,11 @@ build the integer classification into the primitive syntax.
 Let $L$ be the quotient of coherent based circle loops by endpoint-fixed
 homotopy.  The map sending a loop class to its winding number and the map
 sending $n$ to the standard loop class are inverse maps.
+Under the completeness conclusion below, write
+\[
+  S_0:L\longrightarrow G_{\mathcal P}(0,0)
+\]
+for the inverse of the realization comparison on the based-loop fiber.
 
 \begin{theorem}[circle winding classification]
 The finite-generator scoped presentation is geometrically complete on the
@@ -1305,10 +1318,9 @@ based loop fiber, and there is an equivalence
 \[
   L\simeq\Z.
 \]
-The induced continuous map from $L$ into the scoped arrow carrier is
-injective, and its image is exactly the source-target fiber over the base
-point.  In particular the scoped presentation is nondegenerate: the images of
-the zero and one winding loops are distinct.
+The map $S_0$ is continuous and injective, and its image is exactly the
+source-target fiber over the base point.  In particular the scoped presentation
+is nondegenerate: the images of the zero and one winding loops are distinct.
 \end{theorem}
 
 \begin{proof}
@@ -1382,6 +1394,28 @@ For a short worked instance, sorting and cancellation give
 The first step uses the commuting square, the second cancels $b;b^{-1}$,
 and the last step displays the resulting $(2,1)$ winding pair.
 
+\begin{lemma}[simultaneous and sequential torus representatives]
+\label{lem:torus-sequential}
+Let
+\[
+  d_{m,n}(t)=([mt],[nt])
+\]
+be the simultaneous standard loop, and let $|a^m;b^n|$ be the equal-slot
+realization of the sequential word.  Then
+\[
+  d_{m,n}\simeq_{\partial I}|a^m;b^n|.
+\]
+\end{lemma}
+
+\begin{proof}
+Choose lifts of both loops to paths in $\mathbb R^2$ beginning at $(0,0)$.
+The lift of $d_{m,n}$ is $t\mapsto(mt,nt)$, while the lift of the sequential
+equal-slot realization is piecewise linear.  Both lifts end at $(m,n)$.
+The straight-line interpolation between these two lifted paths is therefore
+fixed at both endpoints.  Composing it with the covering map
+$\mathbb R^2\to\mathbb T^2$ gives the required endpoint-fixed homotopy.
+\end{proof}
+
 \begin{theorem}[torus winding classification]
 For the actual topological torus, the quotient $L_{\mathbb T^2}$ of based
 coherent loops by endpoint-fixed homotopy satisfies
@@ -1402,10 +1436,12 @@ The lift of a based loop has endpoint $(m,n)\in\mathbb Z^2$, and endpoint-fixed
 homotopy preserves this pair.  Conversely, the two coordinate projections of
 any based torus loop are circle loops; the circle lifting theorem gives
 endpoint-fixed homotopies to the standard loops of windings $m$ and $n$.
-Taking their product gives a homotopy to $a^m;b^n$.  Thus the coordinate
-winding pair classifies geometric loops.  The word reduction above gives the
-corresponding scoped derivation, so the normal-form criterion proves geometric
-completeness and injectivity.
+Taking their product gives a homotopy to the simultaneous loop $d_{m,n}$;
+Lemma~\ref{lem:torus-sequential} then gives a homotopy to the sequential
+realization $|a^m;b^n|$.  Thus the coordinate winding pair classifies
+geometric loops.  The word reduction above gives the corresponding scoped
+derivation, so the normal-form criterion proves geometric completeness and
+injectivity.
 \end{proof}
 
 This example is genuinely topological: the two coordinates are realized by
@@ -1419,21 +1455,21 @@ discrete-topology claim is made for the geometric torus loop space.
 
 \subsection{Relation to previous computational-path work}
 
-Earlier work develops the calculus, its higher coherence, and particular
-fundamental-group calculations
+Earlier work develops the computational-path calculus, its higher coherence,
+and particular fundamental-group calculations
 \cite{RamosDeQueirozDeOliveira2016propositional,Ramos2017identity,
 RamosDeQueirozDeOliveiraDeVeras2018explicit,
 RamosDeQueirozDeOliveira2021calculation,
 RamosDeQueirozDeOliveira2021fundamental,
-DeVerasRamosDeQueirozDeOliveira2025weak,RamosEtAl2025OmegaPreprint}; the
-topological application, Lean development, and Seifert--van Kampen preprint
-provide geometric and formal case studies
+DeVerasRamosDeQueirozDeOliveira2025weak,RamosEtAl2025OmegaPreprint}.  The
+present paper adds the semantic layer: scoped derivations are proof terms,
+$G_{\mathcal P}$ is their presented groupoid semantics, and soundness is
+separated from completeness.  Normalization is therefore a proof-normalization
+interface rather than a replacement for the presentation, while the universal
+case records the collapse from syntactic scope to ambient semantic equality.
+The topological and Lean developments are supporting case studies
 \cite{DeVerasRamosDeQueirozDeOliveira2025topological,
-RamosEtAl2025LeanPreprint,RamosEtAl2025SVKPreprint}.  The precise distinction
-is that this paper supplies the general continuous quotient semantics and the
-comparison between the final and ordinary composable topologies, together
-with the universal-property and completeness interfaces needed to host those
-calculations.
+RamosEtAl2025LeanPreprint,RamosEtAl2025SVKPreprint}.
 
 \subsection{Logic, rewriting, and semantic scope}
 
@@ -1468,12 +1504,20 @@ computational traces at the presented level \cite{MacLane98,Brown06}.
 The mathematical statements above are independent of the implementation.  A
 Lean 4.24.0 development with Mathlib 4.24.0 checks the construction in the
 scoped-rewrite modules.
-The Lean artifact now checks the transfer argument in
-\LeanName{ScopedGeometricRewriteHawaiianEarring}:
+The Lean artifact now checks the transfer argument in the dedicated
+Hawaiian-earring module:
 an externally supplied non-quotient product map forces failure of ordinary
 pullback compatibility, and external multiplication discontinuity transfers
 through a homeomorphic comparison.  Fabel's classical Hawaiian-earring facts
 remain external inputs rather than being reproved in Lean.
+The finite-generator data are checked separately in
+\LeanName{FiniteCircleTorusPresentation}: it uses one primitive circle
+generator and two primitive torus generators, proves their integer and
+integer-pair trace codes, packages the corresponding finite-carrier completion
+certificates, and proves soundness of the torus commuting square.  The
+manuscript's minimal cancellation-only circle reduction and its
+commutation-generated torus normalizer remain mathematical proofs rather than
+claims about the completed integer-indexed certificate.
 The separate genuine-torus certificate is in
 \LeanName{ComputationalPaths/Path/Topology/TopologicalTorusScoped.lean}.
 The root import hub is \LeanName{ComputationalPaths.lean}.  The principal
@@ -1481,71 +1525,46 @@ declaration layers are listed in Table~\ref{tab:declarations}.
 
 \begin{table}[p]
 \centering
-\scriptsize
+\small
 \begin{tabular}{>{\raggedright\arraybackslash}p{0.29\linewidth}>{\raggedright\arraybackslash}p{0.63\linewidth}}
 \toprule
-Mathematical layer & Checked implementation declarations\\
+Mathematical layer & Representative checked declarations\\
 \midrule
-Presentation and soundness &
+Scoped syntax and soundness &
 \LeanName{ScopedGeometricRewritePresentation},
 \LeanName{ScopedRwEq}, \LeanName{ScopedRwEq.sound}\\
-Weighted realization bridge &
+Weighted realization &
 \LeanName{WeightedSlotReparam}, \LeanName{balancedSlotReparam},
 \LeanName{weightedConcatenationInvariant}\\
-Quotient and final domain &
-\LeanName{scopedEquivalent}, \LeanName{ScopedClass},
-\LeanName{ScopedComposableClass}, \LeanName{scopedCompositionOnStrong}\\
-Groupoid and topology &
-\LeanName{ScopedStrongComposablePair},
-\LeanName{TopologicalWeakCompPathCertificate},
-\LeanName{topologicalWeakCompPathCertificate},
-\LeanName{TotalOpenGeometricCompPath.continuous_totalRefl},
-\LeanName{TotalOpenGeometricCompPath.continuous_totalTrans},
-\LeanName{TotalOpenGeometricCompPath.continuous_totalSymm},
+Quotient groupoid and topology &
+\LeanName{ScopedComposableClass},
+\LeanName{scopedCompositionOnStrong},
 \LeanName{scopedFinalTopologicalGroupoidCertificate}\\
-Ordinary-pullback compatibility &
+Ordinary/final comparison &
 \LeanName{scopedProductCompatibility_iff_four_way},
-\LeanName{scopedProductCompatibility_of_open_pair_map},
-\LeanName{scopedProductCompatibility_of_compact_final_t2},
-\LeanName{scopedProductCompatibility_of_discrete_arrow_and_final_domain}\\
-Comparison and completeness &
-\LeanName{toGeometricClass}, \LeanName{toGeometricStrongPair},
+\LeanName{scopedProductCompatibility_of_compact_final_t2}\\
+Comparison and normal forms &
 \LeanName{ComparisonFunctorCertificate},
 \LeanName{comparisonHomeomorph_of_complete},
-\LeanName{ScopedGeometricNormalFormCertificate},
-\LeanName{geometricCompleteness_of_normalForm}\\
-Hawaiian-earring transfer &
+\LeanName{ScopedGeometricNormalFormCertificate}\\
+Universal and obstruction cases &
+\LeanName{universalHomeomorph},
 \LeanName{QuotientObstructionTransfer},
-\LeanName{QuotientObstructionTransfer.external_isQuotientMap_of_source_isQuotientMap},
-\LeanName{QuotientObstructionTransfer.not_isQuotientMap_quotientMap},
-\LeanName{MultiplicationComparison},
-\LeanName{MultiplicationComparison.not_source_continuous_of_not_external_continuous},
-\LeanName{ScopedGeometricRewrite.not_productQuotientCompatibility_of_transfer},
-\LeanName{ScopedGeometricRewrite.not_final_topology_agreement_of_transfer}\\
-Universal completion &
-\LeanName{universalPresentation},
-\LeanName{universalScopedEquivalent_iff_totalEquivalent},
-\LeanName{universalHomeomorph}\\
-Fundamental-groupoid bridge &
-\LeanName{RealizedFundamentalArrow},
-\LeanName{RealizedFundamentalGroupoidCertificate},
-\LeanName{universalRealizedFundamentalArrowHomeomorph}\\
-Circle &
-\LeanName{circleLoopRule}, \LeanName{circleTrace_normalizes},
-\LeanName{circleLoopEquivInt},
-\LeanName{circleBasedNormalCode},
-\LeanName{circleBasedNormalRepresentative},
-\LeanName{circleBasedNormalCode_scoped},
-\LeanName{circleBasedNormalCode_eq_of_homotopic},
+\LeanName{MultiplicationComparison}\\
+Finite-generator presentation data &
+\LeanName{FiniteCircleTorusPresentation.circleFinitePresentation},
+\LeanName{FiniteCircleTorusPresentation.circleCompletionEquivInt},
+\LeanName{FiniteCircleTorusPresentation.torusFinitePresentation},
+\LeanName{FiniteCircleTorusPresentation.torusCompletionEquivIntProd},
+\LeanName{FiniteCircleTorusPresentation.torusFiniteCommutingSquare}\\
+Completed circle and genuine torus &
 \LeanName{circleBasedNormalFormCertificate},
-\LeanName{circleFinalTopologicalGroupoidCertificate}\\
-Actual topological torus &
+\LeanName{TopologicalTorus.standardLoop_homotopic_sequentialLoop},
 \LeanName{TopologicalTorus.equivIntProd},
-\LeanName{TopologicalTorus.standardLoop_homotopic},
 \LeanName{TopologicalTorus.certificate}\\
 \bottomrule
 \end{tabular}
-\caption{Theorem-to-declaration map for the artifact.}
+\caption{Representative theorem-to-declaration map; the complete map is in the artifact README.}
 \label{tab:declarations}
 \end{table}
 
@@ -1560,6 +1579,15 @@ concrete positive-slot specialization used by the flat-word model.  Thus the
 artifact checks the corresponding soundness and quotient interfaces while the
 manuscript presents the flat-word strictification at the mathematical level.
 
+The finite-generator module uses a one-letter circle alphabet and a two-letter
+torus alphabet, so its trace-code certificates do not silently replace the
+finite syntax by integer-indexed primitive steps.  Its completion relation is
+an explicit normal-form interface; the cancellation-only circle derivation and
+the commutation-generated torus derivation in Section~8 remain the mathematical
+presentation-level proofs.  The declaration map therefore distinguishes the
+finite presentation data from the completed integer and ordinary topological
+certificates.
+
 The realized fundamental-groupoid bridge identifies the quotient of realized
 open paths with the range of the endpoint-and-homotopy code in Mathlib's
 fundamental groupoid.  Its certificate includes explicit carrier membership
@@ -1568,20 +1596,23 @@ contains the continuous strong-pair map and final-composition equation, so the
 formalized comparison is a groupoid morphism on the same final domain as the
 mathematical theorem.
 
-The Lean artifact accompanying this manuscript is archived as
+The preceding Lean artifact snapshot is archived as
 \href{https://doi.org/10.5281/zenodo.21816790}
 {\nolinkurl{doi:10.5281/zenodo.21816790}} and corresponds to the immutable tag
 \texttt{topological-paper-v3} in the
 \href{https://github.com/Arthur742Ramos/ComputationalPathsLean}{GitHub repository}.
-The literal root reproducibility command is \texttt{lake build}; focused module
-commands are listed in the artifact README and can be run independently.
+This revision adds the finite-generator module and the torus
+simultaneous/sequential bridge, so those changes require a new immutable tag
+and archive before submission.  The literal root reproducibility command is
+\texttt{lake build}; focused module commands are listed in the artifact README
+and can be run independently.
 
 The checked modules contain no unfinished proofs and no custom axiom
 declarations.  Declaration-level axiom inspection reports only Lean's standard
 logical and quotient principles, namely propositional extensionality,
 classical choice, and quotient soundness.  The artifact is evidence for the
-stated theorem package and complements formalization work on computational
-paths and the Lean theorem prover
+checked part of the theorem package and for the finite-generator interfaces;
+it complements formalization work on computational paths and the Lean theorem prover
 \cite{deMoura2021,RamosEtAl2025LeanPreprint,RamosEtAl2025OmegaPreprint};
 it is not used as a substitute for the mathematical definitions or arguments
 in the main text.
@@ -1605,7 +1636,7 @@ The universal presentation identifies ordinary quotient-topologized
 fundamental groupoids as geometric completions of scoped trace systems.  The
 compact-Hausdorff and discrete finite-presentation theorems give positive
 ordinary-pullback classes, while the Hawaiian earring shows that the
-final/ordinary distinction can be strict.  The effective normal-form criterion
+final/ordinary distinction can be strict.  The normal-form criterion
 turns concrete reductions into geometric completeness.  The finite-generator
 circle and genuine torus based-loop calculations validate that the framework
 retains nontrivial topological information without silently identifying scoped
