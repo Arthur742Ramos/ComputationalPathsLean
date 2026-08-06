@@ -104,6 +104,6 @@ The checked output is published at
 `output/pdf/topological-computational-paths-v14.pdf`.
 
 The exact source snapshot for the released Lean artifact is the immutable tag
-`topological-paper-v3` in
+`topological-paper-v4` in
 `https://github.com/Arthur742Ramos/ComputationalPathsLean`. The archived
-artifact has DOI [`10.5281/zenodo.21816790`](https://doi.org/10.5281/zenodo.21816790).
+artifact has DOI [`10.5281/zenodo.21817208`](https://doi.org/10.5281/zenodo.21817208).

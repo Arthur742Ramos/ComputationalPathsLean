@@ -412,9 +412,9 @@ implementation architecture. The appendix and artifact may provide:
 - a statement that the checked development introduces no custom axioms and no
   unfinished proofs; and
 - the immutable source snapshot for the released artifact.  It is the tag
-  `topological-paper-v3` in the public repository
+  `topological-paper-v4` in the public repository
   `https://github.com/Arthur742Ramos/ComputationalPathsLean`, archived at
-  DOI `10.5281/zenodo.21816790`.
+  DOI `10.5281/zenodo.21817208`.
 
 Implementation-specific certificate records, source-file names, and phase
 labels do not belong in theorem statements or the mathematical narrative.
@@ -538,9 +538,8 @@ The Phase 0 contract has now been carried through its implementation baseline:
   a path-level round-trip certificate.
 
 The standalone manuscript source is now `main.tex` and has been compiled from
-this directory. The preceding public Lean artifact is tagged
-`topological-paper-v3` and archived at DOI `10.5281/zenodo.21816790`; the
-finite-generator and torus-bridge additions in this revision require a new
-immutable snapshot before submission. The reproducible Lean artifact and the
+this directory. The current public Lean artifact is tagged
+`topological-paper-v4` and archived at DOI `10.5281/zenodo.21817208`. The
+reproducible Lean artifact and the
 manuscript PDF are packaged separately; independent mathematical review
 remains an external submission step, not an unresolved Lean theorem.
