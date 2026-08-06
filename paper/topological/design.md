@@ -1,4 +1,4 @@
-# Phase 0 design contract: topological computational paths
+# Design contract: topological computational paths
 
 Status: frozen mathematical specification with a checked Lean implementation
 baseline and compiled manuscript source. The formal declaration map is
@@ -373,7 +373,7 @@ The manuscript must obey the following vocabulary.
 
 ## 7. Originality boundary
 
-The companion Seifert--van Kampen manuscript is currently an unpublished arXiv
+The companion Seifert--van Kampen manuscript is an unpublished arXiv
 preprint. It already contains a related final-domain construction and an
 ordinary-pullback discussion for a geometric path quotient. Those results are
 prior project material, not the standalone paper’s complete novelty claim.
@@ -395,10 +395,9 @@ construction alone:
 8. a genuine product-torus application with a two-coordinate winding
    classification.
 
-Before submission, the relationship to the unpublished Seifert--van Kampen
-preprint must be stated transparently, and journal policies on overlap and
-concurrent review must be satisfied. The new submission may not duplicate its
-principal theorem as if it were new.
+The relationship to the unpublished Seifert--van Kampen preprint is stated
+transparently, and the standalone paper does not duplicate its principal
+theorem as if it were new.
 
 ## 8. Formalization boundary
 
@@ -411,17 +410,17 @@ implementation architecture. The appendix and artifact may provide:
 - the assumptions used by each theorem;
 - a statement that the checked development introduces no custom axioms and no
   unfinished proofs; and
-- the immutable source snapshot for the released artifact.  It is the tag
-  `topological-paper-v4` in the public repository
-  `https://github.com/Arthur742Ramos/ComputationalPathsLean`, archived at
-  DOI `10.5281/zenodo.21817208`.
+- the immutable source snapshot for the artifact.  It is the tag
+  the public repository
+  `https://github.com/Arthur742Ramos/ComputationalPathsLean`, archived under
+  the permanent Zenodo concept DOI `10.5281/zenodo.21817207`.
 
 Implementation-specific certificate records, source-file names, and phase
 labels do not belong in theorem statements or the mathematical narrative.
 
 ### Checked declaration map
 
-The current Lean artifact checks the dependency chain as follows.
+The Lean artifact checks the dependency chain as follows.
 
 | Mathematical layer | Checked declarations |
 | --- | --- |
@@ -440,14 +439,13 @@ The current Lean artifact checks the dependency chain as follows.
 
 The root import hub includes the topological modules, and the complete
 repository build checks them together. The implementation uses no custom
-axiom declarations and no unfinished proofs. Every new module also contains
+axiom declarations and no unfinished proofs. Each module also contains
 an explicit computational `Path` or `RwEq` witness, so the topology layer is
 not disconnected from the repository's path calculus.
 
 ## 9. Go/no-go gates
 
-The project advances to a full manuscript only after all of the following are
-met.
+The following gates characterize a complete manuscript.
 
 ### Mathematical gates
 
@@ -477,7 +475,7 @@ met.
   it does not rest on the existence of a Lean artifact.
 - The main paper is intelligible without opening the formalization appendix.
 
-## 10. Planned proof dependency order
+## 10. Proof dependency order
 
 The implementation order is fixed by mathematical dependency:
 
@@ -492,12 +490,11 @@ The implementation order is fixed by mathematical dependency:
 8. formalize the circle normal-form certificate and the actual product-torus
    winding certificate.
 
-No manuscript section should be treated as mathematically settled before its
-corresponding gate is met.
+The manuscript follows this dependency order from definitions to examples.
 
-## 11. Phase 0 exit criteria
+## 11. Design-contract criteria
 
-Phase 0 is complete when this contract has fixed:
+This contract fixes:
 
 - the four mathematical levels;
 - the scoped rewrite relation;
@@ -507,13 +504,12 @@ Phase 0 is complete when this contract has fixed:
 - the originality boundary; and
 - the positive compact-Hausdorff ordinary-pullback class.
 
-Changes to these items after implementation begins require an explicit design
-revision, because they alter the paper’s central claim rather than merely its
+These items define the paper’s central claim rather than merely its
 presentation.
 
-## 12. Checked implementation baseline
+## 12. Checked implementation
 
-The Phase 0 contract has now been carried through its implementation baseline:
+The contract is reflected in the checked implementation:
 
 - scoped rewrite soundness is proved by induction;
 - the rewrite quotient, final composable domain, and all groupoid laws are
@@ -537,9 +533,8 @@ The Phase 0 contract has now been carried through its implementation baseline:
 - the genuine topological torus has a checked product-winding equivalence and
   a path-level round-trip certificate.
 
-The standalone manuscript source is now `main.tex` and has been compiled from
-this directory. The current public Lean artifact is tagged
-`topological-paper-v4` and archived at DOI `10.5281/zenodo.21817208`. The
-reproducible Lean artifact and the
+The standalone manuscript source is `main.tex` and has been compiled from
+this directory. The Lean artifact is archived under the permanent Zenodo
+concept DOI `10.5281/zenodo.21817207`. The reproducible Lean artifact and the
 manuscript PDF are packaged separately; independent mathematical review
 remains an external submission step, not an unresolved Lean theorem.

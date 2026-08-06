@@ -26,7 +26,7 @@ soundness, trace normalization, the continuous scoped-arrow map, and the
 integer winding equivalence.  The realized fundamental-groupoid bridge also
 proves carrier closure for identities, reversal, and composition.
 
-The strengthened artifact additionally checks:
+The artifact also checks:
 
 - `scopedProductCompatibility_of_compact_final_t2` and the discrete positive
   ordinary-pullback theorem;
@@ -75,7 +75,7 @@ lake build ComputationalPaths.Path.Topology.TopologicalTorusScoped
 lake build ComputationalPaths.Path.Topology.FiniteCircleTorusPresentation
 ```
 
-Declaration-level audits for the new implementation are:
+Declaration-level audits for these implementation modules are:
 
 ```text
 rg -n '^[[:space:]]*(sorry|admit|axiom)' \
@@ -103,7 +103,8 @@ latexmk -pdf -interaction=nonstopmode -halt-on-error main.tex
 The checked output is published at
 `output/pdf/topological-computational-paths-v14.pdf`.
 
-The exact source snapshot for the released Lean artifact is the immutable tag
-`topological-paper-v4` in
-`https://github.com/Arthur742Ramos/ComputationalPathsLean`. The archived
-artifact has DOI [`10.5281/zenodo.21817208`](https://doi.org/10.5281/zenodo.21817208).
+The exact source snapshot for the artifact is archived under the permanent
+Zenodo concept DOI
+[`10.5281/zenodo.21817207`](https://doi.org/10.5281/zenodo.21817207) and is
+available in the repository at
+`https://github.com/Arthur742Ramos/ComputationalPathsLean`.
