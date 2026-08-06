@@ -816,7 +816,7 @@ continuous by the quotient criterion applied to its continuous
 representative-level concatenation.
 \end{proof}
 
-\begin{figure}[p]
+\begin{figure}[htbp]
 \centering
 \[
 \begin{array}{ccc}
@@ -1257,8 +1257,9 @@ Every signed word $w$ has a finite scoped derivation
 \[
   w\RwEq c_{\operatorname{exp}(w)}.
 \]
-Moreover, two canonical words are scoped equivalent only when their
-exponents are equal after geometric realization.
+If two canonical words have endpoint-fixed homotopic realizations, then their
+exponents are equal.  In particular, scoped-equivalent canonical words have
+equal exponents by soundness.
 \end{lemma}
 
 \begin{proof}
@@ -1384,6 +1385,8 @@ terminating derivation
   w\RwEq a^{m(w)};b^{n(w)}.
 \]
 The pair $(m(w),n(w))$ is invariant under every scoped rule.
+Each signed commutation strictly decreases the number of pairs in which a
+$b^{\pm1}$-letter occurs to the left of an $a^{\pm1}$-letter.
 For a short worked instance, sorting and cancellation give
 \[
   b;a;b^{-1};a;b
@@ -1513,8 +1516,9 @@ remain external inputs rather than being reproved in Lean.
 The finite-generator data are checked separately in
 \LeanName{FiniteCircleTorusPresentation}: it uses one primitive circle
 generator and two primitive torus generators, proves their integer and
-integer-pair trace codes, packages the corresponding finite-carrier completion
-certificates, and proves soundness of the torus commuting square.  The
+integer-pair trace codes, packages completion certificates for the
+finite-generator trace carriers, and proves soundness of the torus commuting
+square.  The
 manuscript's minimal cancellation-only circle reduction and its
 commutation-generated torus normalizer remain mathematical proofs rather than
 claims about the completed integer-indexed certificate.
@@ -1523,7 +1527,7 @@ The separate genuine-torus certificate is in
 The root import hub is \LeanName{ComputationalPaths.lean}.  The principal
 declaration layers are listed in Table~\ref{tab:declarations}.
 
-\begin{table}[p]
+\begin{table}[htbp]
 \centering
 \small
 \begin{tabular}{>{\raggedright\arraybackslash}p{0.29\linewidth}>{\raggedright\arraybackslash}p{0.63\linewidth}}

@@ -410,8 +410,8 @@ implementation architecture. The appendix and artifact may provide:
 - the assumptions used by each theorem;
 - a statement that the checked development introduces no custom axioms and no
   unfinished proofs; and
-- the immutable source snapshot for the artifact.  It is the tag
-  the public repository
+- the immutable source snapshot for the artifact: tag
+  `topological-paper-v6` in the public repository
   `https://github.com/Arthur742Ramos/ComputationalPathsLean`, archived under
   the permanent Zenodo concept DOI `10.5281/zenodo.21817207`.
 

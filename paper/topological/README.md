@@ -101,9 +101,10 @@ latexmk -pdf -interaction=nonstopmode -halt-on-error main.tex
 ```
 
 The checked output is published at
-`output/pdf/topological-computational-paths-v14.pdf`.
+`output/pdf/topological-computational-paths-v15.pdf`.
 
-The exact source snapshot for the artifact is archived under the permanent
+The exact source snapshot for this paper artifact is the tag
+`topological-paper-v6` in the public repository, archived under the permanent
 Zenodo concept DOI
 [`10.5281/zenodo.21817207`](https://doi.org/10.5281/zenodo.21817207) and is
 available in the repository at
