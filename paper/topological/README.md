@@ -92,6 +92,6 @@ The checked output is published at
 `output/pdf/topological-computational-paths.pdf`.
 
 The exact source snapshot for the released Lean artifact is the immutable tag
-`topological-paper-v2` in
+`topological-paper-v3` in
 `https://github.com/Arthur742Ramos/ComputationalPathsLean`. The archived
-artifact has DOI [`10.5281/zenodo.21797011`](https://doi.org/10.5281/zenodo.21797011).
+artifact has DOI [`10.5281/zenodo.21816790`](https://doi.org/10.5281/zenodo.21816790).
