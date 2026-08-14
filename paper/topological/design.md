@@ -445,7 +445,7 @@ implementation architecture. The appendix and artifact may provide:
 - a statement that the checked development introduces no custom axioms and no
   unfinished proofs; and
 - the immutable source snapshot for the artifact: tag
-  `topological-paper-v7` in the public repository
+  `topological-paper-v8` in the public repository
   `https://github.com/Arthur742Ramos/ComputationalPathsLean`, archived under
   the permanent Zenodo concept DOI `10.5281/zenodo.21817207`.
 
@@ -573,8 +573,8 @@ The contract is reflected in the checked implementation:
   topology can distinguish two generators whose observable code agrees.
 
 The standalone manuscript source is `main.tex` and has been compiled from
-this directory. The Lean-only artifact is version `0.6.0+lean-only-v2`,
-archived at Zenodo DOI `10.5281/zenodo.21937506`; the permanent concept DOI is
+this directory. The Lean-only artifact is version `0.6.1+lean-only-v3`,
+archived at Zenodo DOI `10.5281/zenodo.21938980`; the permanent concept DOI is
 `10.5281/zenodo.21817207`. The reproducible Lean artifact and the manuscript
 PDF are packaged separately; independent mathematical review remains an
 external submission step, not an unresolved Lean theorem.

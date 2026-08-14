@@ -113,12 +113,12 @@ latexmk -pdf -interaction=nonstopmode -halt-on-error main.tex
 ```
 
 The checked output is published at
-`output/pdf/topological-computational-paths-v16.pdf`.
+`output/pdf/topological-computational-paths-v17.pdf`.
 
 The exact source snapshot for this paper artifact is the tag
-`topological-paper-v7` in the public repository.  The accompanying Lean-only
-artifact is version `0.6.0+lean-only-v2` at
-[`10.5281/zenodo.21937506`](https://doi.org/10.5281/zenodo.21937506); the
+`topological-paper-v8` in the public repository.  The accompanying Lean-only
+artifact is version `0.6.1+lean-only-v3` at
+[`10.5281/zenodo.21938980`](https://doi.org/10.5281/zenodo.21938980); the
 permanent concept DOI is
 [`10.5281/zenodo.21817207`](https://doi.org/10.5281/zenodo.21817207).  The
 paper source is available in the repository at
