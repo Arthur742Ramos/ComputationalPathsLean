@@ -370,12 +370,14 @@ explicit corollary class.
 
 The actual additive circle is presented from one oriented generator and inverse
 cancellation; its normal forms are derived integer powers and its based loop
-quotient is \(\mathbb Z\). The actual torus is presented from two coordinate
-generators, inverse cancellation, and the commuting square; its based loop
-quotient is \(\mathbb Z^2\). Both completeness proofs use the corresponding
-covering-space winding invariants. The Lean artifact records the finite-generator
-presentation data, the completed circle normal-form certificate, the sound torus
-commuting square, and the genuine product-torus certificate. The minimal
+quotient is \(\mathbb Z\), with a bijective homeomorphism to the scoped based
+fiber. The actual torus is presented from two coordinate generators, inverse
+cancellation, and the commuting square; its based loop quotient is
+\(\mathbb Z^2\), again with a bijective homeomorphism to the scoped based
+fiber. Both completeness proofs use the corresponding covering-space winding
+invariants. The Lean artifact records the finite-generator presentation data,
+the completed circle normal-form certificate, the sound torus commuting square,
+and the genuine product-torus certificate. The minimal
 cancellation/commutation derivations remain mathematical presentation-level
 proofs.
 
@@ -445,7 +447,7 @@ implementation architecture. The appendix and artifact may provide:
 - a statement that the checked development introduces no custom axioms and no
   unfinished proofs; and
 - the immutable source snapshot for the artifact: tag
-  `topological-paper-v8` in the public repository
+  `topological-paper-v9` in the public repository
   `https://github.com/Arthur742Ramos/ComputationalPathsLean`, archived under
   the permanent Zenodo concept DOI `10.5281/zenodo.21817207`.
 

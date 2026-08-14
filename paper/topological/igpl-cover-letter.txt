@@ -37,7 +37,7 @@ soundness-and-completeness interface.
 
 We believe the paper is well suited to the journal’s interests in logic,
 rewriting, type theory, logic and computation, and formalized mathematics.  The
-paper is 29 pages in the submitted PDF.  The accompanying Lean 4.24.0 artifact,
+paper is 30 pages in the submitted PDF.  The accompanying Lean 4.24.0 artifact,
 version 0.6.1+lean-only-v3, is available through the version-specific Zenodo
 record https://doi.org/10.5281/zenodo.21938980 and permanent concept DOI
 https://doi.org/10.5281/zenodo.21817207, with the corresponding source in the

@@ -598,11 +598,16 @@ separated.
 
 The observable codes of $u_e$ and $u_f$ are identical: both have the same
 endpoints, length, realization, and coherent representative.  They are
-therefore topologically indistinguishable in $T_{\mathrm{obs}}$.  Since no
-scoped rule identifies them, and the reduced-word invariant for the structural
-unit, associativity, and cancellation coherences keeps the two one-letter
-words distinct; hence their quotient classes remain distinct, but the
-singleton $\{q_{\mathrm{obs}}(u_e)\}$ is not open.  Consequently the
+therefore topologically indistinguishable in $T_{\mathrm{obs}}$.  To make the
+remaining scoped distinction explicit, let
+\[
+  \Phi:\{e^{\pm1},f^{\pm1}\}^{*}\longrightarrow F(e,f)
+\]
+be the word-evaluation map into the free group on $e$ and $f$.  The structural
+unit, associativity, double-inverse, and cancellation coherences preserve
+$\Phi$, whereas $\Phi(e)=e\neq f=\Phi(f)$ in $F(e,f)$.  Since there is no
+named rewrite relating $e$ and $f$, their scoped classes remain distinct, but
+the singleton $\{q_{\mathrm{obs}}(u_e)\}$ is not open.  Consequently the
 continuous bijection
 \[
   J:G_{\mathcal P}^{\mathrm{tr}}\longrightarrow
@@ -1345,6 +1350,7 @@ $u,v$, equality of their geometric quotient codes implies scoped equivalence:
 \end{definition}
 
 \begin{theorem}[faithfulness and homeomorphism]
+\label{thm:faithfulness-homeomorphism}
 The comparison $R_{\mathcal P}$ is faithful, equivalently injective on arrows
 because its object map is the identity, if and only if $\mathcal P$ is
 geometrically complete.  If $\mathcal P$ is geometrically complete, then
@@ -1780,14 +1786,27 @@ fixed at both endpoints.  Composing it with the covering map
 $\mathbb R^2\to\mathbb T^2$ gives the required endpoint-fixed homotopy.
 \end{proof}
 
+Let $L_{\mathbb T^2}$ be the endpoint-fixed homotopy quotient of the based
+loop space of $\mathbb T^2$, with its quotient topology.  Under geometric
+completeness, write
+\[
+  S_{\mathbb T^2}:L_{\mathbb T^2}\longrightarrow
+  G_{\mathcal P}((0,0),(0,0))
+\]
+for the inverse of the realization comparison on the based-loop fiber.
+
 \begin{theorem}[torus winding classification]
-For the actual topological torus, the quotient $L_{\mathbb T^2}$ of based
-coherent loops by endpoint-fixed homotopy satisfies
+For the actual topological torus, the quotient $L_{\mathbb T^2}$ satisfies
 \[
   L_{\mathbb T^2}\cong\Z\times\Z.
 \]
 The finite-generator scoped presentation is geometrically complete on the
-based loop fiber, and its realization comparison is injective there.
+based loop fiber.  Moreover, the inverse realization comparison
+\[
+  S_{\mathbb T^2}:L_{\mathbb T^2}\xrightarrow{\ \cong\ }
+  G_{\mathcal P}((0,0),(0,0))
+\]
+is a bijective homeomorphism.
 \end{theorem}
 
 \begin{proof}
@@ -1804,8 +1823,13 @@ Taking their product gives a homotopy to the simultaneous loop $d_{m,n}$;
 Lemma~\ref{lem:torus-sequential} then gives a homotopy to the sequential
 realization $|a^m;b^n|$.  Thus the coordinate winding pair classifies
 geometric loops.  The word reduction above gives the corresponding scoped
-derivation, so the normal-form criterion proves geometric completeness and
-injectivity.
+derivation, so the normal-form criterion proves geometric completeness.  The
+fiberwise quotient construction identifies $L_{\mathbb T^2}$ with the based
+geometric quotient, and the quotient-factorization argument in
+ Theorem~\ref{thm:faithfulness-homeomorphism} restricts to the fixed endpoint
+ fiber.  It
+therefore supplies the continuous inverse $S_{\mathbb T^2}$, proving the
+asserted bijective homeomorphism.
 \end{proof}
 
 This example is genuinely topological: the two coordinates are realized by
