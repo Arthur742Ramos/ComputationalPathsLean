@@ -16,7 +16,9 @@
 \hypersetup{
   hidelinks,
   pdftitle={Topological Semantics for Scoped Computational Paths},
-  pdfauthor={Arthur Freitas Ramos, Ruy J. G. B. de Queiroz, Anjolina Grisi de Oliveira, and Tiago M. L. de Veras}
+  pdfauthor={Arthur Freitas Ramos, Ruy J. G. B. de Queiroz, Anjolina Grisi de Oliveira, and Tiago M. L. de Veras},
+  pdfsubject={Topological semantics for scoped computational-path rewrite presentations},
+  pdfkeywords={computational paths, rewriting, fundamental groupoid, quotient topology, topological groupoid}
 }
 
 \emergencystretch=3em
@@ -74,10 +76,15 @@ topological semantics for scoped rewrite presentations whose steps have
 continuous realizations and whose named rewrites carry endpoint-fixed
 homotopies.
 
-A representative pairs a trace with a coherent interval path.  An initial
-topology records endpoints, word length, trace realization, and the chosen
-path.  Named rewrites alone generate syntactic identifications; arbitrary
-endpoint-fixed homotopies enter through a comparison map.
+A representative pairs a trace with a coherent interval path.  We put two
+canonical topologies on this same carrier: a trace-sensitive topology that
+retains the complete finite word, and a coarser observable topology that
+records endpoints, word length, trace realization, and the chosen path.  Named
+rewrites alone generate syntactic identifications; arbitrary endpoint-fixed
+homotopies enter through a comparison map.  Scoped derivations therefore
+remain explicit proof objects, and the quotient satisfies a semantic
+factorization property for continuous groupoid-valued interpretations that
+respect the declared rules.
 
 Every presentation yields a quotient arrow space with a canonical
 final-domain groupoid structure, where multiplication is continuous on the
@@ -90,12 +97,17 @@ strictly finer.  This detects a genuine product-quotient obstruction.
 The realization map to geometric homotopy classes is continuous and faithful
 exactly under geometric completeness.  A continuous section identifies the
 universal coherent-path quotient with the usual quotient-topologized
-fundamental groupoid.  Normal-form certificates reduce completeness to
-normalization plus semantic separation.  As validation,
+fundamental groupoid, and in the universal presentation it identifies the
+trace-sensitive and observable quotient topologies.  Normal-form certificates
+reduce completeness to
+normalization plus semantic separation.  This separates soundness by induction
+on derivations from the metatheoretic claim that the chosen syntax presents all
+geometric homotopies.  As validation,
 finite-generator based-loop presentations for the circle and torus recover
 $\mathbb Z$ and $\mathbb Z^2$.  A Lean 4.24.0 development checks the general
-semantic framework and finite-generator presentation data; the mathematical
-winding reductions are stated independently of the implementation.
+semantic framework, the two representative-topology interfaces, and
+finite-generator presentation data; the mathematical winding reductions are
+stated independently of the implementation.
 \end{abstract}
 
 \maketitle
@@ -209,15 +221,18 @@ and forms the scoped quotient.  The second is the realization map to geometric
 homotopy classes.  Soundness gives the forward comparison;
 normal forms or another completeness argument are needed to make it faithful.
 The notation used below follows this order: $\mathsf{Tr}_{\mathcal P}$ is the
-flat word carrier, $T$ adds a coherent ambient representative and its
-observable topology, and $G_{\mathcal P}$ is the scoped quotient arrow space.
+flat word carrier, $T$ is the common coherent carrier equipped with both a
+trace-sensitive topology $T_{\mathrm{tr}}$ and an observable topology
+$T_{\mathrm{obs}}$, and $G_{\mathcal P}$ is the scoped quotient arrow space.
 
 The contributions are grouped conceptually as follows.
 
 \begin{enumerate}[label=(\roman*),leftmargin=2.2em]
 \item We define continuous geometric rewrite presentations, their scoped
-  derivation relation, and realization soundness.  This supplies the syntax
-  and the semantic induction principle for the rest of the paper.
+  derivation relation, and realization soundness.  We equip the coherent
+  carrier with two canonical representative topologies: the full
+  trace-sensitive topology and its observable semantic coarsening, and prove
+  the continuous comparison between them.
 \item We construct the quotient arrow space and its canonical final-domain
   topological groupoid, then isolate the ordinary-pullback issue.  Four
   equivalent formulations identify the compatibility obstruction; the
@@ -225,15 +240,18 @@ The contributions are grouped conceptually as follows.
   Hawaiian earring gives a strict negative case.
 \item We prove functoriality, the realization comparison, the universal
   presentation theorem, and a normal-form criterion for geometric
-  completeness.  The comparison preserves the final composable-domain
-  operation, not only a set-level map on arrows.
+  completeness.  The universal one-letter section shows that the two
+  representative topologies collapse after universal geometric completion.
+  The comparison preserves the final composable-domain operation, not only a
+  set-level map on arrows.
 \item We apply the normal-form criterion on the based-loop fibers of the
   additive circle and the genuine topological torus, obtaining $\Z$ and
   $\Z^2$ classifications from winding normal forms.  These are validation
   cases for the semantic framework, not new calculations of the classical
   fundamental groups.  The Lean 4.24.0 artifact checks the general semantic
-  interfaces and finite-generator presentation data; the winding arguments
-  remain independent of the implementation.
+  interfaces, including the two representative topologies, and the
+  finite-generator presentation data; the winding arguments remain independent
+  of the implementation.
 \end{enumerate}
 
 Our earlier work supplies the ingredients that this paper organizes into a
@@ -275,8 +293,9 @@ theorem instead of silently replacing the quotient topology with a
 better-behaved one; Proposition~\ref{prop:hawaiian-earring} makes the
 connection explicit for the Hawaiian earring.
 
-The paper is organized as follows.  Section~2 defines geometric traces,
-scoped presentations, and realization soundness.  Section~3 constructs the
+The paper is organized as follows.  Section~2 defines geometric traces, the
+two representative topologies, scoped presentations, and realization soundness.
+Section~3 constructs the
 quotient groupoid and proves its semantic factorization property.  Section~4
 compares the final and ordinary composable-pair topologies.  Functoriality is
 treated in Section~5, and geometric comparison and completeness in Section~6.
@@ -298,7 +317,15 @@ The continuity requirement is part of the presentation data.  Let $E^+$ be a
 topological copy of $E$, let $E^-$ be a formal inverse copy, and write
 \(\widetilde E=E^+\sqcup E^-\).  On $E^+$ we use the given endpoint and
 realization maps; on $E^-$ the endpoint maps are interchanged and the
-realization is reversed.
+realization is reversed.  Thus there are continuous extensions
+\[
+  \widetilde s,\widetilde t:\widetilde E\longrightarrow X,
+  \qquad
+  \widetilde\rho:\widetilde E\longrightarrow X^I,
+\]
+whose restrictions to $E^+$ are $s,t,\rho$ and whose restrictions to the
+inverse copy (under $E^-\cong E$) are $t,s,e\mapsto\rho(e)^{-1}$,
+respectively.
 
 For composable interval paths $\alpha$ and $\beta$ and $m,n\in\N$, write
 $\alpha\star_{m,n}\beta$ for the length-weighted concatenation.  When
@@ -352,7 +379,7 @@ and define the topological trace carrier by the disjoint union
 The length map is the coproduct index.  For $p=(e_1,\ldots,e_n)\in W_n$ with
 $n\geq1$, define its realization by equal word slots,
 \[
- |p|(t)=\rho(e_i)(nt-i+1)
+ |p|(t)=\widetilde\rho(e_i)(nt-i+1)
  \quad\text{for }1\leq i\leq n,\quad
  \frac{i-1}{n}\leq t\leq\frac{i}{n}.
 \]
@@ -370,14 +397,48 @@ operations are literal on words and on the equal-slot realizations, whereas
 inverse cancellation remains a genuine endpoint-fixed homotopy.
 \end{definition}
 
-The compact-open topology gives continuous constant-path and reversal maps on
-$X^I$.  On each fixed pair of length components, the weighted operation
-$\star_{m,n}$ is continuous on the corresponding endpoint pullback; the
-length coordinates are discrete, so these operations assemble continuously
-over the coproduct.  Word concatenation and reversal are continuous on the
-corresponding endpoint pullbacks of the $W_n$.  These are the continuity facts
-used below; no continuity of a product of arbitrary quotient maps is being
-assumed.
+\begin{lemma}[continuity of trace realization]
+\label{lem:trace-realization-continuous}
+The equal-slot realization map
+\[
+  |\cdot|:\mathsf{Tr}_{\mathcal P}\longrightarrow X^I
+\]
+is continuous for the coproduct trace topology.
+\end{lemma}
+
+\begin{proof}
+On the zero-letter component $W_0=X$, the realization is the constant-path
+map.  Its adjoint $X\times I\to X$, $(a,t)\mapsto a$, is continuous, so the
+compact-open exponential law gives continuity into $X^I$.  Fix $n\geq1$.
+For each $1\leq i\leq n$, the closed slot
+\[
+  C_i=W_n\times[(i-1)/n,i/n]\subseteq W_n\times I
+\]
+supports the continuous formula
+\[
+  (p,t)\longmapsto
+  \rho(e_i(p))(nt-i+1),
+\]
+where $e_i:W_n\to\widetilde E$ is the $i$th coordinate and the inverse-copy
+interpretation of $\rho$ is understood on $E^-$.  Continuity follows from the
+continuity of $\rho$ and of evaluation for the compact-open topology.  On a
+common boundary $t=i/n$, the two formulas agree because composability gives
+\(t(e_i)=s(e_{i+1})\).  The pasting lemma therefore gives a continuous adjoint
+\(W_n\times I\to X\).  Since $I$ is compact Hausdorff, the compact-open
+exponential law gives a continuous map $W_n\to X^I$.  The coproduct
+universal property now assembles these component maps into the displayed
+realization map.
+\end{proof}
+
+The compact-open topology also gives continuous constant-path and reversal
+maps on $X^I$.  On each fixed pair of length components, the weighted
+operation $\star_{m,n}$ is continuous on the corresponding endpoint
+pullback; the length coordinates are discrete, so these operations assemble
+continuously over the coproduct.  Word concatenation and reversal are
+continuous on the corresponding endpoint pullbacks of the $W_n$.  Together
+with Lemma~\ref{lem:trace-realization-continuous}, these are the continuity
+facts used below; no continuity of a product of arbitrary quotient maps is
+being assumed.
 
 Let
 \[
@@ -396,31 +457,112 @@ while $\gamma$ is an independently chosen geometric representative observed
 by the topology.  The coherence condition connects them without turning every
 ambient homotopy into a syntactic rewrite.  The scoped quotient identifies all
 coherent representatives of the same scoped trace class.  Thus $\gamma$
-influences the representative topology and defines the raw realization map,
+influences the representative topologies and defines the raw realization map,
 although no particular choice of $\gamma$ survives in a quotient arrow.
-Equip $T$ with the \emph{initial topology} for the observable code
-\[
-  \kappa:T\longrightarrow X\times X\times\N\times X^I\times X^I,
-  \qquad
-  \kappa(p,\gamma)=(s(p),t(p),\ell(p),|p|,\gamma),
-\]
-where $\N$ is discrete; that is, $T$ carries the coarsest topology making
-$\kappa$ continuous.  Operationally, convergence in $T$ is detected through
-these observables: the endpoints control the groupoid base, the discrete
-length records the word stratum, $|p|$ observes the movement of the
-computational realization, and $\gamma$ observes the movement of the chosen
-geometric representative.  The initial topology is exactly the coarsest
-topology with these observations, while the scoped quotient relation below
-controls which computational traces are identified.
 
-The word ``coarsest'' is the relevant canonicity claim.  It is relative to the
-chosen semantic observables, not a claim that no other useful topology exists.
-For example, the subspace topology inherited from
-$\mathsf{Tr}_{\mathcal P}\times X^I$ would additionally make the complete word
-$p$ observable.  The topology used here deliberately retains only the
-endpoints, length, realization, and coherent representative needed by the
-semantic operations.  Among topologies on the same carrier making this code
-continuous, the initial topology is minimal.
+We now put two canonical topologies on this same coherent carrier.  First,
+let
+\[
+  \kappa_{\mathrm{tr}}:T\longrightarrow
+    \mathsf{Tr}_{\mathcal P}\times X^I,
+  \qquad
+  \kappa_{\mathrm{tr}}(p,\gamma)=(p,\gamma).
+\]
+The \emph{trace-sensitive topology} $T_{\mathrm{tr}}$ is the initial topology
+induced by $\kappa_{\mathrm{tr}}$; because $T$ is a subset of
+$\mathsf{Tr}_{\mathcal P}\times X^I$, this is precisely the corresponding
+subspace topology.  It makes the complete finite word a genuine topological
+coordinate.  Second, let
+\[
+  \kappa_{\mathrm{obs}}:T\longrightarrow X\times X\times\N\times X^I\times X^I,
+  \qquad
+  \kappa_{\mathrm{obs}}(p,\gamma)=(s(p),t(p),\ell(p),|p|,\gamma).
+\]
+The \emph{observable topology} $T_{\mathrm{obs}}$ is the initial topology
+induced by $\kappa_{\mathrm{obs}}$:
+it is the coarsest topology making these semantic observables continuous.
+Since the endpoint maps, length, and realization are continuous on the trace
+carrier, $\kappa_{\mathrm{obs}}$ factors continuously through
+$\kappa_{\mathrm{tr}}$.  Consequently the identity
+\[
+  i_T:T_{\mathrm{tr}}\longrightarrow T_{\mathrm{obs}}
+\]
+is continuous.  Thus $T_{\mathrm{tr}}$ is the full computational topology,
+whereas $T_{\mathrm{obs}}$ is its semantic coarsening.
+
+Unless a superscript is displayed, the remainder of Sections~3--8 uses
+$T_{\mathrm{obs}}$ and its quotient.  The trace-sensitive construction is not
+discarded: the same carrier, scoped relation, and quotient construction can be
+formed with $T_{\mathrm{tr}}$, and Proposition~\ref{prop:trace-sensitive-refinement}
+records the comparison between the resulting spaces.
+In the formulas below we suppress the subscript and write $T:=T_{\mathrm{obs}}$
+and $T^{(2)}:=T_{\mathrm{obs}}^{(2)}$.
+
+For the observable choice, write $\kappa=\kappa_{\mathrm{obs}}$.  Operationally,
+convergence in $T_{\mathrm{obs}}$ is detected through these observables: the
+endpoints control the groupoid base, the discrete length records the word
+stratum, $|p|$ observes the movement of the computational realization, and
+$\gamma$ observes the movement of the chosen geometric representative.  The
+initial topology is exactly the coarsest topology with these observations,
+while the scoped quotient relation below controls which computational traces
+are identified.
+
+The word ``coarsest'' is therefore a relative canonicity claim.  It concerns
+$T_{\mathrm{obs}}$ and its chosen semantic observables, not a claim that no
+other useful topology exists.  The trace-sensitive topology $T_{\mathrm{tr}}$
+is the canonical refinement that retains the complete computational word.
+Among topologies on the same carrier making $\kappa_{\mathrm{obs}}$ continuous,
+$T_{\mathrm{obs}}$ is minimal.
+
+For $*=\mathrm{tr},\mathrm{obs}$, define the common composable set with its
+chosen subspace topology by
+\[
+  T_*^{(2)}=\{(u,v)\in T_*\times T_*:t(u)=s(v)\}.
+\]
+
+\begin{proposition}[trace-sensitive refinement]
+\label{prop:trace-sensitive-refinement}
+Let $T_{\mathrm{tr}}$ and $T_{\mathrm{obs}}$ denote the two topologies above.
+The identity $i_T:T_{\mathrm{tr}}\to T_{\mathrm{obs}}$ is continuous, and its
+restriction to the common composable set is continuous:
+\[
+  i_T^{(2)}:T_{\mathrm{tr}}^{(2)}\longrightarrow T_{\mathrm{obs}}^{(2)}.
+\]
+Let $G_{\mathcal P}^{\mathrm{tr}}$ and $G_{\mathcal P}^{\mathrm{obs}}$ be
+the quotient arrow spaces for the same scoped relation, formed from the two
+representative topologies.  Then the identity on quotient sets induces a
+continuous bijection
+\[
+  J:G_{\mathcal P}^{\mathrm{tr}}\longrightarrow G_{\mathcal P}^{\mathrm{obs}},
+  \qquad J\,q_{\mathrm{tr}}=q_{\mathrm{obs}}\,i_T.
+\]
+The corresponding map on final composable-pair quotients is continuous as
+well.  No converse continuity, and hence no homeomorphism, is asserted
+without an additional hypothesis.
+\end{proposition}
+
+\begin{proof}
+The factorization of $\kappa_{\mathrm{obs}}$ through $\kappa_{\mathrm{tr}}$
+proves continuity of $i_T$ by the initial-topology criterion.  Restriction to
+the endpoint pullback gives $i_T^{(2)}$.  The identity preserves the scoped
+equivalence relation, so it descends to $J$.  Since
+$q_{\mathrm{tr}}$ is a quotient map and
+$J\,q_{\mathrm{tr}}=q_{\mathrm{obs}}\,i_T$ is continuous, the quotient
+criterion proves continuity of $J$.  The same argument applies to the
+componentwise final composable-pair quotients.
+\end{proof}
+
+\begin{example}[Same geometry, different computation]
+Suppose $p,q\in W_n$ have the same endpoints and the same equal-slot
+realization, and let $\gamma$ be a common coherent representative.  If
+$p\neq q$, then $(p,\gamma)$ and $(q,\gamma)$ have identical observable
+codes.  They are therefore topologically indistinguishable in
+$T_{\mathrm{obs}}$, even though the scoped quotient identifies them only when
+$p\RwEq q$.  If the trace carrier is Hausdorff, the trace-sensitive topology
+$T_{\mathrm{tr}}$ can separate these two computationally different points.
+The two topologies consequently expose different stages of the passage from
+syntax to semantics.
+\end{example}
 
 \begin{example}[One trace, two coherent representatives]
 Let $p$ be a trace and let $\gamma$ and $\delta$ be endpoint-fixed homotopic
@@ -428,35 +570,34 @@ representatives with
 \[
   \gamma\simeq_{\partial I}|p|\simeq_{\partial I}\delta.
 \]
-Then $(p,\gamma)$ and $(p,\delta)$ are both points of $T$.  The initial
+Then $(p,\gamma)$ and $(p,\delta)$ are both points of $T$.  The observable
 topology may observe the difference between their fifth coordinates, but the
 scoped quotient identifies them because the trace coordinate is the same.
 This is why a coherent representative is useful before quotienting without
 becoming extra data in a quotient arrow.
 \end{example}
 
-For $u=(p,\gamma)\in T$, put $s(u)=s(p)$ and $t(u)=t(p)$, and give
-\[
-  T^{(2)}=\{(u,v)\in T\times T:t(u)=s(v)\}
-\]
-the subspace topology from $T\times T$.
+For $u=(p,\gamma)\in T$, put $s(u)=s(p)$ and $t(u)=t(p)$.  In the
+unadorned notation used from this point onward,
+$T^{(2)}:=T_{\mathrm{obs}}^{(2)}$.
 
 \begin{lemma}[continuity of coherent operations]\label{lem:coherent-operations-continuous}
-Let $\iota:X\to T$ send $a$ to the coherent identity
-$(1_a,c_a)$, let $\sigma:T\to T$ send $(p,\gamma)$ to
+For either $*=\mathrm{tr}$ or $*=\mathrm{obs}$, let $\iota:X\to T_*$ send
+$a$ to the coherent identity $(1_a,c_a)$, let $\sigma:T_*\to T_*$ send
+$(p,\gamma)$ to
 $(p^{-1},\gamma^{-1})$, and let
 \[
-  \mu:T^{(2)}\longrightarrow T,
+  \mu_*:T_*^{(2)}\longrightarrow T_*,
   \qquad ((p,\gamma),(q,\delta))\longmapsto
     (p;q,\gamma\star_{\ell(p),\ell(q)}\delta),
 \]
-where the weighted operation uses the discrete trace lengths.  Then $\iota$,
-$\sigma$, and $\mu$ are continuous.
+where the weighted operation uses the discrete trace lengths.  Then all three
+maps are continuous.
 \end{lemma}
 
 \begin{proof}
-For the initial topology on $T$, it is enough to check continuity after
-applying $\kappa$.  The three resulting observable codes are respectively
+For $T_{\mathrm{obs}}$, it is enough to check continuity after applying
+$\kappa_{\mathrm{obs}}$.  The three resulting observable codes are respectively
 \[
   (a,a,0,c_a,c_a),
 \quad
@@ -473,9 +614,16 @@ the second uses reversal on $X^I$; and the third uses addition on the discrete
 length coordinate and continuity of the weighted operation on each fixed
 length component.  Each code depends continuously only on the observable
 codes of the input(s), so the initial-topology criterion proves continuity of
-all three operations.  Reversal and weighted concatenation preserve the
-coherence predicate by reversing and concatenating the endpoint-fixed
-homotopies.
+all three operations.  For $T_{\mathrm{tr}}$, the corresponding first
+coordinates are the continuous word maps
+$a\mapsto 1_a$, $p\mapsto p^{-1}$, and $(p,q)\mapsto p;q$ on the trace
+carrier; the second coordinates are the same continuous path operations just
+used.  The initial-topology criterion for $\kappa_{\mathrm{tr}}$ therefore
+proves continuity in the trace-sensitive topology as well.  Reversal and
+weighted concatenation preserve the coherence predicate by reversing and
+concatenating the endpoint-fixed homotopies.  In the Lean development, the
+parenthesized internal trace is flattened to a signed word precisely to check
+these first-coordinate maps.
 \end{proof}
 
 \begin{definition}[scoped presentation]
@@ -491,7 +639,7 @@ between the realizations of $p$ and $q$.
 The semantic witness is part of the presentation data.  No completeness
 condition is included in the definition.
 
-\begin{definition}[scoped rewrite equality]
+\begin{definition}[scoped rewrite equality]\label{def:scoped-rewrite-equality}
 For parallel traces, write $p\RwEq q$ for the inductively generated relation
 whose constructors are reflexivity, the named generators $R_{\mathcal P}$,
 symmetry, transitivity, congruence under concatenation and reversal, and the
@@ -655,6 +803,15 @@ The result is independent of representative choice because concatenation was
 defined through the componentwise quotient.
 \end{proof}
 
+The theorem is stated with the observable representative topology, so the
+unadorned notation $G_{\mathcal P}$ means $G_{\mathcal P}^{\mathrm{obs}}$.
+The trace-sensitive quotient $G_{\mathcal P}^{\mathrm{tr}}$ has the same
+underlying scoped arrows and the same descended algebraic operations.  The
+continuity proof is parallel because Lemma~\ref{lem:coherent-operations-continuous}
+proves continuity of the raw operations for both representative topologies;
+Proposition~\ref{prop:trace-sensitive-refinement} supplies the continuous
+comparison between the resulting quotient spaces.
+
 The quotient construction has the expected semantic universal property.  It is
 useful to state it here because it explains why the final composable-pair
 topology is the natural domain for multiplication.
@@ -701,6 +858,13 @@ needed.
 \end{proof}
 
 \section{Final and ordinary composable-pair topologies}
+
+This section uses the observable choice $G_{\mathcal P}=G_{\mathcal P}^{\mathrm{obs}}$
+and $T=T_{\mathrm{obs}}$.  Replacing these by the trace-sensitive spaces gives
+a parallel final-versus-ordinary comparison.  The continuous map $J$ of
+Proposition~\ref{prop:trace-sensitive-refinement} does not, by itself, make the
+reverse identity continuous or transfer product-quotient compatibility in
+either direction; those remain topology-specific assertions.
 
 There is another natural composable domain.  Let
 \[
@@ -834,10 +998,15 @@ G_{\mathcal P}^{(2),\Fin}$ is continuous.  The upper quotient is therefore
 the unconditional composition domain, while the lower pullback is the
 ordinary topological-groupoid domain.
 \caption{Final versus ordinary composable-pair topologies.}
-% Alt text: A commutative square compares the quotient of explicitly composable
-% representatives with the ordinary pullback of quotient arrows.  The upper
-% quotient maps to the lower pullback through the canonical map j.
 \label{fig:final-ordinary}
+\par\smallskip
+\begin{minipage}{0.92\linewidth}
+\footnotesize\textit{Alt text:} A commutative square compares the quotient of
+explicitly composable representatives with the ordinary pullback of quotient
+arrows.  The canonical bijection $j$ runs from the final quotient to the
+ordinary pullback; it is always continuous and is a homeomorphism exactly under
+product-quotient compatibility.
+\end{minipage}
 \end{figure}
 \FloatBarrier
 
@@ -867,9 +1036,8 @@ The identity map
 is a continuous bijection by the comparison theorem.  A continuous bijection
 from a compact space to a Hausdorff space is a homeomorphism: its image of
 every closed set is compact, hence closed, so its inverse is continuous.  The
-quotient map defining the final domain followed by $j$ is therefore the raw
-ordinary-pair map followed by a homeomorphism, and is a quotient map.  This is
-exactly product-quotient compatibility.
+composite $j\circ q_{\Fin}^{(2)}=q_{\Ord}^{(2)}$ is therefore a quotient map.
+This is exactly product-quotient compatibility.
 \end{proof}
 
 \begin{corollary}[finite discrete presentations]
@@ -952,6 +1120,13 @@ continuity of ordinary-product multiplication on $G_0$ would imply continuity
 on $\pi_1^q(\mathbb H,x_0)$, again contradicting Fabel's theorem.
 \end{proof}
 
+The Hawaiian-earring statement is intentionally formulated for the observable
+quotient used in the main final-versus-ordinary theorem.  The trace-sensitive
+refinement maps continuously to that quotient by
+Proposition~\ref{prop:trace-sensitive-refinement}; this does not reverse the
+comparison or assert an ordinary-pair obstruction for the finer topology
+without a separate product-quotient argument.
+
 This example is a diagnostic application rather than a new theorem about the
 Hawaiian earring: the external non-quotient result is classical, while the
 proposition locates it exactly at the comparison map $j$.  It also shows why
@@ -978,11 +1153,22 @@ composition.  The assignment preserves identity maps and composites.
 \end{theorem}
 
 \begin{proof}
-Induction on scoped rewrite derivations proves that the step map sends related
-traces to related traces.  It therefore descends through the quotient.  The
-raw map on coherent paths is continuous, so the quotient criterion gives
-continuity on arrows.  Applying the step map to reflexivity, reversal, and
-concatenation gives the corresponding preservation equations before quotienting.
+Write $f:X\to Y$ for the underlying map of spaces and $F_*p$ for the trace
+obtained by applying the step map to every letter of $p$.  The raw map is
+\[
+  \widetilde F:T_{\mathcal P}\longrightarrow T_{\mathcal Q},
+  \qquad (p,\gamma)\longmapsto(F_*p,f\circ\gamma).
+\]
+It preserves coherence because realizations are preserved by the step map and
+endpoint-fixed homotopies may be postcomposed with $f$.  It is continuous:
+on every word stratum the induced trace map is continuous, postcomposition
+$X^I\to Y^I$ is continuous for the compact-open topology, and the observable
+code of $\widetilde F(p,\gamma)$ is consequently a continuous function of the
+observable code of $(p,\gamma)$.  Induction on scoped rewrite derivations
+proves that $\widetilde F$ sends related traces to related traces.  It therefore
+descends through the quotient, and the quotient criterion gives continuity on
+arrows.  Applying the step map to reflexivity, reversal, and concatenation
+gives the corresponding preservation equations before quotienting.
 The same argument on the explicit composable carrier gives a continuous map on
 final composable domains and proves final composition preservation.  Identity
 and composite step maps are definitionally the identity and composite maps on
@@ -993,6 +1179,11 @@ The same construction gives ordinary-pair continuity for every presentation
 map.  If both source and target presentations satisfy product-quotient
 compatibility, the ordinary multiplication maps are continuous as well.  This
 is a derived theorem, not the definition of functoriality.
+For the trace-sensitive representative topology, the full-word component of
+$F_*$ is continuous on each coproduct stratum and the path component is the
+same compact-open postcomposition map.  Thus the functoriality proof has a
+parallel trace-sensitive form; the unadorned statement uses the observable
+quotient as above.
 
 \section{Geometric comparison and complete presentations}
 
@@ -1013,7 +1204,11 @@ for the quotient map.  Define the final composable geometric domain by
 The weighted concatenation invariance lemma makes representative-level
 concatenation descend to a well-defined composition on
 $H_{\mathrm{geo}}^{(2),\Fin}$, with continuity supplied by its quotient
-topology.  The realization comparison and its composable-domain map are
+topology.  Composing the coherent identity map with $h$ gives a continuous
+identity map into $H_{\mathrm{geo}}$, while coherent reversal preserves
+geometric equivalence and therefore descends continuously.  Together, these
+operations equip $H_{\mathrm{geo}}$ with its final-domain groupoid structure.
+The realization comparison and its composable-domain map are
 \[
   R_{\mathcal P}:G_{\mathcal P}\longrightarrow H_{\mathrm{geo}}
 \]
@@ -1097,6 +1292,16 @@ Since $h$ is quotient and $q$ is continuous, $S$ is continuous.  The two
 composites are identity maps by quotient induction.
 \end{proof}
 
+The comparison theorem is written for $T_{\mathrm{obs}}$.  For the
+trace-sensitive topology, the raw geometric quotient map is
+$h_{\mathrm{tr}}=h_{\mathrm{obs}}\circ i_T$, hence is continuous by
+Proposition~\ref{prop:trace-sensitive-refinement}; the same quotient
+factorization proves the corresponding $R_{\mathcal P}^{\mathrm{tr}}$ and its
+final-domain composable-pair map continuous.  Geometric completeness is a
+statement about the scoped and geometric equivalence relations, so it is
+unchanged by this choice, while the homeomorphism conclusion is understood
+with the selected quotient topology.
+
 \begin{definition}[normal-form certificate]
 A normal-form certificate for $\mathcal P$ consists of a set
 $\mathsf{NF}$ of proof-irrelevant normal-form codes, a representative map
@@ -1115,7 +1320,7 @@ their chosen representatives, so scoped reflexivity supplies the intermediate
 rewrite equivalence.
 \end{definition}
 
-\begin{theorem}[normal-form completeness criterion]
+\begin{theorem}[normal-form completeness criterion]\label{thm:normal-form-completeness}
 A normal-form certificate implies geometric completeness.  Therefore
 the realization comparison is faithful and is a homeomorphism on arrow spaces.
 \end{theorem}
@@ -1138,7 +1343,7 @@ claims follow from the comparison theorem.
 \end{proof}
 
 \begin{corollary}[fiberwise normal-form completeness]\label{cor:fiberwise-normal-form}
-For fixed endpoints $a,b\in X$, the definitions and Theorem~6.5 (the
+For fixed endpoints $a,b\in X$, the definitions and Theorem~\ref{thm:normal-form-completeness} (the
 normal-form completeness criterion) restrict verbatim to the fiber
 $T(a,b)\subseteq T$.
 In particular, a normal-form certificate on $T(a,a)$ proves geometric
@@ -1164,6 +1369,11 @@ universal presentation is complete in one step: it builds the ambient
 homotopy relation into the presentation, rather than deriving it from a
 normalizer.
 
+The universal quotient identification below is valid for either representative
+topology.  We write $T_{\mathcal U_X}$ and $G_{\mathcal U_X}$ without a
+superscript for the observable choice; the trace-sensitive version is obtained
+by replacing the carrier topology throughout.
+
 \begin{lemma}[coherent-path quotient identification]
 For the universal presentation, the projection
 \[
@@ -1180,16 +1390,21 @@ with the endpoint maps retained.
 \end{lemma}
 
 \begin{proof}
-Continuity of $\pi$ is immediate from the initial topology defined by the
-code $\kappa$.  Every $\gamma\in X^I$ has the coherent representative
+For $T_{\mathrm{obs}}$, continuity of $\pi$ is immediate from the fifth
+coordinate of $\kappa_{\mathrm{obs}}$.  For $T_{\mathrm{tr}}$, it is the
+restriction of the second projection
+$\mathsf{Tr}_{\mathcal P}\times X^I\to X^I$.  Every $\gamma\in X^I$ has the
+coherent representative
 \[
   \sigma(\gamma)=(\langle\gamma\rangle,\gamma),
 \]
 where $\langle\gamma\rangle$ is the one-letter universal trace and the
 coherence is the constant endpoint-fixed homotopy.  The map $\sigma$ is
-continuous on the one-letter coproduct component and $\pi\sigma=\mathrm{id}$.
-Thus $\pi$ is quotient: if $\pi^{-1}(U)$ is open, then
-$U=\sigma^{-1}(\pi^{-1}(U))$ is open.  The general quotient-factorization
+continuous on the one-letter coproduct component for $T_{\mathrm{tr}}$; it is
+also continuous for $T_{\mathrm{obs}}$ because its observable code is built
+continuously from $\gamma$.  Since $\pi\sigma=\mathrm{id}$, if
+$\pi^{-1}(U)$ is open then
+$U=\sigma^{-1}(\pi^{-1}(U))$ is open.  Thus $\pi$ is quotient.  The general quotient-factorization
 lemma applied to the homotopy relation now induces mutually inverse
 continuous maps between the two displayed quotient spaces.
 \end{proof}
@@ -1221,6 +1436,30 @@ geometric completeness theorem then gives the homeomorphism and groupoid
 isomorphism.
 \end{proof}
 
+\begin{corollary}[collapse of the two universal topologies]
+\label{cor:universal-topology-collapse}
+For the universal presentation, the comparison map from
+Proposition~\ref{prop:trace-sensitive-refinement}
+\[
+  J_{\mathcal U_X}:G_{\mathcal U_X}^{\mathrm{tr}}
+    \longrightarrow G_{\mathcal U_X}^{\mathrm{obs}}
+\]
+is a homeomorphism.  More precisely, both spaces are canonically
+homeomorphic to $\Pi_1^q(X)$, and these homeomorphisms identify
+$J_{\mathcal U_X}$ with the identity on path classes.
+\end{corollary}
+
+\begin{proof}
+The coherent-path quotient identification lemma applies to both representative
+topologies and identifies each universal scoped quotient with
+$\Pi_1^q(X)$.  The quotient maps are induced by the same representative
+realization $\gamma$, so the two identifications commute with the identity on
+path classes.  Hence the comparison map in
+Proposition~\ref{prop:trace-sensitive-refinement}
+is the composite of one homeomorphism with the inverse of the other, and is
+therefore a homeomorphism.
+\end{proof}
+
 \begin{remark}
 The multiplication in this completion is understood on the final composable
 domain.  This is the unconditional topological statement.  For compact final
@@ -1243,7 +1482,7 @@ realization
 The formal reversal supplies $a^{-1}$; no integer-indexed primitive step is
 assumed.  A based trace is therefore a finite signed word in $a$ and
 $a^{-1}$.  No additional cancellation generator is needed: the structural
-inverse coherences in Definition~2.6 instantiate to
+inverse coherences in Definition~\ref{def:scoped-rewrite-equality} instantiate to
 \(a;a^{-1}\RwEq1_0\) and \(a^{-1};a\RwEq1_0\), and are closed under the
 scoped congruence.
 
@@ -1507,7 +1746,7 @@ computational traces at the presented level \cite{MacLane98,Brown06}.
 The mathematical statements above are independent of the implementation.  A
 Lean 4.24.0 development with Mathlib 4.24.0 checks the construction in the
 scoped-rewrite modules.
-The Lean artifact now checks the transfer argument in the dedicated
+The Lean artifact checks the transfer argument in the dedicated
 Hawaiian-earring module:
 an externally supplied non-quotient product map forces failure of ordinary
 pullback compatibility, and external multiplication discontinuity transfers
@@ -1524,6 +1763,16 @@ commutation-generated torus normalizer remain mathematical proofs rather than
 claims about the completed integer-indexed certificate.
 The separate genuine-torus certificate is in
 \LeanName{ComputationalPaths/Path/Topology/TopologicalTorusScoped.lean}.
+The trace-sensitive representative topology is implemented in the module
+\LeanName{TraceSensitiveTopologicalCompPath}.
+That module flattens the parenthesized internal traces to signed finite words,
+proves continuity of the full trace code and full trace realization, and proves
+its continuous coarsening to the observable code.  It also checks identity,
+weighted composition, reversal, and the associated path/rewrite certificates.
+It is an explicit topology rather than a replacement for the default
+observable topology used by the earlier quotient modules.  The universal
+section and the resulting collapse of the two quotient topologies are checked
+in \LeanName{TraceSensitiveUniversalCollapse}.
 The root import hub is \LeanName{ComputationalPaths.lean}.  The principal
 declaration layers are listed in Table~\ref{tab:declarations}.
 
@@ -1540,6 +1789,13 @@ Scoped syntax and soundness &
 Weighted realization &
 \LeanName{WeightedSlotReparam}, \LeanName{balancedSlotReparam},
 \LeanName{weightedConcatenationInvariant}\\
+Trace-sensitive topology &
+\LeanName{TraceSensitiveTopologicalCompPath.lean},
+\LeanName{continuous_fullTraceRealization},
+\LeanName{continuous_traceSensitive_to_observable},
+\LeanName{traceSensitiveTopologyCertificate},
+\LeanName{TraceSensitiveQuotient.continuous_quotientComparison},
+\LeanName{TraceSensitiveQuotient.quotientComparisonHomeomorph_of_realization_section}\\
 Quotient groupoid and topology &
 \LeanName{ScopedComposableClass},
 \LeanName{scopedCompositionOnStrong},
@@ -1553,6 +1809,7 @@ Comparison and normal forms &
 \LeanName{ScopedGeometricNormalFormCertificate}\\
 Universal and obstruction cases &
 \LeanName{universalHomeomorph},
+\LeanName{ScopedGeometricRewrite.universalTraceSensitiveHomeomorph},
 \LeanName{QuotientObstructionTransfer},
 \LeanName{MultiplicationComparison}\\
 Finite-generator presentation data &
@@ -1582,6 +1839,14 @@ null-homotopy hypotheses for zero slots; the artifact also includes the
 concrete positive-slot specialization used by the flat-word model.  Thus the
 artifact checks the corresponding soundness and quotient interfaces while the
 manuscript presents the flat-word strictification at the mathematical level.
+The trace-sensitive module complements this development by exposing the full
+signed word as a topological coordinate while retaining the observable code as
+a continuous coarsening.  Its explicit certificate records the two topology
+interfaces without changing the topology instances used by the quotient
+groupoid and ordinary/final comparison modules.  The universal-collapse module
+then packages the continuous one-letter representative section and proves a
+homeomorphism between the explicitly trace-sensitive and observable universal
+quotient topologies.
 
 The finite-generator module uses a one-letter circle alphabet and a two-letter
 torus alphabet, so its trace-code certificates do not silently replace the
@@ -1600,14 +1865,18 @@ contains the continuous strong-pair map and final-composition equation, so the
 formalized comparison is a groupoid morphism on the same final domain as the
 mathematical theorem.
 
-The Lean artifact is archived under the permanent Zenodo concept DOI
+The Lean core artifact, version \texttt{0.5.5+lean-only-v1}, is archived on Zenodo
+under the version DOI
+\href{https://doi.org/10.5281/zenodo.21817877}
+{\nolinkurl{doi:10.5281/zenodo.21817877}}; its permanent concept DOI is
 \href{https://doi.org/10.5281/zenodo.21817207}
-{\nolinkurl{doi:10.5281/zenodo.21817207}} and is available in the
+{\nolinkurl{doi:10.5281/zenodo.21817207}} \cite{RamosEtAl2026TopologyArtifact}.
+The source is also available in the
 \href{https://github.com/Arthur742Ramos/ComputationalPathsLean}{GitHub repository}.
-It contains the finite-generator module and the torus
-simultaneous/sequential bridge.  The literal root reproducibility command is
-\texttt{lake build}; focused module commands are listed in the artifact README
-and can be run independently.
+It contains the finite-generator module, the torus simultaneous/sequential
+bridge, and the trace-sensitive topology module described above.  The literal
+root reproducibility command is \texttt{lake build}; focused module commands
+are listed in the artifact README and can be run independently.
 
 The checked modules contain no unfinished proofs and no custom axiom
 declarations.  Declaration-level axiom inspection reports only Lean's standard
@@ -1619,16 +1888,19 @@ it complements formalization work on computational paths and the Lean theorem pr
 it is not used as a substitute for the mathematical definitions or arguments
 in the main text.
 
+\section*{Funding}
+No external funding was received for this work.
+
 \section*{Acknowledgements}
 AI-assisted tools were used during manuscript preparation for editorial
-preparation, reference auditing, and software and documentation support.  The
-authors reviewed the resulting text and take responsibility for the final
+support, reference auditing, and assistance with software and documentation.
+The authors reviewed the resulting text and take responsibility for the final
 content.
 
 \FloatBarrier
 \section{Conclusion}
 
-Scoped computational paths provide a useful middle level between raw path
+Scoped computational paths provide a useful intermediate layer between raw path
 syntax and semantic fundamental-groupoid arrows.  The final-domain
 construction is the key topological device: it gives a fully unconditional
 groupoid multiplication while exposing, rather than hiding, the precise
@@ -1644,6 +1916,7 @@ circle and genuine torus based-loop calculations validate that the framework
 retains nontrivial topological information without silently identifying scoped
 syntax with ambient equality.
 
+\enlargethispage{3\baselineskip}
 \bibliographystyle{amsplain}
 \begingroup
 \small

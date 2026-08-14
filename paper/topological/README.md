@@ -9,7 +9,11 @@ finite-generator presentation data in
 `ComputationalPaths/Path/Topology/FiniteCircleTorusPresentation.lean`, and the
 Hawaiian-earring transfer module
 `ComputationalPaths/Path/Topology/ScopedGeometricRewriteHawaiianEarring.lean`,
-and is imported by `ComputationalPaths.lean`.
+the trace-sensitive topology module
+`ComputationalPaths/Path/Topology/TraceSensitiveTopologicalCompPath.lean`, and
+the universal-topology collapse module
+`ComputationalPaths/Path/Topology/TraceSensitiveUniversalCollapse.lean`.  The
+modules are imported by `ComputationalPaths.lean`.
 
 The implementation has two explicit levels of composition:
 
@@ -73,6 +77,8 @@ lake build ComputationalPaths.Path.Topology.ScopedGeometricRewriteHawaiianEarrin
 lake build ComputationalPaths.Path.Topology.ScopedGeometricRewriteCircle
 lake build ComputationalPaths.Path.Topology.TopologicalTorusScoped
 lake build ComputationalPaths.Path.Topology.FiniteCircleTorusPresentation
+lake build ComputationalPaths.Path.Topology.TraceSensitiveTopologicalCompPath
+lake build ComputationalPaths.Path.Topology.TraceSensitiveUniversalCollapse
 ```
 
 Declaration-level audits for these implementation modules are:
@@ -81,7 +87,9 @@ Declaration-level audits for these implementation modules are:
 rg -n '^[[:space:]]*(sorry|admit|axiom)' \
   ComputationalPaths/Path/Topology/ScopedGeometricRewrite*.lean \
   ComputationalPaths/Path/Topology/WeightedConcatenation.lean \
-  ComputationalPaths/Path/Topology/FiniteCircleTorusPresentation.lean
+  ComputationalPaths/Path/Topology/FiniteCircleTorusPresentation.lean \
+  ComputationalPaths/Path/Topology/TraceSensitiveTopologicalCompPath.lean \
+  ComputationalPaths/Path/Topology/TraceSensitiveUniversalCollapse.lean
 git diff --check
 ```
 
