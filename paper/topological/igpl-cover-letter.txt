@@ -37,9 +37,9 @@ soundness-and-completeness interface.
 
 We believe the paper is well suited to the journal’s interests in logic,
 rewriting, type theory, logic and computation, and formalized mathematics.  The
-paper is 26 pages in the submitted PDF.  The accompanying Lean 4.24.0 artifact,
-version 0.5.5+lean-only-v1, is available through the version-specific Zenodo
-record https://doi.org/10.5281/zenodo.21817877 and permanent concept DOI
+paper is 27 pages in the submitted PDF.  The accompanying Lean 4.24.0 artifact,
+version 0.6.0+lean-only-v2, is available through the version-specific Zenodo
+record https://doi.org/10.5281/zenodo.21937506 and permanent concept DOI
 https://doi.org/10.5281/zenodo.21817207, with the corresponding source in the
 ComputationalPathsLean repository:
 https://github.com/Arthur742Ramos/ComputationalPathsLean.
