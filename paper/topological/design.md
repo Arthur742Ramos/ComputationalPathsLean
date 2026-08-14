@@ -192,6 +192,19 @@ q_{\mathrm{ord}}^{(2)}=j\circ q_{\mathrm{fin}}^{(2)}.
 The map \(j\) is always continuous. The reverse identity need not be
 continuous.
 
+The distinction can occur in a finite example.  Let (X=\{*\}), let the
+primitive generator space be the discrete two-point set \(\{e,f\}\), let both
+generators realize the constant path at \(*\), and impose no scoped rewrite
+between the reduced one-letter traces (e) and (f).  The trace-sensitive
+code separates these words, while the observable code records the same
+endpoints, length, realization, and representative for both.  The identity
+from the trace-sensitive two-point topology to the observable indiscrete
+topology is continuous, but the reverse identity is not.  The scoped quotient
+therefore retains two distinct, topologically inseparable classes.  This is a
+finite separation certificate, not an appeal to a pathological infinite
+space; the Lean declaration `TraceSensitiveSeparation.certificate` checks the
+word separation, observable collapse, and the two continuity assertions.
+
 ### Definition 4.3 (product-quotient compatibility)
 
 The presentation satisfies product-quotient compatibility when
@@ -236,6 +249,12 @@ is continuous. Thus the rewrite quotient carries a canonical
 
 This terminology is deliberately weaker than “topological groupoid,” because
 the domain of multiplication need not have the ordinary pullback topology.
+
+Formally, a **final-domain topological groupoid** consists of a topological
+groupoid arrow space together with a specified topology on the set of
+composable pairs, not necessarily the ordinary pullback topology, for which
+multiplication is continuous and the groupoid laws hold.  The specified final
+domain is part of the structure.
 
 ### Theorem C (ordinary/final topology comparison)
 
@@ -322,6 +341,13 @@ rewrite traces. Its multiplication is understood through the unconditional
 final-domain construction; no ordinary-pullback assumption is part of the
 completion claim.
 
+The based-loop form is obtained fiberwise: for fixed endpoints (a,b), the
+coherent carrier is given its own subspace topology and its scoped quotient is
+given its own quotient topology.  The restricted universal projection is
+quotient by its one-letter continuous section.  Thus the fiberwise statement
+does not rely on the generally invalid inference that restricting a global
+quotient map to a fiber preserves quotientness.
+
 ### Theorem E' (normal forms)
 
 An explicit normalizer into proof-irrelevant normal-form codes, together with
@@ -395,6 +421,14 @@ construction alone:
 8. a genuine product-torus application with a two-coordinate winding
    classification.
 
+The novelty is architectural rather than a claim to have invented quotient
+topologies or recomputed the classical fundamental groups.  The standalone
+contribution integrates scoped syntax, coherent representatives, the
+trace-sensitive/observable topology comparison, the final/ordinary
+composable-pair distinction, and the soundness/completeness interface into one
+reusable semantic construction.  The circle and torus calculations validate
+that interface; they are applications, not the novelty boundary itself.
+
 The relationship to the unpublished Seifert--van Kampen preprint is stated
 transparently, and the standalone paper does not duplicate its principal
 theorem as if it were new.
@@ -429,6 +463,7 @@ The Lean artifact checks the dependency chain as follows.
 | Rewrite quotient | `scopedEquivalent`, `scopedClassTopologicalSpace`, `scopedSrc`, `scopedTgt`, `scopedSymm` |
 | Final and ordinary composable domains | `ScopedComposableClass`, `ScopedComposablePair`, `scopedCompositionFromComposable`, `ScopedStrongComposablePair`, `scopedCompositionOnStrong`, `scopedPairToOrdinary`, `scopedOrdinaryToFinal`, `scopedOrdinaryPairMap` |
 | Groupoid laws and topology comparison | `TopologicalWeakCompPathCertificate`, `topologicalWeakCompPathCertificate`, `TotalOpenGeometricCompPath.continuous_totalRefl`, `TotalOpenGeometricCompPath.continuous_totalTrans`, `TotalOpenGeometricCompPath.continuous_totalSymm`, `scopedFinalTopologicalGroupoidCertificate`, `scopedProductCompatibility_iff_four_way`, `scopedFinalOrdinaryHomeomorph`, `scopedProductCompatibility_of_open_pair_map`, `scopedProductCompatibility_of_compact_final_t2`, `scopedProductCompatibility_of_discrete_arrow_and_final_domain` |
+| Trace-sensitive topology and finite separation | `TraceSensitiveTopologicalCompPath`, `continuous_fullTraceRealization`, `continuous_traceSensitive_to_observable`, `TraceSensitiveSeparation.oneLetter_e_ne_f`, `TraceSensitiveSeparation.observableCode_e_eq_f`, `TraceSensitiveSeparation.not_continuous_observable_to_trace`, `TraceSensitiveSeparation.certificate` |
 | Geometric comparison and completeness | `toGeometricClass`, `toGeometricComposableClass`, `toGeometricStrongPair`, `toGeometricClass_composition_on_strong`, `GeometricCompleteness`, `ScopedGeometricNormalFormCertificate`, `geometricCompleteness_of_normalForm`, `toGeometricClass_injective_iff_geometricCompleteness`, `comparisonHomeomorph_of_complete`, `comparisonCompletenessCertificate`, `ComparisonFunctorCertificate` |
 | Hawaiian-earring obstruction transfer | `QuotientObstructionTransfer`, `QuotientObstructionTransfer.external_isQuotientMap_of_source_isQuotientMap`, `QuotientObstructionTransfer.not_isQuotientMap_quotientMap`, `MultiplicationComparison`, `MultiplicationComparison.not_source_continuous_of_not_external_continuous`, `ScopedGeometricRewrite.not_productQuotientCompatibility_of_transfer`, `ScopedGeometricRewrite.not_final_topology_agreement_of_transfer` |
 | Realized fundamental-groupoid bridge | `RealizedFundamentalArrow`, `realizedFundamentalArrowHomeomorph`, `PresentedRealizedFundamentalArrow`, `realizedFundamentalGroupoidArrow`, `RealizedFundamentalGroupoidCertificate`, `presentedRealizedFundamentalArrow_identity_mem`, `presentedRealizedFundamentalArrow_reversal_mem`, `presentedRealizedFundamentalArrow_composition_mem`, `universalRealizedFundamentalArrowHomeomorph` |
@@ -450,6 +485,8 @@ The following gates characterize a complete manuscript.
 ### Mathematical gates
 
 - The scoped relation is nondegenerate: parallel traces are not all identified.
+- The finite two-generator separation certificate demonstrates that the
+  trace-sensitive-to-observable comparison need not be a homeomorphism.
 - Realization soundness is proved by induction over the scoped congruence.
 - Quotient multiplication is proved continuous on \(C_{\mathrm{fin}}\).
 - The ordinary/final topology comparison is proved as an exact classification;
@@ -532,6 +569,8 @@ The contract is reflected in the checked implementation:
   certificate;
 - the genuine topological torus has a checked product-winding equivalence and
   a path-level round-trip certificate.
+- the finite trace-sensitive separation certificate checks that the full word
+  topology can distinguish two generators whose observable code agrees.
 
 The standalone manuscript source is `main.tex` and has been compiled from
 this directory. The Lean-only artifact is version `0.6.0+lean-only-v2`,

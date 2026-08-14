@@ -12,7 +12,9 @@ Hawaiian-earring transfer module
 the trace-sensitive topology module
 `ComputationalPaths/Path/Topology/TraceSensitiveTopologicalCompPath.lean`, and
 the universal-topology collapse module
-`ComputationalPaths/Path/Topology/TraceSensitiveUniversalCollapse.lean`.  The
+`ComputationalPaths/Path/Topology/TraceSensitiveUniversalCollapse.lean`, and
+the finite topology-separation certificate
+`ComputationalPaths/Path/Topology/TraceSensitiveSeparation.lean`.  The
 modules are imported by `ComputationalPaths.lean`.
 
 The implementation has two explicit levels of composition:
@@ -79,6 +81,7 @@ lake build ComputationalPaths.Path.Topology.TopologicalTorusScoped
 lake build ComputationalPaths.Path.Topology.FiniteCircleTorusPresentation
 lake build ComputationalPaths.Path.Topology.TraceSensitiveTopologicalCompPath
 lake build ComputationalPaths.Path.Topology.TraceSensitiveUniversalCollapse
+lake build ComputationalPaths.Path.Topology.TraceSensitiveSeparation
 ```
 
 Declaration-level audits for these implementation modules are:
@@ -89,7 +92,8 @@ rg -n '^[[:space:]]*(sorry|admit|axiom)' \
   ComputationalPaths/Path/Topology/WeightedConcatenation.lean \
   ComputationalPaths/Path/Topology/FiniteCircleTorusPresentation.lean \
   ComputationalPaths/Path/Topology/TraceSensitiveTopologicalCompPath.lean \
-  ComputationalPaths/Path/Topology/TraceSensitiveUniversalCollapse.lean
+  ComputationalPaths/Path/Topology/TraceSensitiveUniversalCollapse.lean \
+  ComputationalPaths/Path/Topology/TraceSensitiveSeparation.lean
 git diff --check
 ```
 

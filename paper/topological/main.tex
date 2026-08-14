@@ -95,8 +95,8 @@ compact-Hausdorff hypotheses suffice.  For the universal presentation of the
 Hawaiian earring the based-loop comparison fails: the final pair topology is
 strictly finer.  This detects a genuine product-quotient obstruction.
 
-The realization map to geometric homotopy classes is continuous and faithful
-exactly under geometric completeness.  A continuous section identifies the
+The realization map to geometric homotopy classes is always continuous and is
+faithful exactly under geometric completeness.  A continuous section identifies the
 universal coherent-path quotient with the usual quotient-topologized
 fundamental groupoid, and in the universal presentation it identifies the
 trace-sensitive and observable quotient topologies.  Normal-form certificates
@@ -254,6 +254,19 @@ The contributions are grouped conceptually as follows.
   finite-generator presentation data; the winding arguments remain independent
   of the implementation.
 \end{enumerate}
+
+The novelty claim is deliberately architectural.  Quotient factorization,
+continuous-bijection criteria, and the classical circle and torus winding
+classifications are standard ingredients in isolation.  The contribution here
+is their integration with scoped computational syntax: the same coherent
+carrier supports a trace-sensitive and an observable topology, the quotient of
+explicitly composable representatives supplies an unconditional multiplication
+domain, and the exact comparison with the ordinary pullback topology records
+when that domain can be replaced.  The semantic factorization and normal-form
+theorems then separate what is proved by the rewrite calculus from what must be
+shown geometrically.  Thus the circle and torus sections validate the general
+interface; they are not presented as new computations of classical
+fundamental groups.
 
 Our earlier work supplies the ingredients that this paper organizes into a
 topological semantics.  The identity-type and explicit-calculus papers
@@ -567,6 +580,40 @@ The two topologies consequently expose different stages of the passage from
 syntax to semantics.
 \end{example}
 
+\begin{example}[A genuine quotient-topology separation]
+\label{ex:quotient-topology-separation}
+Let $X=\{*\}$ have its unique topology, let
+$E=\{e,f\}$ be discrete, and let both primitive steps have source and target
+$*$ and realization the constant path $c_*$.  Declare no named rewrite
+relating the one-letter traces $e$ and $f$; only the structural groupoid rules
+are present.  Write
+\[
+  u_e=(e,c_*),\qquad u_f=(f,c_*),
+\]
+for the corresponding coherent points.  The trace-sensitive carrier is
+discrete in this example: every finite word stratum is finite discrete, and
+the path and coherence coordinates are singletons.  Hence the distinct
+scoped classes $q_{\mathrm{tr}}(u_e)$ and $q_{\mathrm{tr}}(u_f)$ can be
+separated.
+
+The observable codes of $u_e$ and $u_f$ are identical: both have the same
+endpoints, length, realization, and coherent representative.  They are
+therefore topologically indistinguishable in $T_{\mathrm{obs}}$.  Since no
+scoped rule identifies them, and the reduced-word invariant for the structural
+unit, associativity, and cancellation coherences keeps the two one-letter
+words distinct; hence their quotient classes remain distinct, but the
+singleton $\{q_{\mathrm{obs}}(u_e)\}$ is not open.  Consequently the
+continuous bijection
+\[
+  J:G_{\mathcal P}^{\mathrm{tr}}\longrightarrow
+    G_{\mathcal P}^{\mathrm{obs}}
+\]
+from Proposition~\ref{prop:trace-sensitive-refinement} is not a
+homeomorphism.  Thus the distinction between the two representative
+topologies survives the scoped quotient; it disappears only under additional
+hypotheses, such as the universal section of Section~7.
+\end{example}
+
 \begin{example}[One trace, two coherent representatives]
 Let $p$ be a trace and let $\gamma$ and $\delta$ be endpoint-fixed homotopic
 representatives with
@@ -662,9 +709,18 @@ available.  In particular, ambient equality of traces is not a constructor.
 \label{lem:weighted-concat-invariance}
 Let $\alpha\simeq_{\partial I}\alpha'$ and
 $\beta\simeq_{\partial I}\beta'$ be endpoint-fixed homotopies of composable
-paths.  Assume that whenever a factor carries zero weight, it is endpoint-fixed
-homotopic to the constant path at its endpoint.  For
-arbitrary $m,n,m',n'\in\N$, with the zero-length conventions above,
+paths.  Write $c_x$ for the constant path at $x$, and assume explicitly that
+\[
+\begin{aligned}
+m=0&\Rightarrow \alpha(0)=\alpha(1)\ \text{and}\ \alpha\simeq_{\partial I}c_{\alpha(0)},\\
+n=0&\Rightarrow \beta(0)=\beta(1)\ \text{and}\ \beta\simeq_{\partial I}c_{\beta(0)},\\
+m'=0&\Rightarrow \alpha'(0)=\alpha'(1)\ \text{and}\ \alpha'\simeq_{\partial I}c_{\alpha'(0)},\\
+n'=0&\Rightarrow \beta'(0)=\beta'(1)\ \text{and}\ \beta'\simeq_{\partial I}c_{\beta'(0)}.
+\end{aligned}
+\]
+Thus every zero-weight factor has coincident endpoints and is endpoint-fixed
+homotopic to the constant path at that endpoint.  For arbitrary
+$m,n,m',n'\in\N$, with the zero-length conventions above,
 \[
   \alpha\star_{m,n}\beta
   \simeq_{\partial I}
@@ -700,9 +756,9 @@ given homotopies at the common breakpoint $1/2$ gives
   \alpha'\star_{1,1}\beta'.
 \]
 Combining these homotopies proves the claim when all weights are positive.
-If a weight is zero, first use the assumed endpoint-fixed homotopy to replace
+If a weight is zero, first use the corresponding zero-slot hypothesis to replace
 the corresponding factor by the constant path at its endpoint.  Such a factor
-has coinciding endpoints by the zero-slot hypothesis, so the stated
+has coinciding endpoints by the displayed hypothesis, so the stated
 convention then deletes that constant factor.  When the zero/nonzero status
 changes between the two sides, this replacement inserts or removes the factor
 up to endpoint-fixed homotopy.  The remaining positive-weight factors are
@@ -769,6 +825,19 @@ map
 \]
 The quotient topology is chosen precisely so that this map has the required
 continuity.
+
+\begin{definition}[final-domain topological groupoid]
+Let $G\rightrightarrows X$ be a groupoid whose arrow space and structure maps
+are topological, and let $C_{\mathrm{fin}}$ be a specified topology on the set
+of composable arrow pairs $G\times_XG$.  We call this data a
+\emph{final-domain topological groupoid} when multiplication
+\[
+  m:C_{\mathrm{fin}}\longrightarrow G
+\]
+is continuous and the remaining groupoid laws hold.  The designated topology
+is part of the structure; it need not be the subspace topology inherited from
+the ordinary product $G\times G$.
+\end{definition}
 
 \begin{theorem}[canonical final-domain groupoid]
 For every continuous geometric rewrite presentation $\mathcal P$:
@@ -1085,8 +1154,15 @@ $\pi_1^q(\mathbb H,x_0)$ is not continuous \cite{Fabel11}.
 
 \begin{proposition}[Hawaiian-earring obstruction]
 \label{prop:hawaiian-earring}
-Apply the universal presentation of Section~7 fiberwise at $x_0$, giving the
-based coherent carrier $T_0$ and its scoped quotient $G_0$.  Then the ordinary
+Use the observable based fiber of the universal presentation and the
+fiberwise quotient construction of Lemma~\ref{lem:fiberwise-coherent-path-quotient}:
+\[
+  T_0:=T_{\mathcal U_{\mathbb H}}^{\mathrm{obs}}(x_0,x_0),
+  \qquad
+  G_0:=G_{\mathcal U_{\mathbb H}}^{\mathrm{obs}}(x_0,x_0),
+\]
+with quotient map $q_0:T_0\to G_0$ and projection
+$\pi_0:T_0\to\Omega$.  Then the ordinary
 pair map
 \[
   q_0\times q_0:T_0\times T_0\longrightarrow G_0\times G_0
@@ -1097,20 +1173,20 @@ ordinary product is discontinuous.
 \end{proposition}
 
 \begin{proof}
-The projection $\pi:T_0\to\Omega$, $(p,\gamma)\mapsto\gamma$, has the
-continuous section $\sigma(\gamma)=(\langle\gamma\rangle,\gamma)$ from
-Section~7.  The universal-completion homeomorphism of
-Theorem~\ref{thm:universal-completion},
+The fiberwise lemma gives that $\pi_0$ is quotient and has the continuous
+section $\sigma(\gamma)=(\langle\gamma\rangle,\gamma)$.  It also gives a
+fiberwise universal-completion homeomorphism
 \[
-  h:G_0\longrightarrow\pi_1^q(\mathbb H,x_0)
+  h:G_0\longrightarrow\pi_1^q(\mathbb H,x_0),
+  \qquad h\circ q_0=q_\Omega\circ\pi_0.
 \]
-satisfies $h\circ q_0=q_\Omega\circ\pi$.  Suppose that $q_0\times q_0$ were
+Suppose that $q_0\times q_0$ were
 quotient.  Postcomposition with the homeomorphism $h\times h$ would make
 \[
-  (q_\Omega\times q_\Omega)\circ(\pi\times\pi)
+  (q_\Omega\times q_\Omega)\circ(\pi_0\times\pi_0)
 \]
 a quotient map.  If $(q_\Omega\times q_\Omega)^{-1}(U)$ were open, its
-preimage under the continuous map $\pi\times\pi$ would therefore be open;
+preimage under the continuous map $\pi_0\times\pi_0$ would therefore be open;
 the quotient criterion for the displayed composite would force $U$ to be
 open.  Hence $q_\Omega\times q_\Omega$ would be quotient, contradicting
 Fabel's theorem.
@@ -1378,6 +1454,7 @@ superscript for the observable choice; the trace-sensitive version is obtained
 by replacing the carrier topology throughout.
 
 \begin{lemma}[coherent-path quotient identification]
+\label{lem:coherent-path-quotient-identification}
 For the universal presentation, the projection
 \[
   \pi:T_{\mathcal U_X}\longrightarrow X^I,
@@ -1410,6 +1487,44 @@ $\pi^{-1}(U)$ is open then
 $U=\sigma^{-1}(\pi^{-1}(U))$ is open.  Thus $\pi$ is quotient.  The general quotient-factorization
 lemma applied to the homotopy relation now induces mutually inverse
 continuous maps between the two displayed quotient spaces.
+\end{proof}
+
+\begin{lemma}[fiberwise coherent-path quotient]
+\label{lem:fiberwise-coherent-path-quotient}
+Fix $a,b\in X$, and let
+\[
+  X^I(a,b)=\{\gamma\in X^I:\gamma(0)=a,\ \gamma(1)=b\}
+\]
+carry its subspace topology.  For $*=\mathrm{tr},\mathrm{obs}$, define the
+based-endpoint coherent carrier
+\[
+  T_{\mathcal U_X}^{*}(a,b)=
+  \{(p,\gamma)\in T_{\mathcal U_X}^{*}:s(p)=a,\ t(p)=b\}
+\]
+with its own subspace topology, and define
+$G_{\mathcal U_X}^{*}(a,b)$ to be its quotient by scoped equivalence, with
+the quotient topology.  The restricted projection
+\[
+  \pi_{a,b}^{*}:T_{\mathcal U_X}^{*}(a,b)\longrightarrow X^I(a,b)
+\]
+is quotient.  Hence $G_{\mathcal U_X}^{*}(a,b)$ is canonically homeomorphic
+to the endpoint-fixed homotopy quotient of $X^I(a,b)$.
+\end{lemma}
+
+\begin{proof}
+The projection is continuous for either representative topology.  Its
+one-letter section
+\[
+  \sigma_{a,b}(\gamma)=(\langle\gamma\rangle,\gamma)
+\]
+lands in the fixed endpoint fiber and is continuous by the same coordinate
+argument as in Lemma~\ref{lem:coherent-path-quotient-identification}.
+If $(\pi_{a,b}^{*})^{-1}(U)$ is open, then
+$U=\sigma_{a,b}^{-1}((\pi_{a,b}^{*})^{-1}(U))$ is open.  Thus the restricted
+projection is quotient without appealing to a restriction theorem for the
+global projection.  In the universal presentation, scoped equivalence on this
+fiber is exactly endpoint-fixed homotopy, so quotient factorization gives the
+claimed homeomorphism.
 \end{proof}
 
 There are three related objects here.  The usual path-class space
@@ -1546,8 +1661,9 @@ Its named rules are the derived integer rules
 The finite-generator argument above explains why this completion does not
 build the integer classification into the primitive syntax.
 
-Let $L$ be the quotient of coherent based circle loops by endpoint-fixed
-homotopy.  The map sending a loop class to its winding number and the map
+Let $L$ be the endpoint-fixed homotopy quotient of the based circle loop space,
+with its quotient topology.  The map sending a loop class to its winding
+number and the map
 sending $n$ to the standard loop class are inverse maps.
 Under the completeness conclusion below, write
 \[
@@ -1561,9 +1677,12 @@ based loop fiber, and there is an equivalence
 \[
   L\simeq\Z.
 \]
-The map $S_0$ is continuous and injective, and its image is exactly the
-source-target fiber over the base point.  In particular the scoped presentation
-is nondegenerate: the images of the zero and one winding loops are distinct.
+Moreover, the inverse realization comparison
+\[
+  S_0:L\xrightarrow{\ \cong\ }G_{\mathcal P}(0,0)
+\]
+is a bijective homeomorphism.  In particular the scoped presentation is
+nondegenerate: the images of the zero and one winding loops are distinct.
 \end{theorem}
 
 \begin{proof}
@@ -1772,6 +1891,15 @@ That module flattens the parenthesized internal traces to signed finite words,
 proves continuity of the full trace code and full trace realization, and proves
 its continuous coarsening to the observable code.  It also checks identity,
 weighted composition, reversal, and the associated path/rewrite certificates.
+The finite two-generator separation mechanism from
+Example~\ref{ex:quotient-topology-separation} is checked independently in
+\LeanName{TraceSensitiveSeparation}: its certificate proves that the one-letter
+trace codes differ, that the observable codes agree, and that the identity from
+the discrete trace topology to the indiscrete observable topology is continuous
+while the reverse identity is not.  This is a finite code-level certificate
+for the example's topological mechanism; the mathematical statement that the
+scoped quotient retains two reduced one-letter classes uses the presentation's
+reduced-word invariant.
 It is an explicit topology rather than a replacement for the default
 observable topology used by the earlier quotient modules.  The universal
 section and the resulting collapse of the two quotient topologies are checked
@@ -1799,6 +1927,11 @@ Trace-sensitive topology &
 \LeanName{traceSensitiveTopologyCertificate},
 \LeanName{TraceSensitiveQuotient.continuous_quotientComparison},
 \LeanName{TraceSensitiveQuotient.quotientComparisonHomeomorph_of_realization_section}\\
+Finite topology separation &
+\LeanName{TraceSensitiveSeparation.oneLetter_e_ne_f},
+\LeanName{TraceSensitiveSeparation.observableCode_e_eq_f},
+\LeanName{TraceSensitiveSeparation.not_continuous_observable_to_trace},
+\LeanName{TraceSensitiveSeparation.certificate}\\
 Quotient groupoid and topology &
 \LeanName{ScopedComposableClass},
 \LeanName{scopedCompositionOnStrong},
