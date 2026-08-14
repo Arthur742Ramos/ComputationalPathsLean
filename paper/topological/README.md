@@ -116,7 +116,7 @@ The checked output is published at
 `output/pdf/topological-computational-paths-v17.pdf`.
 
 The exact source snapshot for this paper artifact is the tag
-`topological-paper-v10` in the public repository.  The accompanying Lean-only
+`topological-paper-v12` in the public repository.  The accompanying Lean-only
 artifact is version `0.6.1+lean-only-v3` at
 [`10.5281/zenodo.21938980`](https://doi.org/10.5281/zenodo.21938980); the
 permanent concept DOI is
