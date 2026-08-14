@@ -80,7 +80,8 @@ A representative pairs a trace with a coherent interval path.  We put two
 canonical topologies on this same carrier: a trace-sensitive topology that
 retains the complete finite word, and a coarser observable topology that
 records endpoints, word length, trace realization, and the chosen path.  Named
-rewrites alone generate syntactic identifications; arbitrary endpoint-fixed
+rewrites together with the structural rules generate syntactic
+identifications; arbitrary endpoint-fixed
 homotopies enter through a comparison map.  Scoped derivations therefore
 remain explicit proof objects, and the quotient satisfies a semantic
 factorization property for continuous groupoid-valued interpretations that
@@ -372,11 +373,13 @@ parenthesization or of geometric homotopy witness.
 For $n\geq 1$, let $W_n\subseteq\widetilde E^n$ be the subspace of composable
 words $(e_1,\ldots,e_n)$ satisfying
 \(t(e_i)=s(e_{i+1})\) for every $i$.  Put $W_0=X$, representing empty traces,
-and define the topological trace carrier by the disjoint union
+with both endpoint maps equal to the identity on $X$, and define the
+topological trace carrier by the disjoint union
 \[
   \mathsf{Tr}_{\mathcal P}=\coprod_{n\in\N}W_n.
 \]
-The length map is the coproduct index.  For $p=(e_1,\ldots,e_n)\in W_n$ with
+Give $\N$ the discrete topology.  The length map is the coproduct index and
+is continuous.  For $p=(e_1,\ldots,e_n)\in W_n$ with
 $n\geq1$, define its realization by equal word slots,
 \[
  |p|(t)=\widetilde\rho(e_i)(nt-i+1)
@@ -417,11 +420,11 @@ For each $1\leq i\leq n$, the closed slot
 supports the continuous formula
 \[
   (p,t)\longmapsto
-  \rho(e_i(p))(nt-i+1),
+  \widetilde\rho(e_i(p))(nt-i+1),
 \]
-where $e_i:W_n\to\widetilde E$ is the $i$th coordinate and the inverse-copy
-interpretation of $\rho$ is understood on $E^-$.  Continuity follows from the
-continuity of $\rho$ and of evaluation for the compact-open topology.  On a
+where $e_i:W_n\to\widetilde E$ is the $i$th coordinate.  Continuity follows
+from the continuity of $\widetilde\rho$ and of evaluation for the compact-open
+topology.  On a
 common boundary $t=i/n$, the two formulas agree because composability gives
 \(t(e_i)=s(e_{i+1})\).  The pasting lemma therefore gives a continuous adjoint
 \(W_n\times I\to X\).  Since $I$ is compact Hausdorff, the compact-open
