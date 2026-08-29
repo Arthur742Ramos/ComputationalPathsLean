@@ -5,9 +5,8 @@ package «computational_paths» where
   version := v!"0.1.0"
 
 require mathlib from git
-  "https://github.com/leanprover-community/mathlib4" @ "v4.24.0"
+  "https://github.com/leanprover-community/mathlib4.git" @ "v4.33.0"
 
-@[default_target]
 lean_lib ComputationalPaths where
   roots := #[`ComputationalPaths,
     `ComputationalPaths.Path.Algebra,
@@ -27,6 +26,14 @@ lean_lib ComputationalPaths where
     `ComputationalPaths.Path.Rewriting,
     `ComputationalPaths.Path.Transport,
     `ComputationalPaths.TypeFormers]
+
+@[default_target]
+lean_lib Challenge where
+  roots := #[`Challenge]
+
+@[default_target]
+lean_lib Solution where
+  roots := #[`Solution]
 
 lean_exe computational_paths where
   root := `Main

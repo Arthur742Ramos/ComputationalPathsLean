@@ -5,7 +5,6 @@ repository_root=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 cd "$repository_root"
 
 lake build
-lake build ComputationalPaths.Path.OmegaGroupoid.PalomarStatement
 lake env lean Challenge.lean
 lake env lean Solution.lean
 
@@ -23,7 +22,7 @@ if [ "$(rg -n '\bsorry\b' Challenge.lean | wc -l | tr -d ' ')" -ne 1 ]; then
 fi
 
 if rg -n '\bsorry\b|\badmit\b|^axiom |native_decide|Lean\.ofReduceBool' \
-  Solution.lean ComputationalPaths/Path/OmegaGroupoid/PalomarStatement.lean; then
+  Solution.lean; then
   echo "forbidden proof marker found in the selected proof boundary" >&2
   exit 1
 fi
@@ -37,7 +36,7 @@ fi
 ruby -rjson -e '
   config = JSON.parse(File.binread("comparator.json"))
   abort "NanoDa replay is disabled" unless config["enable_nanoda"] == true
-  expected = ["ComputationalPaths.Path.PalomarOmegaGroupoid.main_result"]
+  expected = ["ComputationalPaths.Path.PalomarOmegaGroupoid433.main_result"]
   abort "Comparator theorem target is wrong" unless config["theorem_names"] == expected
   expected_axioms = ["propext", "Quot.sound", "Classical.choice"]
   abort "Unexpected permitted axioms" unless config["permitted_axioms"] == expected_axioms
