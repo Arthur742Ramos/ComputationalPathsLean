@@ -2,20 +2,21 @@
 version: "v0.4"
 
 project:
-  name: "An Extensional 3-Truncated Weak Omega-Groupoid of Computational Paths"
+  name: "A Proof-Relevant 3-Truncated Weak Omega-Groupoid of Computational Paths"
   description: >-
-    A focused Lean formalization of the higher-cell structure carried by
-    computational paths.  The certificate keeps the trace-carrying Path
-    record at dimension one, reifies the symmetric reflexive transitive
-    closure of primitive rewrite steps as Type-valued 2-cells, supplies named
-    unit, associativity, inverse, interchange, pentagon, and triangle
-    coherences at dimension three, and exhibits parallel-cell fillers at all
-    dimensions four and above.  It also proves both directions of the
-    Derivation-2/RwEq presentation correspondence, its two round-trip laws,
-    and explicit nontriviality of trace and derivation syntax.  The result is
-    deliberately stated for Lean's extensional, proof-irrelevant setting: it
-    does not claim an intensional HoTT identity type or a constructive Squier
-    finite-derivation-type theorem.
+    A focused Lean certificate for the repository's proof-relevant
+    computational-path omega-groupoid.  It synchronizes the Type-valued
+    stabilized derivation tower with the RwEq-level weak-groupoid package.
+    The selected theorem records the exact Derivation-2/RwEq correspondence
+    and both reification round trips, a typed normalizer with a decreasing
+    core measure and core-strict output witness, explicit Mac Lane pentagon and triangle routes with proved
+    distinct primitive-edge counts and explicit local-confluence diamond
+    derivations for their coherence, inverse-cancellation coherence,
+    proof-relevant interchange, and Eckmann--Hilton commutativity of 2-loops.
+    It also records where the trace and higher derivation syntax is genuinely
+    nontrivial.  The result is deliberately stated for Lean's extensional,
+    proof-irrelevant setting: it does not claim an intensional HoTT identity
+    type or a constructive Squier finite-derivation-type theorem.
   authors:
     - "Arthur Freitas Ramos"
     - "Ruy J. G. B. de Queiroz"
@@ -42,9 +43,9 @@ sources:
     location: "The higher-cell and weak omega-groupoid sections"
     relationship: "adapts"
     note: >-
-      This submission extracts the higher-cell claim into a small,
-      statement-facing certificate and tightens its scope to the theorem
-      actually checked by the kernel.  The source snapshot is pinned to the
+      This submission selects and cross-checks the repository's native
+      proof-relevant derivation tower, stabilized omega package, and explicit
+      coherence-route modules.  The source snapshot is pinned to the
       immutable parent commit recorded below.
   - title: "Weak omega-categories from intensional type theory"
     authors:
@@ -73,32 +74,35 @@ related_formalizations:
   - id: "https://github.com/Arthur742Ramos/ComputationalPathsLean/commit/2a2baa1f31c68f0e696021db91f8381dd2854652"
     relationship: "adapts"
     note: >-
-      The focused Palomar certificate is developed in this repository from
-      the pinned parent snapshot.  The broader exploratory omega-groupoid
-      modules remain available under ComputationalPaths/Path/OmegaGroupoid/;
-      the selected result is independently stated in PalomarStatement.lean.
+      The selected result is a compact, independently stated certificate over
+      the pinned parent modules.  The full normalization and coherence
+      developments remain available under ComputationalPaths/Path/OmegaGroupoid/;
+      PalomarStatement.lean exposes their auditable theorem boundary.
 
 status:
   scope: >-
     The selected declaration is an existence certificate for every carrier
-    type A.  Its data are explicit: trace-carrying 1-cells, a complete
-    Derivation-2 presentation of RwEq, a proof-irrelevance transport connector
-    for all parallel 2-cells, named groupoid and bicategorical coherence
-    cells, and explicit fillers for every parallel 3-cell and higher cell in
-    the declared tower.  The certificate separately records trace and
-    derivation-syntax nontriviality, so the higher contraction is not being
-    presented as a collapse of the lower computational syntax.  No custom
-    axioms, sorry, admit, evaluator escape, or external mathematical input is
-    used by the selected proof.  The only reported dependencies are Lean's
-    standard `propext` and `Quot.sound` axioms.
+    type A.  Its data are explicit: trace-carrying 1-cells; a complete
+    Type-valued Derivation-2 presentation of RwEq; the native stabilized
+    higher-cell tower; a decreasing normalization measure and typed
+    normalization bridge; explicit two-route critical-pair calculations for
+    the pentagon, triangle, and inverse laws; proof-relevant interchange; and
+    Eckmann--Hilton commutativity for 2-loops.  The certificate separately
+    proves route-syntax separation and lower/higher syntax nontriviality, so
+    the higher contraction is not being offered as the sole mathematical
+    content.  No custom axioms, sorry, admit, evaluator escape, or external
+    mathematical input is used by the selected proof.  The reported
+    dependencies are Lean's standard `propext`, `Quot.sound`, and
+    `Classical.choice`, the latter occurring in the repository's existing
+    RwEq reification package.
   sorry_count: 0
   sorry_in_definitions: 0
-  axioms: ["propext", "Quot.sound"]
+  axioms: ["propext", "Quot.sound", "Classical.choice"]
   main_results:
     - declaration: "ComputationalPaths.Path.PalomarOmegaGroupoid.main_result"
       file: "Solution.lean"
       sorry_count: 0
-      axioms: ["propext", "Quot.sound"]
+      axioms: ["propext", "Quot.sound", "Classical.choice"]
       comparator_config: "comparator.json"
 
 automation:
@@ -122,30 +126,33 @@ automation:
   spend_usd: "not tracked"
   notes: >-
     The parent dependency is pinned by lean-toolchain and lake-manifest.json.
-    The focused statement module is built separately before the independent
-    Challenge and Solution modules are compiled.
+    The statement module is built separately before the independent
+    Challenge and Solution modules are compiled; the selected proof also
+    reuses the repository's checked normalization and coherence modules.
 
 fidelity:
   divergences: >-
-    The focused statement preserves the computational-path and higher-cell
-    definitions needed for the selected result while omitting the broader
-    exploratory normalization and application modules.  It makes the
-    proof-irrelevance construction the primary level-3 argument and states
-    the dimensions 4-plus fillers explicitly.  This is a scope clarification,
-    not a claim that the entire parent repository has been refactored to this
-    smaller presentation.
+    The statement-facing file is intentionally compact, but its fields refer
+    to the parent repository's native stabilized derivation tower and
+    proof-relevant weak-groupoid package rather than copying them into a new
+    interface.  It adds a finite syntax invariant for route separation and
+    exposes the exact theorem boundary; it does not claim that every theorem
+    in the broader parent repository is part of the selected result.
 
 review:
   status: "self-assessed"
   reviewers: []
   notes: >-
-    The selected proof was reviewed for exact cell indexing, endpoint
-    typing, rewrite-closure round trips, named coherence endpoints, the
-    extensional proof-irrelevance boundary, and lower-level syntax witnesses.
-    The result is not described as a constructive Squier finite-derivation
-    proof, intensional HoTT identity type, peer review, editorial approval, or
-    mathematical endorsement.  Any Palomar editorial step is an automated
-    editorial review identifying no blocking problem.
+    The selected proof was reviewed for exact cell indexing, endpoint typing,
+    rewrite-closure round trips, decreasing normalization measures, explicit
+    route lengths and separation, constructive local-confluence critical-pair
+    derivations rather than primitive pentagon/triangle labels,
+    proof-relevant interchange and Eckmann--Hilton cells, and the extensional
+    proof-irrelevance boundary.  The result is not described as a constructive
+    Squier finite-derivation proof, intensional HoTT identity type, peer
+    review, editorial approval, or mathematical endorsement.  Any Palomar
+    editorial step is an automated editorial review identifying no blocking
+    problem.
 
 alignment:
   namespace: "ComputationalPaths.Path.PalomarOmegaGroupoid"
@@ -156,25 +163,30 @@ alignment:
       status: "adapted"
       note: "The lower cell retains the explicit Step-list trace and equality proof."
     - source: "Explicit 2-cell rewrite presentation"
-      lean: "ComputationalPaths.Path.PalomarOmegaGroupoid.Derivation₂"
-      module: "ComputationalPaths/Path/OmegaGroupoid/PalomarStatement.lean"
+      lean: "ComputationalPaths.Path.OmegaGroupoid.Derivation₂"
+      module: "ComputationalPaths/Path/OmegaGroupoid.lean"
       status: "proved"
       note: "The selected certificate proves soundness, completeness, and both reification round trips against RwEq."
-    - source: "Proof-irrelevance 3-cell contraction"
-      lean: "ComputationalPaths.Path.PalomarOmegaGroupoid.contractibility₃"
-      module: "Solution.lean"
+    - source: "Typed core normalization"
+      lean: "ComputationalPaths.Path.OmegaGroupoid.CoreStep"
+      module: "ComputationalPaths/Path/OmegaGroupoid.lean"
       status: "proved"
-      note: "The connector is generated from equality of Prop-valued induced equality proofs."
-    - source: "Named higher coherence"
-      lean: "ComputationalPaths.Path.PalomarOmegaGroupoid.CoherenceCertificate"
-      module: "ComputationalPaths/Path/OmegaGroupoid/PalomarStatement.lean"
+      note: "The selected certificate records KBO/redex decrease, strict and core-strict normal forms, and a typed Derivation-3 normalization bridge."
+    - source: "Proof-relevant coherence routes"
+      lean: "ComputationalPaths.Path.OmegaGroupoidCompPaths.pentagon_coherence"
+      module: "ComputationalPaths/Path/OmegaGroupoid/GroupoidProofs.lean"
       status: "proved"
-      note: "Unit, associativity, inverse, interchange, pentagon, and triangle cells are all explicit Derivation-3 witnesses."
-    - source: "Higher-cell contraction boundary"
-      lean: "ComputationalPaths.Path.PalomarOmegaGroupoid.contractibilityHigh"
-      module: "Solution.lean"
+      note: "Pentagon, triangle, and inverse-cancellation routes are explicit RwEq syntax; the selected pentagon and triangle 3-cells are derived from local-confluence diamonds with administrative normalization cells."
+    - source: "Interchange and Eckmann--Hilton"
+      lean: "ComputationalPaths.EckmannHilton.eckmann_hilton"
+      module: "ComputationalPaths/Path/OmegaGroupoid/EckmannHiltonProof.lean"
       status: "proved"
-      note: "Every parallel 3-cell has a 4-cell and every parallel 4-cell has an n-indexed higher cell."
+      note: "The selected certificate includes proof-relevant interchange and commutativity of 2-loops."
+    - source: "Stabilized omega-groupoid tower"
+      lean: "ComputationalPaths.Path.OmegaGroupoid.Stabilization.compPathStabilizedOmegaGroupoid"
+      module: "ComputationalPaths/Path/OmegaGroupoid/Stabilization.lean"
+      status: "proved"
+      note: "The native tower is contractible from level 4 upward while retaining explicit lower-cell syntax."
 
 acknowledgements: >-
   Thanks to the authors and contributors of the Calculus of Computational

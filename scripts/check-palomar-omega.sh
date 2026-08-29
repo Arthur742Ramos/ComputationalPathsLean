@@ -39,7 +39,7 @@ ruby -rjson -e '
   abort "NanoDa replay is disabled" unless config["enable_nanoda"] == true
   expected = ["ComputationalPaths.Path.PalomarOmegaGroupoid.main_result"]
   abort "Comparator theorem target is wrong" unless config["theorem_names"] == expected
-  expected_axioms = ["propext", "Quot.sound"]
+  expected_axioms = ["propext", "Quot.sound", "Classical.choice"]
   abort "Unexpected permitted axioms" unless config["permitted_axioms"] == expected_axioms
   puts "Comparator configuration validation passed"
 '

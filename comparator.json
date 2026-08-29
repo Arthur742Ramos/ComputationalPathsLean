@@ -3,6 +3,6 @@
   "solution_module": "Solution",
   "theorem_names": ["ComputationalPaths.Path.PalomarOmegaGroupoid.main_result"],
   "definition_names": [],
-  "permitted_axioms": ["propext", "Quot.sound"],
+  "permitted_axioms": ["propext", "Quot.sound", "Classical.choice"],
   "enable_nanoda": true
 }
