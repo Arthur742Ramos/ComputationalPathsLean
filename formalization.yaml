@@ -1,0 +1,181 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/mathlib-initiative/formalization.yaml/main/schema/formalization.schema.json
+version: "v0.4"
+
+project:
+  name: "An Extensional 3-Truncated Weak Omega-Groupoid of Computational Paths"
+  description: >-
+    A focused Lean formalization of the higher-cell structure carried by
+    computational paths.  The certificate keeps the trace-carrying Path
+    record at dimension one, reifies the symmetric reflexive transitive
+    closure of primitive rewrite steps as Type-valued 2-cells, supplies named
+    unit, associativity, inverse, interchange, pentagon, and triangle
+    coherences at dimension three, and exhibits parallel-cell fillers at all
+    dimensions four and above.  It also proves both directions of the
+    Derivation-2/RwEq presentation correspondence, its two round-trip laws,
+    and explicit nontriviality of trace and derivation syntax.  The result is
+    deliberately stated for Lean's extensional, proof-irrelevant setting: it
+    does not claim an intensional HoTT identity type or a constructive Squier
+    finite-derivation-type theorem.
+  authors:
+    - "Arthur Freitas Ramos"
+    - "Ruy J. G. B. de Queiroz"
+    - "Anjolina Grisi de Oliveira"
+  license: "MIT"
+  responsible_maintainers:
+    - "Arthur Freitas Ramos"
+
+repository:
+  role: "substantive-development"
+
+classification:
+  arxiv: ["math.LO", "math.AT", "math.GN", "cs.LO"]
+  msc2020: ["03B38", "18D05", "18N50", "55Q05", "68V15"]
+
+sources:
+  - title: "Computational Paths: A Calculus of Equality"
+    authors:
+      - "Arthur Freitas Ramos"
+      - "Ruy J. G. B. de Queiroz"
+      - "Anjolina Grisi de Oliveira"
+    type: "paper"
+    id: "https://github.com/Arthur742Ramos/ComputationalPathsLean/blob/2a2baa1f31c68f0e696021db91f8381dd2854652/paper/main.tex"
+    location: "The higher-cell and weak omega-groupoid sections"
+    relationship: "adapts"
+    note: >-
+      This submission extracts the higher-cell claim into a small,
+      statement-facing certificate and tightens its scope to the theorem
+      actually checked by the kernel.  The source snapshot is pinned to the
+      immutable parent commit recorded below.
+  - title: "Weak omega-categories from intensional type theory"
+    authors:
+      - "Peter Lumsdaine"
+    type: "paper"
+    id: "https://arxiv.org/abs/0812.0409"
+    location: "Weak higher-categorical coherence from type-theoretic data"
+    relationship: "background"
+    note: >-
+      Background for the weak omega-categorical terminology; the present
+      Lean result is an extensional computational-path certificate with its
+      proof-irrelevance boundary made explicit.
+  - title: "Types are weak omega-groupoids"
+    authors:
+      - "Benno van den Berg"
+      - "Richard Garner"
+    type: "paper"
+    id: "https://doi.org/10.1112/plms/pdq026"
+    location: "Weak omega-groupoid interpretation of identity types"
+    relationship: "background"
+    note: >-
+      Background for the comparison point; no claim is made that the present
+      trace-carrying Path record is an intensional identity type.
+
+related_formalizations:
+  - id: "https://github.com/Arthur742Ramos/ComputationalPathsLean/commit/2a2baa1f31c68f0e696021db91f8381dd2854652"
+    relationship: "adapts"
+    note: >-
+      The focused Palomar certificate is developed in this repository from
+      the pinned parent snapshot.  The broader exploratory omega-groupoid
+      modules remain available under ComputationalPaths/Path/OmegaGroupoid/;
+      the selected result is independently stated in PalomarStatement.lean.
+
+status:
+  scope: >-
+    The selected declaration is an existence certificate for every carrier
+    type A.  Its data are explicit: trace-carrying 1-cells, a complete
+    Derivation-2 presentation of RwEq, a proof-irrelevance transport connector
+    for all parallel 2-cells, named groupoid and bicategorical coherence
+    cells, and explicit fillers for every parallel 3-cell and higher cell in
+    the declared tower.  The certificate separately records trace and
+    derivation-syntax nontriviality, so the higher contraction is not being
+    presented as a collapse of the lower computational syntax.  No custom
+    axioms, sorry, admit, evaluator escape, or external mathematical input is
+    used by the selected proof.  The only reported dependencies are Lean's
+    standard `propext` and `Quot.sound` axioms.
+  sorry_count: 0
+  sorry_in_definitions: 0
+  axioms: ["propext", "Quot.sound"]
+  main_results:
+    - declaration: "ComputationalPaths.Path.PalomarOmegaGroupoid.main_result"
+      file: "Solution.lean"
+      sorry_count: 0
+      axioms: ["propext", "Quot.sound"]
+      comparator_config: "comparator.json"
+
+automation:
+  methods:
+    - method: "manual"
+      tool_setup: >-
+        Mathematical scope selection, extensional-versus-intensional audit,
+        theorem-boundary design, source attribution, and metadata review.
+    - method: "agent"
+      models: ["Codex"]
+      framework: "Lean 4.24.0 and Lake"
+      tool_setup: >-
+        Focused extraction and proof review; every selected declaration is
+        checked by the Lean kernel and by an independent Challenge/Solution
+        compilation gate.
+      cost:
+        wall_time: "local development"
+        spend_usd: "not tracked"
+        hardware: "local machine"
+      prompting_notes: "Focused omega-groupoid proof, dependency audit, and Palomar packaging."
+  spend_usd: "not tracked"
+  notes: >-
+    The parent dependency is pinned by lean-toolchain and lake-manifest.json.
+    The focused statement module is built separately before the independent
+    Challenge and Solution modules are compiled.
+
+fidelity:
+  divergences: >-
+    The focused statement preserves the computational-path and higher-cell
+    definitions needed for the selected result while omitting the broader
+    exploratory normalization and application modules.  It makes the
+    proof-irrelevance construction the primary level-3 argument and states
+    the dimensions 4-plus fillers explicitly.  This is a scope clarification,
+    not a claim that the entire parent repository has been refactored to this
+    smaller presentation.
+
+review:
+  status: "self-assessed"
+  reviewers: []
+  notes: >-
+    The selected proof was reviewed for exact cell indexing, endpoint
+    typing, rewrite-closure round trips, named coherence endpoints, the
+    extensional proof-irrelevance boundary, and lower-level syntax witnesses.
+    The result is not described as a constructive Squier finite-derivation
+    proof, intensional HoTT identity type, peer review, editorial approval, or
+    mathematical endorsement.  Any Palomar editorial step is an automated
+    editorial review identifying no blocking problem.
+
+alignment:
+  namespace: "ComputationalPaths.Path.PalomarOmegaGroupoid"
+  statements:
+    - source: "Trace-carrying computational paths"
+      lean: "ComputationalPaths.Path.Path"
+      module: "ComputationalPaths/Path/Basic/Core.lean"
+      status: "adapted"
+      note: "The lower cell retains the explicit Step-list trace and equality proof."
+    - source: "Explicit 2-cell rewrite presentation"
+      lean: "ComputationalPaths.Path.PalomarOmegaGroupoid.Derivation₂"
+      module: "ComputationalPaths/Path/OmegaGroupoid/PalomarStatement.lean"
+      status: "proved"
+      note: "The selected certificate proves soundness, completeness, and both reification round trips against RwEq."
+    - source: "Proof-irrelevance 3-cell contraction"
+      lean: "ComputationalPaths.Path.PalomarOmegaGroupoid.contractibility₃"
+      module: "Solution.lean"
+      status: "proved"
+      note: "The connector is generated from equality of Prop-valued induced equality proofs."
+    - source: "Named higher coherence"
+      lean: "ComputationalPaths.Path.PalomarOmegaGroupoid.CoherenceCertificate"
+      module: "ComputationalPaths/Path/OmegaGroupoid/PalomarStatement.lean"
+      status: "proved"
+      note: "Unit, associativity, inverse, interchange, pentagon, and triangle cells are all explicit Derivation-3 witnesses."
+    - source: "Higher-cell contraction boundary"
+      lean: "ComputationalPaths.Path.PalomarOmegaGroupoid.contractibilityHigh"
+      module: "Solution.lean"
+      status: "proved"
+      note: "Every parallel 3-cell has a 4-cell and every parallel 4-cell has an n-indexed higher cell."
+
+acknowledgements: >-
+  Thanks to the authors and contributors of the Calculus of Computational
+  Paths, Lean 4, Mathlib, and the Palomar Registry tooling.

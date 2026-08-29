@@ -23,6 +23,7 @@ lean_lib ComputationalPaths where
     `ComputationalPaths.Path.HIT,
     `ComputationalPaths.Path.Homotopy,
     `ComputationalPaths.Path.OmegaGroupoidCompPaths,
+    `ComputationalPaths.Path.OmegaGroupoid.PalomarStatement,
     `ComputationalPaths.Path.Rewriting,
     `ComputationalPaths.Path.Transport,
     `ComputationalPaths.TypeFormers]
