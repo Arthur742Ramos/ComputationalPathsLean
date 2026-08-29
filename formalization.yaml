@@ -26,7 +26,7 @@ repository:
 
 classification:
   arxiv: ["math.LO", "math.AT", "math.GN", "cs.LO"]
-  msc2020: ["03B38", "18D05", "18N50", "55Q05", "68V15"]
+  msc2020: ["03B38", "18N20", "18N50", "55Q05", "68V15"]
 
 sources:
   - title: "Computational Paths: A Calculus of Equality"
