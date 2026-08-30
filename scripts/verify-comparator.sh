@@ -79,8 +79,7 @@ GOBIN="$bin_dir" go install "github.com/zouuup/landrun/cmd/landrun@$landrun_comm
 
 cd "$repository_root"
 lake exe cache get
-PALOMAR_LANDRUN_BIN="$bin_dir/landrun" \
 COMPARATOR_LEAN4EXPORT="$lean4export_dir/.lake/build/bin/lean4export" \
 COMPARATOR_NANODA="$nanoda_dir/target/release/nanoda_bin" \
-COMPARATOR_LANDRUN="$repository_root/scripts/landrun-wrapper.sh" \
+COMPARATOR_LANDRUN="$bin_dir/landrun" \
   lake env "$comparator_dir/.lake/build/bin/comparator" comparator.json
