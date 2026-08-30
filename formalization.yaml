@@ -2,17 +2,16 @@
 version: "v0.4"
 
 project:
-  name: "A Self-Contained Computational-Path Coherence Certificate"
+  name: "Proof-Relevant Associativity Rewriting for Free Magmas"
   description: >-
-    A compact, independently compilable Lean certificate for a
-    trace-carrying computational-path calculus.  The selected theorem gives
-    a Type-valued presentation of the symmetric reflexive transitive rewrite
-    closure, proves both reification round trips, exhibits explicit Mac Lane
-    pentagon and triangle routes with distinct primitive-edge counts, and
-    records their extensional coherence boundary and inverse cancellation.
-    The result is deliberately stated for Lean's extensional,
-    proof-irrelevant setting: it does not claim an intensional HoTT identity
-    type or a constructive Squier finite-derivation-type theorem.
+    A compact Lean development of directed associativity rewriting on
+    Mathlib's free magmas. It proves strict termination, constructs irreducible
+    canonical right-associated normal forms, derives global confluence, and
+    establishes soundness and completeness of the induced symmetric rewrite
+    equality against both Mathlib's free semigroup semantics and its standard
+    associativity quotient. Two explicit routes around Mac Lane's pentagon
+    have the same endpoints but retain distinct proof-relevant traces with two
+    and three primitive rotations.
   authors:
     - "Arthur Freitas Ramos"
     - "Ruy J. G. B. de Queiroz"
@@ -22,12 +21,9 @@ project:
   responsible_maintainers:
     - "Arthur Freitas Ramos"
 
-repository:
-  role: "substantive-development"
-
 classification:
-  arxiv: ["math.LO", "math.AT", "math.GN", "cs.LO"]
-  msc2020: ["03B38", "18N20", "18N50", "55Q05", "68V15"]
+  arxiv: ["math.LO", "math.CT", "cs.LO"]
+  msc2020: ["03B35", "18M05", "68Q42", "68V20"]
 
 sources:
   - title: "Computational Paths: A Calculus of Equality"
@@ -37,145 +33,187 @@ sources:
       - "Anjolina Grisi de Oliveira"
     type: "paper"
     id: "https://github.com/Arthur742Ramos/ComputationalPathsLean/blob/2a2baa1f31c68f0e696021db91f8381dd2854652/paper/main.tex"
-    location: "The higher-cell and weak omega-groupoid sections"
+    location: "Computational paths and rewrite equality"
     relationship: "adapts"
     note: >-
-      This submission adapts the computational-path notation and coherence
-      questions developed in the paper into a standalone Palomar statement
-      boundary.  The parent source snapshot is pinned to the immutable commit
-      recorded below; the selected Challenge intentionally has no import from
-      the repository's local implementation modules.
-  - title: "Weak omega-categories from intensional type theory"
+      The submission extracts the paper's proof-relevant computational-path
+      viewpoint into a standalone associativity rewrite problem over standard
+      Mathlib free objects. It does not claim that the paper already contains
+      these exact Lean termination, confluence, or quotient-completeness
+      theorems.
+  - title: "Natural associativity and commutativity"
     authors:
-      - "Peter Lumsdaine"
+      - "Saunders Mac Lane"
     type: "paper"
-    id: "https://arxiv.org/abs/0812.0409"
-    location: "Weak higher-categorical coherence from type-theoretic data"
+    id: "https://hdl.handle.net/1911/62865"
+    location: "The associativity coherence pentagon"
     relationship: "background"
     note: >-
-      Background for the weak omega-categorical terminology; the present
-      Lean result is an extensional computational-path certificate with its
-      proof-irrelevance boundary made explicit.
-  - title: "Types are weak omega-groupoids"
+      The two explicit four-input traces are the two directed routes around
+      the classical associativity pentagon.
+  - title: "Confluent Reductions: Abstract Properties and Applications to Term Rewriting Systems"
     authors:
-      - "Benno van den Berg"
-      - "Richard Garner"
+      - "Gerard Huet"
     type: "paper"
-    id: "https://doi.org/10.1112/plms/pdq026"
-    location: "Weak omega-groupoid interpretation of identity types"
+    id: "https://doi.org/10.1145/322217.322230"
+    location: "Termination and confluence of abstract reductions"
     relationship: "background"
     note: >-
-      Background for the comparison point; no claim is made that the present
-      trace-carrying Path record is an intensional identity type.
+      Standard term-rewriting context for the well-foundedness, normalization,
+      and global confluence results formalized here.
 
 related_formalizations:
-  - id: "https://github.com/Arthur742Ramos/ComputationalPathsLean/commit/2a2baa1f31c68f0e696021db91f8381dd2854652"
-    relationship: "adapts"
+  - id: "https://github.com/leanprover-community/mathlib4/blob/db584cd6d46c92f209a44c0f1c829460d327499d/Mathlib/Algebra/Free.lean"
+    relationship: "builds-on"
     note: >-
-      The selected result is a compact, independently stated certificate.  The
-      repository's larger normalization and coherence developments remain
-      available under ComputationalPaths/Path/OmegaGroupoid/, while the
-      Palomar-facing theorem has a separate standard-library-only Challenge
-      closure.
+      Mathlib supplies the standard free objects and quotient semantics. The
+      present development adds a proof-relevant directed rewrite system,
+      constructive normalization traces, confluence, and completeness.
 
 status:
   scope: >-
-    The selected declaration is an existence certificate for every carrier
-    type A.  Its data are explicit: trace-carrying 1-cells; a complete
-    Type-valued Derivation-2 presentation of RwEq; two distinct pentagon
-    routes; two distinct triangle routes; extensional boundary coherence for
-    those routes; inverse cancellation; and a concrete nontrivial trace
-    witness.  No custom axioms, admit, evaluator escape, or external
-    mathematical input is used by the selected proof.  The reported
-    dependencies are only Lean's standard `propext`, `Quot.sound`, and
-    `Classical.choice` as permitted by the Palomar contract.
+    The selected declarations cover the associativity-only rewrite calculus
+    on free magma trees: strict termination; canonical normalization and
+    irreducibility; global confluence; soundness and completeness against
+    FreeSemigroup equality; equivalence with Mathlib's associativity quotient;
+    and concrete distinct routes around Mac Lane's pentagon. The result does
+    not include units,
+    inverses, general monoidal categories, higher associahedra, or a complete
+    omega-groupoid. It makes no novelty or priority claim beyond this formal
+    integration and certificate boundary.
   sorry_count: 0
   sorry_in_definitions: 0
   axioms: ["propext", "Quot.sound", "Classical.choice"]
   main_results:
-    - declaration: "ComputationalPaths.Path.PalomarOmegaGroupoid433.main_result"
+    - declaration: "ComputationalPaths.Path.PalomarAssociativity.assocStep_wellFounded"
       file: "Solution.lean"
       sorry_count: 0
-      axioms: ["propext", "Quot.sound", "Classical.choice"]
+      axioms: ["propext", "Classical.choice", "Quot.sound"]
+      comparator_config: "comparator.json"
+    - declaration: "ComputationalPaths.Path.PalomarAssociativity.assoc_normalizes"
+      file: "Solution.lean"
+      sorry_count: 0
+      axioms: ["propext", "Quot.sound"]
+      comparator_config: "comparator.json"
+    - declaration: "ComputationalPaths.Path.PalomarAssociativity.rightComb_irreducible"
+      file: "Solution.lean"
+      sorry_count: 0
+      axioms: ["propext"]
+      comparator_config: "comparator.json"
+    - declaration: "ComputationalPaths.Path.PalomarAssociativity.assoc_reduces_confluent"
+      file: "Solution.lean"
+      sorry_count: 0
+      axioms: ["propext", "Quot.sound"]
+      comparator_config: "comparator.json"
+    - declaration: "ComputationalPaths.Path.PalomarAssociativity.assoc_rwEq_iff_freeSemigroup_eq"
+      file: "Solution.lean"
+      sorry_count: 0
+      axioms: ["propext", "Quot.sound"]
+      comparator_config: "comparator.json"
+    - declaration: "ComputationalPaths.Path.PalomarAssociativity.assoc_rwEq_iff_assocQuotient_eq"
+      file: "Solution.lean"
+      sorry_count: 0
+      axioms: ["propext", "Quot.sound"]
+      comparator_config: "comparator.json"
+    - declaration: "ComputationalPaths.Path.PalomarAssociativity.pentagon_route_counts"
+      file: "Solution.lean"
+      sorry_count: 0
+      axioms: []
+      comparator_config: "comparator.json"
+    - declaration: "ComputationalPaths.Path.PalomarAssociativity.pentagon_routes_distinct"
+      file: "Solution.lean"
+      sorry_count: 0
+      axioms: ["propext", "Quot.sound"]
       comparator_config: "comparator.json"
 
 automation:
   methods:
     - method: "manual"
       tool_setup: >-
-        Mathematical scope selection, extensional-versus-intensional audit,
-        theorem-boundary design, source attribution, and metadata review.
+        Mathematical scope selection, rewrite-system design, source audit,
+        theorem-boundary review, and metadata verification.
     - method: "agent"
       models: ["Codex"]
-      framework: "Lean 4.33.0 and Lake"
+      framework: "Lean 4.33.0, Lake, and Mathlib v4.33.0"
       tool_setup: >-
-        Focused extraction and proof review; every selected declaration is
-        checked by the Lean kernel and by an independent Challenge/Solution
-        compilation gate.
+        Proof development, focused compilation, import-closure inspection,
+        forbidden-marker checks, axiom auditing, and repository packaging.
       cost:
         wall_time: "local development"
         spend_usd: "not tracked"
         hardware: "local machine"
-      prompting_notes: "Focused omega-groupoid proof, dependency audit, and Palomar packaging."
+      prompting_notes: >-
+        Strengthen the Palomar artifact with standard-library-grounded
+        termination, normalization, confluence, completeness, and explicit
+        proof-relevant pentagon traces.
   spend_usd: "not tracked"
   notes: >-
-    The parent dependency is pinned by lean-toolchain and lake-manifest.json.
-    Challenge and Solution are compiled independently; Challenge imports only
-    Mathlib, and Solution proves the same declaration boundary without
-    relying on Challenge's deliberate statement-side hole.
+    Lean and Mathlib revisions are pinned by lean-toolchain and
+    lake-manifest.json. Challenge and Solution are compiled independently.
+    Challenge imports only Mathlib.Algebra.Free and exposes exactly eight
+    theorem holes; Solution proves all eight declarations.
 
 fidelity:
   divergences: >-
-    The statement-facing file is intentionally compact and self-contained so
-    Palomar can audit its transitive imports.  It is an explicit extraction of
-    the trace, rewrite, and coherence ideas in the parent development, not a
-    claim that every theorem in the broader repository is part of this result.
+    This is a focused associativity fragment, not a claim that the entire
+    Calculus of Computational Paths or all higher coherence laws have been
+    formalized in the selected declarations. Proof relevance here means that
+    reduction witnesses inhabit inductive Type-valued trace syntax; endpoint
+    semantic equalities remain Lean propositions.
 
 review:
   status: "self-assessed"
   reviewers: []
   notes: >-
-    The selected proof was reviewed for exact endpoint typing,
-    rewrite-closure round trips, explicit route lengths and separation,
-    inverse cancellation, and the extensional proof-irrelevance boundary.
-    The result is not described as a constructive Squier finite-derivation
-    proof, intensional HoTT identity type, peer review, editorial approval, or
-    mathematical endorsement.  Any Palomar editorial step is an automated
-    editorial review identifying no blocking problem.
+    The selected boundary was checked for decreasing-measure orientation,
+    normal-form correctness, arbitrary-peak joining, both directions of each
+    semantic characterization, exact quotient alignment, and syntactic
+    separation of the two pentagon routes. Palomar editorial review, registry
+    acceptance, and mathematical endorsement are not claimed.
 
 alignment:
-  namespace: "ComputationalPaths.Path.PalomarOmegaGroupoid433"
+  namespace: "ComputationalPaths.Path.PalomarAssociativity"
   statements:
-    - source: "Trace-carrying computational paths"
-      lean: "ComputationalPaths.Path.PalomarOmegaGroupoid433.Path"
+    - source: "Termination of directed associativity rotations"
+      lean: "ComputationalPaths.Path.PalomarAssociativity.assocStep_wellFounded"
       module: "Challenge.lean"
       status: "proved"
-      note: "The standalone lower cell retains the explicit Step-list trace and equality proof."
-    - source: "Explicit 2-cell rewrite presentation"
-      lean: "ComputationalPaths.Path.PalomarOmegaGroupoid433.Derivation₂"
+      note: "A natural-number tree weight strictly decreases under every context-closed rotation."
+    - source: "Canonical right-associated normal forms"
+      lean: "ComputationalPaths.Path.PalomarAssociativity.assoc_normalizes"
       module: "Challenge.lean"
       status: "proved"
-      note: "The selected certificate proves the presentation equivalence and both reification round trips against the standalone RwEq closure."
-    - source: "Primitive rewrite presentation"
-      lean: "ComputationalPaths.Path.PalomarOmegaGroupoid433.RewriteStep"
+      note: "Every free magma tree has an explicit reduction trace to the right comb of its nonempty word."
+    - source: "Irreducibility of canonical normal forms"
+      lean: "ComputationalPaths.Path.PalomarAssociativity.rightComb_irreducible"
       module: "Challenge.lean"
       status: "proved"
-      note: "Primitive associativity, unit, inverse, and congruence rewrites are explicit constructors."
-    - source: "Explicit coherence routes"
-      lean: "ComputationalPaths.Path.PalomarOmegaGroupoid433.pentagon_left_route"
+      note: "No context-closed directed associativity rotation can start from a canonical right comb."
+    - source: "Global confluence"
+      lean: "ComputationalPaths.Path.PalomarAssociativity.assoc_reduces_confluent"
       module: "Challenge.lean"
       status: "proved"
-      note: "The pentagon and triangle routes are explicit RwEq syntax, with kernel-proved edge counts and extensional boundary coherence."
-    - source: "Extensional coherence boundary"
-      lean: "ComputationalPaths.Path.PalomarOmegaGroupoid433.BoundaryCoherence"
+      note: "Every pair of reductions from a common source joins at its canonical right comb."
+    - source: "Free-semigroup soundness and completeness"
+      lean: "ComputationalPaths.Path.PalomarAssociativity.assoc_rwEq_iff_freeSemigroup_eq"
       module: "Challenge.lean"
       status: "proved"
-      note: "The certificate states the exact extensional coherence boundary without overstating it as a proof-relevant higher syntax theorem."
-    - source: "Selected certificate boundary"
-      lean: "ComputationalPaths.Path.PalomarOmegaGroupoid433.OmegaGroupoidCertificate"
+      note: "Proof-relevant symmetric reassociation exists exactly when the standard nonempty words are equal."
+    - source: "Mathlib associativity-quotient characterization"
+      lean: "ComputationalPaths.Path.PalomarAssociativity.assoc_rwEq_iff_assocQuotient_eq"
       module: "Challenge.lean"
       status: "proved"
-      note: "The selected record packages the standalone auditable theorem boundary for every carrier type."
+      note: "The custom rewrite equality is identified with equality in Mathlib's pre-existing AssocQuotient."
+    - source: "Mac Lane pentagon route lengths"
+      lean: "ComputationalPaths.Path.PalomarAssociativity.pentagon_route_counts"
+      module: "Challenge.lean"
+      status: "proved"
+      note: "The two directed pentagon routes have exactly two and three primitive associativity steps."
+    - source: "Proof-relevant separation of pentagon routes"
+      lean: "ComputationalPaths.Path.PalomarAssociativity.pentagon_routes_distinct"
+      module: "Challenge.lean"
+      status: "proved"
+      note: "Different primitive-step counts certify that the same-boundary traces are not definitionally collapsed."
 
 acknowledgements: >-
   Thanks to the authors and contributors of the Calculus of Computational

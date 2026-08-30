@@ -1,7 +1,16 @@
 {
   "challenge_module": "Challenge",
   "solution_module": "Solution",
-  "theorem_names": ["ComputationalPaths.Path.PalomarOmegaGroupoid433.main_result"],
+  "theorem_names": [
+    "ComputationalPaths.Path.PalomarAssociativity.assocStep_wellFounded",
+    "ComputationalPaths.Path.PalomarAssociativity.assoc_normalizes",
+    "ComputationalPaths.Path.PalomarAssociativity.rightComb_irreducible",
+    "ComputationalPaths.Path.PalomarAssociativity.assoc_reduces_confluent",
+    "ComputationalPaths.Path.PalomarAssociativity.assoc_rwEq_iff_freeSemigroup_eq",
+    "ComputationalPaths.Path.PalomarAssociativity.assoc_rwEq_iff_assocQuotient_eq",
+    "ComputationalPaths.Path.PalomarAssociativity.pentagon_route_counts",
+    "ComputationalPaths.Path.PalomarAssociativity.pentagon_routes_distinct"
+  ],
   "definition_names": [],
   "permitted_axioms": ["propext", "Quot.sound", "Classical.choice"],
   "enable_nanoda": true

@@ -1,352 +1,280 @@
-/-
-# Solution: the self-contained computational-path coherence certificate
+import Mathlib.Algebra.Free
+import Lean.Elab.Tactic.Omega
 
-The selected theorem is proved against the same standalone statement boundary
-as `Challenge.lean`.  The repository's larger implementation remains useful
-for development, but Palomar's Challenge closure cannot depend on it; this
-file therefore makes every selected definition explicit and proves the
-certificate with the Lean kernel.
+/-!
+# Proof-relevant associativity coherence for free magmas — solution
+
+The solution proves that context-closed right rotations on Mathlib's
+`FreeMagma` terminate, normalize every tree to a canonical right comb, and are
+globally confluent. It then identifies the induced proof-relevant symmetric
+rewrite equality with equality in both Mathlib's `FreeSemigroup` semantics and
+its standard `Magma.AssocQuotient`. Finally, it constructs the two sides of
+Mac Lane's pentagon as traces of different lengths.
 -/
 
-import Mathlib
-
-set_option linter.dupNamespace false
-
-namespace ComputationalPaths.Path.PalomarOmegaGroupoid433
+namespace ComputationalPaths.Path.PalomarAssociativity
 
 universe u
 
-/-! ## Trace-carrying paths -/
+inductive AssocStep {α : Type u} : FreeMagma α → FreeMagma α → Type u where
+  | rotate (x y z : FreeMagma α) : AssocStep ((x * y) * z) (x * (y * z))
+  | congrLeft {x x' : FreeMagma α} (h : AssocStep x x') (y : FreeMagma α) :
+      AssocStep (x * y) (x' * y)
+  | congrRight (x : FreeMagma α) {y y' : FreeMagma α} (h : AssocStep y y') :
+      AssocStep (x * y) (x * y')
 
-structure Step (A : Type u) where
-  src : A
-  tgt : A
-  proof : src = tgt
+inductive AssocReduces {α : Type u} : FreeMagma α → FreeMagma α → Type u where
+  | refl (x : FreeMagma α) : AssocReduces x x
+  | step {x y : FreeMagma α} (h : AssocStep x y) : AssocReduces x y
+  | trans {x y z : FreeMagma α} (h₁ : AssocReduces x y)
+      (h₂ : AssocReduces y z) : AssocReduces x z
 
-namespace Step
+inductive AssocRwEq {α : Type u} : FreeMagma α → FreeMagma α → Type u where
+  | refl (x : FreeMagma α) : AssocRwEq x x
+  | step {x y : FreeMagma α} (h : AssocStep x y) : AssocRwEq x y
+  | symm {x y : FreeMagma α} (h : AssocRwEq x y) : AssocRwEq y x
+  | trans {x y z : FreeMagma α} (h₁ : AssocRwEq x y)
+      (h₂ : AssocRwEq y z) : AssocRwEq x z
 
-def symm {A : Type u} (s : Step A) : Step A :=
-  ⟨s.tgt, s.src, s.proof.symm⟩
+abbrev word {α : Type u} : FreeMagma α → FreeSemigroup α :=
+  FreeMagma.toFreeSemigroup
 
-end Step
+def rightCombAux {α : Type u} (head : α) : List α → FreeMagma α
+  | [] => FreeMagma.of head
+  | next :: tail => FreeMagma.of head * rightCombAux next tail
 
-structure Path {A : Type u} (a b : A) where
-  steps : List (Step A)
-  proof : a = b
+def rightComb {α : Type u} (w : FreeSemigroup α) : FreeMagma α :=
+  rightCombAux w.head w.tail
 
-namespace Path
+@[simp] theorem rightComb_of {α : Type u} (x : α) :
+    rightComb (FreeSemigroup.of x) = FreeMagma.of x := rfl
 
-def refl {A : Type u} (a : A) : Path a a :=
-  ⟨[], rfl⟩
+@[simp] theorem rightComb_of_mul {α : Type u} (x : α)
+    (w : FreeSemigroup α) :
+    rightComb (FreeSemigroup.of x * w) =
+      FreeMagma.of x * rightComb w := by
+  cases w
+  rfl
 
-def ofEq {A : Type u} {a b : A} (h : a = b) : Path a b :=
-  ⟨[⟨a, b, h⟩], h⟩
+def leafCount {α : Type u} : FreeMagma α → Nat
+  | .of _ => 1
+  | x * y => leafCount x + leafCount y
 
-def trans {A : Type u} {a b c : A} (p : Path a b) (q : Path b c) : Path a c :=
-  ⟨p.steps ++ q.steps, p.proof.trans q.proof⟩
+def assocWeight {α : Type u} : FreeMagma α → Nat
+  | .of _ => 0
+  | x * y => assocWeight x + assocWeight y + leafCount x
 
-def symm {A : Type u} {a b : A} (p : Path a b) : Path b a :=
-  ⟨p.steps.reverse.map Step.symm, p.proof.symm⟩
+namespace AssocReduces
 
-@[simp] theorem trans_refl_left {A : Type u} {a b : A} (p : Path a b) :
-    trans (refl a) p = p := by
-  cases p
-  simp [trans, refl]
+def congrLeft {α : Type u} {x x' : FreeMagma α}
+    (h : AssocReduces x x') (y : FreeMagma α) :
+    AssocReduces (x * y) (x' * y) :=
+  match h with
+  | .refl _ => .refl _
+  | .step s => .step (.congrLeft s y)
+  | .trans h₁ h₂ => .trans (congrLeft h₁ y) (congrLeft h₂ y)
 
-@[simp] theorem trans_refl_right {A : Type u} {a b : A} (p : Path a b) :
-    trans p (refl b) = p := by
-  cases p
-  simp [trans, refl]
+def congrRight {α : Type u} (x : FreeMagma α)
+    {y y' : FreeMagma α} (h : AssocReduces y y') :
+    AssocReduces (x * y) (x * y') :=
+  match h with
+  | .refl _ => .refl _
+  | .step s => .step (.congrRight x s)
+  | .trans h₁ h₂ => .trans (congrRight x h₁) (congrRight x h₂)
 
-theorem trans_assoc {A : Type u} {a b c d : A}
-    (p : Path a b) (q : Path b c) (r : Path c d) :
-    trans (trans p q) r = trans p (trans q r) := by
-  cases p
-  cases q
-  cases r
-  simp [trans, List.append_assoc]
-
-theorem ofEq_ne_refl {A : Type u} (a : A) :
-    ofEq (rfl : a = a) ≠ refl a := by
-  intro h
-  have hs := congrArg (fun p : Path a a => p.steps) h
-  simp [ofEq, refl] at hs
-
-end Path
-
-/-! ## Primitive rewrites and their symmetric closure -/
-
-inductive RewriteStep {A : Type u} :
-    {a b : A} → Path a b → Path a b → Type (u + 1) where
-  | trans_assoc {a b c d : A}
-      (p : Path a b) (q : Path b c) (r : Path c d) :
-      RewriteStep (Path.trans (Path.trans p q) r)
-        (Path.trans p (Path.trans q r))
-  | trans_refl_left {a b : A} (p : Path a b) :
-      RewriteStep (Path.trans (Path.refl a) p) p
-  | trans_refl_right {a b : A} (p : Path a b) :
-      RewriteStep (Path.trans p (Path.refl b)) p
-  | trans_symm {a b : A} (p : Path a b) :
-      RewriteStep (Path.trans p (Path.symm p)) (Path.refl a)
-  | symm_trans {a b : A} (p : Path a b) :
-      RewriteStep (Path.trans (Path.symm p) p) (Path.refl b)
-  | trans_congr_left {a c d : A}
-      (q : Path c d) {p r : Path a c} (s : RewriteStep p r) :
-      RewriteStep (Path.trans p q) (Path.trans r q)
-  | trans_congr_right {a b c : A}
-      (p : Path a b) {q r : Path b c} (s : RewriteStep q r) :
-      RewriteStep (Path.trans p q) (Path.trans p r)
-
-inductive RwEq {A : Type u} {a b : A} :
-    Path a b → Path a b → Type (u + 1) where
-  | refl {p : Path a b} : RwEq p p
-  | step {p q : Path a b} : RewriteStep p q → RwEq p q
-  | symm {p q : Path a b} : RwEq p q → RwEq q p
-  | trans {p q r : Path a b} : RwEq p q → RwEq q r → RwEq p r
-
-inductive Derivation₂ {A : Type u} {a b : A} :
-    Path a b → Path a b → Type (u + 1) where
-  | refl {p : Path a b} : Derivation₂ p p
-  | step {p q : Path a b} : RewriteStep p q → Derivation₂ p q
-  | symm {p q : Path a b} : Derivation₂ p q → Derivation₂ q p
-  | trans {p q r : Path a b} : Derivation₂ p q → Derivation₂ q r → Derivation₂ p r
-
-def toRwEq {A : Type u} {a b : A} {p q : Path a b} :
-    Derivation₂ p q → RwEq p q
-  | .refl => .refl
+def toRwEq {α : Type u} {x y : FreeMagma α} :
+    AssocReduces x y → AssocRwEq x y
+  | .refl _ => .refl _
   | .step s => .step s
-  | .symm h => .symm (toRwEq h)
   | .trans h₁ h₂ => .trans (toRwEq h₁) (toRwEq h₂)
 
-def ofRwEq {A : Type u} {a b : A} {p q : Path a b} :
-    RwEq p q → Derivation₂ p q
-  | .refl => .refl
-  | .step s => .step s
-  | .symm h => .symm (ofRwEq h)
-  | .trans h₁ h₂ => .trans (ofRwEq h₁) (ofRwEq h₂)
-
-def rwEqStepCount {A : Type u} {a b : A} {p q : Path a b} :
-    RwEq p q → Nat
-  | .refl => 0
+def stepCount {α : Type u} {x y : FreeMagma α} :
+    AssocReduces x y → Nat
+  | .refl _ => 0
   | .step _ => 1
-  | .symm h => rwEqStepCount h
-  | .trans h₁ h₂ => rwEqStepCount h₁ + rwEqStepCount h₂
+  | .trans h₁ h₂ => stepCount h₁ + stepCount h₂
 
-/-! ## Explicit coherence routes -/
+end AssocReduces
 
-def pentagon_right_route {A : Type u} {a b c d e : A}
-    (f : Path a b) (g : Path b c) (h : Path c d) (k : Path d e) :
-    RwEq
-      (Path.trans (Path.trans (Path.trans f g) h) k)
-      (Path.trans f (Path.trans g (Path.trans h k))) :=
-  RwEq.trans
-    (RwEq.step (RewriteStep.trans_assoc (Path.trans f g) h k))
-    (RwEq.step (RewriteStep.trans_assoc f g (Path.trans h k)))
+structure AssocJoin {α : Type u} (x y : FreeMagma α) where
+  target : FreeMagma α
+  left : AssocReduces x target
+  right : AssocReduces y target
 
-def pentagon_left_route {A : Type u} {a b c d e : A}
-    (f : Path a b) (g : Path b c) (h : Path c d) (k : Path d e) :
-    RwEq
-      (Path.trans (Path.trans (Path.trans f g) h) k)
-      (Path.trans f (Path.trans g (Path.trans h k))) :=
-  RwEq.trans
-    (RwEq.step (RewriteStep.trans_congr_left k
-      (RewriteStep.trans_assoc f g h)))
-    (RwEq.trans
-      (RwEq.step (RewriteStep.trans_assoc f (Path.trans g h) k))
-      (RwEq.step (RewriteStep.trans_congr_right f
-        (RewriteStep.trans_assoc g h k))))
+private theorem leafCount_pos {α : Type u} (x : FreeMagma α) :
+    0 < leafCount x := by
+  induction x using FreeMagma.recOnMul with
+  | ih1 _ => simp [leafCount]
+  | ih2 x y hx hy =>
+      simp only [leafCount]
+      omega
 
-def triangle_left_route {A : Type u} {a b c : A}
-    (f : Path a b) (g : Path b c) :
-    RwEq
-      (Path.trans (Path.trans f (Path.refl b)) g)
-      (Path.trans f g) :=
-  RwEq.trans
-    (RwEq.step (RewriteStep.trans_assoc f (Path.refl b) g))
-    (RwEq.step (RewriteStep.trans_congr_right f
-      (RewriteStep.trans_refl_left g)))
-
-def triangle_right_route {A : Type u} {a b c : A}
-    (f : Path a b) (g : Path b c) :
-    RwEq
-      (Path.trans (Path.trans f (Path.refl b)) g)
-      (Path.trans f g) :=
-  RwEq.step (RewriteStep.trans_congr_left g
-    (RewriteStep.trans_refl_right f))
-
-/-! This is the extensional boundary of a higher coherence cell.  Its two
-routes remain distinct Type-valued derivations; only their endpoint equality
-proofs are identified, exactly at Lean's proof-irrelevant boundary. -/
-
-structure BoundaryCoherence {A : Type u} {a b : A}
-    {p q : Path a b} (left right : RwEq p q) : Type (u + 1) where
-  proof_boundary : p.proof = q.proof
-
-def boundaryCoherence {A : Type u} {a b : A}
-    {p q : Path a b} (left right : RwEq p q) : BoundaryCoherence left right :=
-  ⟨Subsingleton.elim _ _⟩
-
-/-! ## Selected auditable theorem boundary -/
-
-structure OmegaGroupoidCertificate (A : Type u) where
-  derivation_presentation :
-    ∀ {a b : A} {p q : Path a b},
-      Nonempty (Derivation₂ p q) ↔ Nonempty (RwEq p q)
-  two_cell_to_rw_eq_roundtrip :
-    ∀ {a b : A} {p q : Path a b} (h : RwEq p q),
-      toRwEq (ofRwEq h) = h
-  two_cell_reification_roundtrip :
-    ∀ {a b : A} {p q : Path a b} (d : Derivation₂ p q),
-      ofRwEq (toRwEq d) = d
-  pentagon_right_witness :
-    ∀ {a b c d e : A} (f : Path a b) (g : Path b c)
-      (h : Path c d) (k : Path d e),
-      RwEq
-        (Path.trans (Path.trans (Path.trans f g) h) k)
-        (Path.trans f (Path.trans g (Path.trans h k)))
-  pentagon_left_witness :
-    ∀ {a b c d e : A} (f : Path a b) (g : Path b c)
-      (h : Path c d) (k : Path d e),
-      RwEq
-        (Path.trans (Path.trans (Path.trans f g) h) k)
-        (Path.trans f (Path.trans g (Path.trans h k)))
-  pentagon_route_counts :
-    ∀ {a b c d e : A} (f : Path a b) (g : Path b c)
-      (h : Path c d) (k : Path d e),
-      rwEqStepCount (pentagon_right_route f g h k) = 2 ∧
-        rwEqStepCount (pentagon_left_route f g h k) = 3
-  pentagon_routes_distinct :
-    ∀ {a b c d e : A} (f : Path a b) (g : Path b c)
-      (h : Path c d) (k : Path d e),
-      pentagon_right_route f g h k ≠ pentagon_left_route f g h k
-  pentagon_coherence :
-    ∀ {a b c d e : A} (f : Path a b) (g : Path b c)
-      (h : Path c d) (k : Path d e),
-      BoundaryCoherence
-        (pentagon_right_route f g h k) (pentagon_left_route f g h k)
-  triangle_left_witness :
-    ∀ {a b c : A} (f : Path a b) (g : Path b c),
-      RwEq (Path.trans (Path.trans f (Path.refl b)) g) (Path.trans f g)
-  triangle_right_witness :
-    ∀ {a b c : A} (f : Path a b) (g : Path b c),
-      RwEq (Path.trans (Path.trans f (Path.refl b)) g) (Path.trans f g)
-  triangle_route_counts :
-    ∀ {a b c : A} (f : Path a b) (g : Path b c),
-      rwEqStepCount (triangle_left_route f g) = 2 ∧
-        rwEqStepCount (triangle_right_route f g) = 1
-  triangle_routes_distinct :
-    ∀ {a b c : A} (f : Path a b) (g : Path b c),
-      triangle_left_route f g ≠ triangle_right_route f g
-  triangle_coherence :
-    ∀ {a b c : A} (f : Path a b) (g : Path b c),
-      BoundaryCoherence (triangle_left_route f g) (triangle_right_route f g)
-  inverse_cancellation :
-    ∀ {a b : A} (p : Path a b),
-      RwEq (Path.trans p (Path.symm p)) (Path.refl a)
-  path_trace_is_nontrivial :
-    ∀ (a : A), Path.ofEq (rfl : a = a) ≠ Path.refl a
-
-theorem toRwEq_ofRwEq {A : Type u} {a b : A} {p q : Path a b}
-    (h : RwEq p q) : toRwEq (ofRwEq h) = h := by
+private theorem assocStep_leafCount {α : Type u} {x y : FreeMagma α}
+    (h : AssocStep x y) : leafCount x = leafCount y := by
   induction h with
-  | refl => rfl
-  | step _ => rfl
-  | symm h ih =>
-      simp [toRwEq, ofRwEq, ih]
-  | trans h₁ h₂ ih₁ ih₂ =>
-      simp [toRwEq, ofRwEq, ih₁, ih₂]
+  | rotate x y z => simp [leafCount, Nat.add_assoc]
+  | congrLeft h y ih => simp [leafCount, ih]
+  | congrRight x h ih => simp [leafCount, ih]
 
-theorem ofRwEq_toRwEq {A : Type u} {a b : A} {p q : Path a b}
-    (d : Derivation₂ p q) : ofRwEq (toRwEq d) = d := by
-  induction d with
-  | refl => rfl
-  | step _ => rfl
-  | symm d ih =>
-      simp [toRwEq, ofRwEq, ih]
-  | trans d₁ d₂ ih₁ ih₂ =>
-      simp [toRwEq, ofRwEq, ih₁, ih₂]
+theorem assocStep_weight_decreases {α : Type u} {x y : FreeMagma α}
+    (h : AssocStep x y) : assocWeight y < assocWeight x := by
+  induction h with
+  | rotate x y z =>
+      have hx := leafCount_pos x
+      simp only [assocWeight, leafCount]
+      omega
+  | congrLeft h y ih =>
+      have hc := assocStep_leafCount h
+      simp only [assocWeight]
+      omega
+  | congrRight x h ih =>
+      simp only [assocWeight]
+      omega
 
-theorem pentagon_route_counts_explicit {A : Type u} {a b c d e : A}
-    (f : Path a b) (g : Path b c) (h : Path c d) (k : Path d e) :
-    rwEqStepCount (pentagon_right_route f g h k) = 2 ∧
-      rwEqStepCount (pentagon_left_route f g h k) = 3 := by
-  constructor <;> rfl
+theorem assocStep_wellFounded (α : Type u) :
+    WellFounded (fun y x : FreeMagma α => Nonempty (AssocStep x y)) := by
+  exact Subrelation.wf
+    (fun h => assocStep_weight_decreases h.some)
+    (measure assocWeight).wf
 
-theorem pentagon_routes_distinct_explicit {A : Type u} {a b c d e : A}
-    (f : Path a b) (g : Path b c) (h : Path c d) (k : Path d e) :
-    pentagon_right_route f g h k ≠ pentagon_left_route f g h k := by
-  intro hroute
-  have hcount := congrArg (fun r => rwEqStepCount r) hroute
-  have hcounts := pentagon_route_counts_explicit f g h k
-  rw [hcounts.1, hcounts.2] at hcount
+private theorem assocStep_word_eq {α : Type u} {x y : FreeMagma α}
+    (h : AssocStep x y) : word x = word y := by
+  induction h with
+  | rotate x y z => simp [word, mul_assoc]
+  | congrLeft h y ih => simp only [word, map_mul, ih]
+  | congrRight x h ih => simp only [word, map_mul, ih]
+
+private theorem assocReduces_word_eq {α : Type u} {x y : FreeMagma α}
+    (h : AssocReduces x y) : word x = word y := by
+  induction h with
+  | refl _ => rfl
+  | step h => exact assocStep_word_eq h
+  | trans h₁ h₂ ih₁ ih₂ => exact ih₁.trans ih₂
+
+private theorem assocRwEq_word_eq {α : Type u} {x y : FreeMagma α}
+    (h : AssocRwEq x y) : word x = word y := by
+  induction h with
+  | refl _ => rfl
+  | step h => exact assocStep_word_eq h
+  | symm h ih => exact ih.symm
+  | trans h₁ h₂ ih₁ ih₂ => exact ih₁.trans ih₂
+
+private theorem word_rightComb {α : Type u} (w : FreeSemigroup α) :
+    word (rightComb w) = w := by
+  induction w using FreeSemigroup.recOnMul with
+  | ih1 x => rfl
+  | ih2 x w _ ih => simp [word, ih]
+
+private def rightComb_append {α : Type u} (u v : FreeSemigroup α) :
+    AssocReduces (rightComb u * rightComb v) (rightComb (u * v)) := by
+  induction u using FreeSemigroup.recOnMul with
+  | ih1 x => exact .refl _
+  | ih2 x u _ ih =>
+      simpa only [rightComb_of_mul, mul_assoc] using
+        AssocReduces.trans
+          (AssocReduces.step
+            (AssocStep.rotate (FreeMagma.of x) (rightComb u) (rightComb v)))
+          (AssocReduces.congrRight (FreeMagma.of x) ih)
+
+def assocNormalization {α : Type u} (x : FreeMagma α) :
+    AssocReduces x (rightComb (word x)) := by
+  induction x using FreeMagma.recOnMul with
+  | ih1 x => exact .refl _
+  | ih2 x y ihx ihy =>
+      exact AssocReduces.trans
+        (AssocReduces.congrLeft ihx y)
+        (AssocReduces.trans
+          (AssocReduces.congrRight (rightComb (word x)) ihy)
+          (by simpa only [word, map_mul] using
+            rightComb_append (word x) (word y)))
+
+theorem assoc_normalizes {α : Type u} (x : FreeMagma α) :
+    Nonempty (AssocReduces x (rightComb (word x))) :=
+  ⟨assocNormalization x⟩
+
+theorem rightComb_irreducible {α : Type u} (w : FreeSemigroup α) :
+    ∀ {y : FreeMagma α}, AssocStep (rightComb w) y → False := by
+  induction w using FreeSemigroup.recOnMul with
+  | ih1 x =>
+      intro y h
+      cases h
+  | ih2 x w _ ih =>
+      intro y h
+      rw [rightComb_of_mul] at h
+      cases h with
+      | congrLeft h _ => cases h
+      | congrRight _ h => exact ih h
+
+theorem assoc_reduces_confluent {α : Type u} {x y z : FreeMagma α}
+    (hy : AssocReduces x y) (hz : AssocReduces x z) :
+    Nonempty (AssocJoin y z) := by
+  let target := rightComb (word x)
+  have wy := assocReduces_word_eq hy
+  have wz := assocReduces_word_eq hz
+  have ry : AssocReduces y target := by
+    simpa only [target, wy] using assocNormalization y
+  have rz : AssocReduces z target := by
+    simpa only [target, wz] using assocNormalization z
+  exact ⟨⟨target, ry, rz⟩⟩
+
+private def assocRwEq_of_word_eq {α : Type u} {x y : FreeMagma α}
+    (h : word x = word y) : AssocRwEq x y := by
+  have hx := AssocReduces.toRwEq (assocNormalization x)
+  have hy : AssocRwEq y (rightComb (word x)) := by
+    simpa only [h] using AssocReduces.toRwEq (assocNormalization y)
+  exact .trans hx (.symm hy)
+
+theorem assoc_rwEq_iff_freeSemigroup_eq {α : Type u}
+    (x y : FreeMagma α) :
+    Nonempty (AssocRwEq x y) ↔ word x = word y := by
+  constructor
+  · rintro ⟨h⟩
+    exact assocRwEq_word_eq h
+  · intro h
+    exact ⟨assocRwEq_of_word_eq h⟩
+
+private theorem assocQuotient_eq_iff_word_eq {α : Type u}
+    (x y : FreeMagma α) :
+    Magma.AssocQuotient.of x = Magma.AssocQuotient.of y ↔
+      word x = word y := by
+  constructor
+  · intro h
+    have h' := congrArg (FreeMagmaAssocQuotientEquiv α) h
+    simpa [FreeMagmaAssocQuotientEquiv, word] using h'
+  · intro h
+    apply (FreeMagmaAssocQuotientEquiv α).injective
+    simpa [FreeMagmaAssocQuotientEquiv, word] using h
+
+theorem assoc_rwEq_iff_assocQuotient_eq {α : Type u}
+    (x y : FreeMagma α) :
+    Nonempty (AssocRwEq x y) ↔
+      Magma.AssocQuotient.of x = Magma.AssocQuotient.of y := by
+  rw [assoc_rwEq_iff_freeSemigroup_eq, assocQuotient_eq_iff_word_eq]
+
+def pentagonShort {α : Type u} (w x y z : FreeMagma α) :
+    AssocReduces (((w * x) * y) * z) (w * (x * (y * z))) :=
+  .trans
+    (.step (.rotate (w * x) y z))
+    (.step (.rotate w x (y * z)))
+
+def pentagonLong {α : Type u} (w x y z : FreeMagma α) :
+    AssocReduces (((w * x) * y) * z) (w * (x * (y * z))) :=
+  .trans
+    (.step (.congrLeft (.rotate w x y) z))
+    (.trans
+      (.step (.rotate w (x * y) z))
+      (.step (.congrRight w (.rotate x y z))))
+
+theorem pentagon_route_counts {α : Type u} (w x y z : FreeMagma α) :
+    AssocReduces.stepCount (pentagonShort w x y z) = 2 ∧
+      AssocReduces.stepCount (pentagonLong w x y z) = 3 := by
+  exact ⟨rfl, rfl⟩
+
+theorem pentagon_routes_distinct {α : Type u} (w x y z : FreeMagma α) :
+    pentagonShort w x y z ≠ pentagonLong w x y z := by
+  intro h
+  have hc := congrArg AssocReduces.stepCount h
+  change 2 = 3 at hc
   omega
 
-theorem triangle_route_counts_explicit {A : Type u} {a b c : A}
-    (f : Path a b) (g : Path b c) :
-    rwEqStepCount (triangle_left_route f g) = 2 ∧
-      rwEqStepCount (triangle_right_route f g) = 1 := by
-  constructor <;> rfl
-
-theorem triangle_routes_distinct_explicit {A : Type u} {a b c : A}
-    (f : Path a b) (g : Path b c) :
-    triangle_left_route f g ≠ triangle_right_route f g := by
-  intro hroute
-  have hcount := congrArg (fun r => rwEqStepCount r) hroute
-  have hcounts := triangle_route_counts_explicit f g
-  rw [hcounts.1, hcounts.2] at hcount
-  omega
-
-theorem main_result (A : Type u) : Nonempty (OmegaGroupoidCertificate A) := by
-  refine ⟨{
-    derivation_presentation := by
-      intro a b p q
-      constructor
-      · rintro ⟨d⟩
-        exact ⟨toRwEq d⟩
-      · rintro ⟨h⟩
-        exact ⟨ofRwEq h⟩
-    two_cell_to_rw_eq_roundtrip := by
-      intro a b p q h
-      exact toRwEq_ofRwEq h
-    two_cell_reification_roundtrip := by
-      intro a b p q d
-      exact ofRwEq_toRwEq d
-    pentagon_right_witness := by
-      intro a b c d e f g h k
-      exact pentagon_right_route f g h k
-    pentagon_left_witness := by
-      intro a b c d e f g h k
-      exact pentagon_left_route f g h k
-    pentagon_route_counts := by
-      intro a b c d e f g h k
-      exact pentagon_route_counts_explicit f g h k
-    pentagon_routes_distinct := by
-      intro a b c d e f g h k
-      exact pentagon_routes_distinct_explicit f g h k
-    pentagon_coherence := by
-      intro a b c d e f g h k
-      exact boundaryCoherence _ _
-    triangle_left_witness := by
-      intro a b c f g
-      exact triangle_left_route f g
-    triangle_right_witness := by
-      intro a b c f g
-      exact triangle_right_route f g
-    triangle_route_counts := by
-      intro a b c f g
-      exact triangle_route_counts_explicit f g
-    triangle_routes_distinct := by
-      intro a b c f g
-      exact triangle_routes_distinct_explicit f g
-    triangle_coherence := by
-      intro a b c f g
-      exact boundaryCoherence _ _
-    inverse_cancellation := by
-      intro a b p
-      exact RwEq.step (RewriteStep.trans_symm p)
-    path_trace_is_nontrivial := by
-      intro a
-      exact Path.ofEq_ne_refl a
-  }⟩
-
-end ComputationalPaths.Path.PalomarOmegaGroupoid433
+end ComputationalPaths.Path.PalomarAssociativity

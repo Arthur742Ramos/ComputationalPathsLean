@@ -1,8 +1,9 @@
 # ComputationalPathsLean
 
 [![CI](https://github.com/Arthur742Ramos/ComputationalPathsLean/actions/workflows/lean_action_ci.yml/badge.svg)](https://github.com/Arthur742Ramos/ComputationalPathsLean/actions/workflows/lean_action_ci.yml)
-[![Lean](https://img.shields.io/badge/Lean-4.24.0-orange)](https://leanprover.github.io/)
-[![Mathlib](https://img.shields.io/badge/Mathlib-v4.24.0-blue)](https://github.com/leanprover-community/mathlib4)
+[![Lean](https://img.shields.io/badge/Lean-4.33.0-orange)](https://leanprover.github.io/)
+[![Mathlib](https://img.shields.io/badge/Mathlib-v4.33.0-blue)](https://github.com/leanprover-community/mathlib4)
+[![Palomar Readiness](https://github.com/Arthur742Ramos/ComputationalPathsLean/actions/workflows/palomar-readiness.yml/badge.svg)](https://github.com/Arthur742Ramos/ComputationalPathsLean/actions/workflows/palomar-readiness.yml)
 
 A Lean 4 book companion repository for **computational paths**: explicit, trace-carrying witnesses of equality built on top of Lean's `Eq`.
 
@@ -20,6 +21,25 @@ This library develops:
   winding-expression presentations (including circle and torus case studies),
 - weak higher-groupoid structure (`OmegaGroupoid`),
 - and a broad collection of mathematical modules under `ComputationalPaths/`.
+
+## Palomar associativity certificate
+
+The standalone Palomar boundary proves termination, canonical normalization,
+global confluence, and semantic completeness for proof-relevant associativity
+rewriting on Mathlib free magmas. It also constructs and separates the two
+directed routes around Mac Lane's pentagon. The eight selected declarations are
+stated in [`Challenge.lean`](Challenge.lean), proved in
+[`Solution.lean`](Solution.lean), and explained in
+[`ASSOCIATIVITY_COHERENCE_CERTIFICATE.md`](ASSOCIATIVITY_COHERENCE_CERTIFICATE.md).
+
+Run the complete local audit with:
+
+```bash
+scripts/check-palomar-associativity.sh
+```
+
+The pinned Comparator/NanoDa replay runs in the Palomar Readiness workflow.
+Submissions use the current [Palomar submission form](https://submit.palomar-registry.org/).
 
 ## Project scope
 
@@ -64,6 +84,10 @@ ComputationalPathsLean/
 ├── lakefile.lean                     # Lake package configuration
 ├── lake-manifest.json                # Lake dependency manifest
 ├── lean-toolchain                    # Pinned Lean toolchain
+├── Challenge.lean                    # Palomar statement boundary
+├── Solution.lean                     # Palomar checked proofs
+├── comparator.json                   # Selected declaration contract
+├── formalization.yaml                # Provenance and scope metadata
 ├── ComputationalPaths/
 │   ├── Basic.lean                    # Core exports + libraryVersion
 │   ├── Path/                         # Computational paths core ecosystem
@@ -113,8 +137,8 @@ ComputationalPathsLean/
 - `git`
 
 This project is pinned to:
-- Lean `v4.24.0` (`lean-toolchain`)
-- Mathlib `v4.24.0` (`lakefile.lean`)
+- Lean `v4.33.0` (`lean-toolchain`)
+- Mathlib `v4.33.0` (`lakefile.lean`)
 
 ### Build
 
