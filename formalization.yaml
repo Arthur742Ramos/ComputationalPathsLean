@@ -1,0 +1,220 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/mathlib-initiative/formalization.yaml/main/schema/formalization.schema.json
+version: "v0.4"
+
+project:
+  name: "Proof-Relevant Associativity Rewriting for Free Magmas"
+  description: >-
+    A compact Lean development of directed associativity rewriting on
+    Mathlib's free magmas. It proves strict termination, constructs irreducible
+    canonical right-associated normal forms, derives global confluence, and
+    establishes soundness and completeness of the induced symmetric rewrite
+    equality against both Mathlib's free semigroup semantics and its standard
+    associativity quotient. Two explicit routes around Mac Lane's pentagon
+    have the same endpoints but retain distinct proof-relevant traces with two
+    and three primitive rotations.
+  authors:
+    - "Arthur Freitas Ramos"
+    - "Ruy J. G. B. de Queiroz"
+    - "Anjolina Grisi de Oliveira"
+    - "Tiago M. L. de Veras"
+  license: "MIT"
+  responsible_maintainers:
+    - "Arthur Freitas Ramos"
+
+classification:
+  arxiv: ["math.LO", "math.CT", "cs.LO"]
+  msc2020: ["03B35", "18M05", "68Q42", "68V20"]
+
+sources:
+  - title: "Computational Paths: A Calculus of Equality"
+    authors:
+      - "Arthur Freitas Ramos"
+      - "Ruy J. G. B. de Queiroz"
+      - "Anjolina Grisi de Oliveira"
+    type: "paper"
+    id: "https://github.com/Arthur742Ramos/ComputationalPathsLean/blob/2a2baa1f31c68f0e696021db91f8381dd2854652/paper/main.tex"
+    location: "Computational paths and rewrite equality"
+    relationship: "adapts"
+    note: >-
+      The submission extracts the paper's proof-relevant computational-path
+      viewpoint into a standalone associativity rewrite problem over standard
+      Mathlib free objects. It does not claim that the paper already contains
+      these exact Lean termination, confluence, or quotient-completeness
+      theorems.
+  - title: "Natural associativity and commutativity"
+    authors:
+      - "Saunders Mac Lane"
+    type: "paper"
+    id: "https://hdl.handle.net/1911/62865"
+    location: "The associativity coherence pentagon"
+    relationship: "background"
+    note: >-
+      The two explicit four-input traces are the two directed routes around
+      the classical associativity pentagon.
+  - title: "Confluent Reductions: Abstract Properties and Applications to Term Rewriting Systems"
+    authors:
+      - "Gerard Huet"
+    type: "paper"
+    id: "https://doi.org/10.1145/322217.322230"
+    location: "Termination and confluence of abstract reductions"
+    relationship: "background"
+    note: >-
+      Standard term-rewriting context for the well-foundedness, normalization,
+      and global confluence results formalized here.
+
+related_formalizations:
+  - id: "https://github.com/leanprover-community/mathlib4/blob/db584cd6d46c92f209a44c0f1c829460d327499d/Mathlib/Algebra/Free.lean"
+    relationship: "builds-on"
+    note: >-
+      Mathlib supplies the standard free objects and quotient semantics. The
+      present development adds a proof-relevant directed rewrite system,
+      constructive normalization traces, confluence, and completeness.
+
+status:
+  scope: >-
+    The selected declarations cover the associativity-only rewrite calculus
+    on free magma trees: strict termination; canonical normalization and
+    irreducibility; global confluence; soundness and completeness against
+    FreeSemigroup equality; equivalence with Mathlib's associativity quotient;
+    and concrete distinct routes around Mac Lane's pentagon. The result does
+    not include units,
+    inverses, general monoidal categories, higher associahedra, or a complete
+    omega-groupoid. It makes no novelty or priority claim beyond this formal
+    integration and certificate boundary.
+  sorry_count: 0
+  sorry_in_definitions: 0
+  axioms: ["propext", "Quot.sound", "Classical.choice"]
+  main_results:
+    - declaration: "ComputationalPaths.Path.PalomarAssociativity.assocStep_wellFounded"
+      file: "Solution.lean"
+      sorry_count: 0
+      axioms: ["propext", "Classical.choice", "Quot.sound"]
+      comparator_config: "comparator.json"
+    - declaration: "ComputationalPaths.Path.PalomarAssociativity.assoc_normalizes"
+      file: "Solution.lean"
+      sorry_count: 0
+      axioms: ["propext", "Quot.sound"]
+      comparator_config: "comparator.json"
+    - declaration: "ComputationalPaths.Path.PalomarAssociativity.rightComb_irreducible"
+      file: "Solution.lean"
+      sorry_count: 0
+      axioms: ["propext"]
+      comparator_config: "comparator.json"
+    - declaration: "ComputationalPaths.Path.PalomarAssociativity.assoc_reduces_confluent"
+      file: "Solution.lean"
+      sorry_count: 0
+      axioms: ["propext", "Quot.sound"]
+      comparator_config: "comparator.json"
+    - declaration: "ComputationalPaths.Path.PalomarAssociativity.assoc_rwEq_iff_freeSemigroup_eq"
+      file: "Solution.lean"
+      sorry_count: 0
+      axioms: ["propext", "Quot.sound"]
+      comparator_config: "comparator.json"
+    - declaration: "ComputationalPaths.Path.PalomarAssociativity.assoc_rwEq_iff_assocQuotient_eq"
+      file: "Solution.lean"
+      sorry_count: 0
+      axioms: ["propext", "Quot.sound"]
+      comparator_config: "comparator.json"
+    - declaration: "ComputationalPaths.Path.PalomarAssociativity.pentagon_route_counts"
+      file: "Solution.lean"
+      sorry_count: 0
+      axioms: []
+      comparator_config: "comparator.json"
+    - declaration: "ComputationalPaths.Path.PalomarAssociativity.pentagon_routes_distinct"
+      file: "Solution.lean"
+      sorry_count: 0
+      axioms: ["propext", "Quot.sound"]
+      comparator_config: "comparator.json"
+
+automation:
+  methods:
+    - method: "manual"
+      tool_setup: >-
+        Mathematical scope selection, rewrite-system design, source audit,
+        theorem-boundary review, and metadata verification.
+    - method: "agent"
+      models: ["Codex"]
+      framework: "Lean 4.33.0, Lake, and Mathlib v4.33.0"
+      tool_setup: >-
+        Proof development, focused compilation, import-closure inspection,
+        forbidden-marker checks, axiom auditing, and repository packaging.
+      cost:
+        wall_time: "local development"
+        spend_usd: "not tracked"
+        hardware: "local machine"
+      prompting_notes: >-
+        Strengthen the Palomar artifact with standard-library-grounded
+        termination, normalization, confluence, completeness, and explicit
+        proof-relevant pentagon traces.
+  spend_usd: "not tracked"
+  notes: >-
+    Lean and Mathlib revisions are pinned by lean-toolchain and
+    lake-manifest.json. Challenge and Solution are compiled independently.
+    Challenge imports only Mathlib.Algebra.Free and exposes exactly eight
+    theorem holes; Solution proves all eight declarations.
+
+fidelity:
+  divergences: >-
+    This is a focused associativity fragment, not a claim that the entire
+    Calculus of Computational Paths or all higher coherence laws have been
+    formalized in the selected declarations. Proof relevance here means that
+    reduction witnesses inhabit inductive Type-valued trace syntax; endpoint
+    semantic equalities remain Lean propositions.
+
+review:
+  status: "self-assessed"
+  reviewers: []
+  notes: >-
+    The selected boundary was checked for decreasing-measure orientation,
+    normal-form correctness, arbitrary-peak joining, both directions of each
+    semantic characterization, exact quotient alignment, and syntactic
+    separation of the two pentagon routes. Palomar editorial review, registry
+    acceptance, and mathematical endorsement are not claimed.
+
+alignment:
+  namespace: "ComputationalPaths.Path.PalomarAssociativity"
+  statements:
+    - source: "Termination of directed associativity rotations"
+      lean: "ComputationalPaths.Path.PalomarAssociativity.assocStep_wellFounded"
+      module: "Challenge.lean"
+      status: "proved"
+      note: "A natural-number tree weight strictly decreases under every context-closed rotation."
+    - source: "Canonical right-associated normal forms"
+      lean: "ComputationalPaths.Path.PalomarAssociativity.assoc_normalizes"
+      module: "Challenge.lean"
+      status: "proved"
+      note: "Every free magma tree has an explicit reduction trace to the right comb of its nonempty word."
+    - source: "Irreducibility of canonical normal forms"
+      lean: "ComputationalPaths.Path.PalomarAssociativity.rightComb_irreducible"
+      module: "Challenge.lean"
+      status: "proved"
+      note: "No context-closed directed associativity rotation can start from a canonical right comb."
+    - source: "Global confluence"
+      lean: "ComputationalPaths.Path.PalomarAssociativity.assoc_reduces_confluent"
+      module: "Challenge.lean"
+      status: "proved"
+      note: "Every pair of reductions from a common source joins at its canonical right comb."
+    - source: "Free-semigroup soundness and completeness"
+      lean: "ComputationalPaths.Path.PalomarAssociativity.assoc_rwEq_iff_freeSemigroup_eq"
+      module: "Challenge.lean"
+      status: "proved"
+      note: "Proof-relevant symmetric reassociation exists exactly when the standard nonempty words are equal."
+    - source: "Mathlib associativity-quotient characterization"
+      lean: "ComputationalPaths.Path.PalomarAssociativity.assoc_rwEq_iff_assocQuotient_eq"
+      module: "Challenge.lean"
+      status: "proved"
+      note: "The custom rewrite equality is identified with equality in Mathlib's pre-existing AssocQuotient."
+    - source: "Mac Lane pentagon route lengths"
+      lean: "ComputationalPaths.Path.PalomarAssociativity.pentagon_route_counts"
+      module: "Challenge.lean"
+      status: "proved"
+      note: "The two directed pentagon routes have exactly two and three primitive associativity steps."
+    - source: "Proof-relevant separation of pentagon routes"
+      lean: "ComputationalPaths.Path.PalomarAssociativity.pentagon_routes_distinct"
+      module: "Challenge.lean"
+      status: "proved"
+      note: "Different primitive-step counts certify that the same-boundary traces are not definitionally collapsed."
+
+acknowledgements: >-
+  Thanks to the authors and contributors of the Calculus of Computational
+  Paths, Lean 4, Mathlib, and the Palomar Registry tooling.
