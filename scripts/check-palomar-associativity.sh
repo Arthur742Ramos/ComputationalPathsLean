@@ -30,23 +30,23 @@ if [ "$(sed -n '1p' Challenge.lean)" != "import Mathlib.Algebra.Free" ]; then
   echo "Challenge.lean must have the single narrow Mathlib.Algebra.Free import" >&2
   exit 1
 fi
-if [ "$(rg -c '^import ' Challenge.lean)" -ne 1 ]; then
+if [ "$(grep -c '^import ' Challenge.lean)" -ne 1 ]; then
   echo "Challenge.lean must contain exactly one direct import" >&2
   exit 1
 fi
 
-challenge_holes=$(rg -c '^[[:space:]]*sorry[[:space:]]*$' Challenge.lean)
+challenge_holes=$(grep -Ec '^[[:space:]]*sorry[[:space:]]*$' Challenge.lean)
 if [ "$challenge_holes" -ne 8 ]; then
   echo "Challenge.lean must contain exactly eight selected theorem holes" >&2
   exit 1
 fi
 
-if rg -n '\badmit\b|^[[:space:]]*(noncomputable[[:space:]]+)?axiom[[:space:]]|native_decide|Lean\.ofReduceBool' \
+if grep -En '\badmit\b|^[[:space:]]*(noncomputable[[:space:]]+)?axiom[[:space:]]|native_decide|Lean\.ofReduceBool' \
   Challenge.lean Solution.lean; then
   echo "forbidden axiom, admission, or evaluator escape found" >&2
   exit 1
 fi
-if rg -n '\bsorry\b' Solution.lean; then
+if grep -En '\bsorry\b' Solution.lean; then
   echo "Solution.lean contains a proof hole" >&2
   exit 1
 fi
