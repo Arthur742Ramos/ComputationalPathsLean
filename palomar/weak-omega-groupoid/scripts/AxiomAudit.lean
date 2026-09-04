@@ -1,0 +1,14 @@
+import Solution
+
+open ComputationalPaths.PalomarWeakOmegaGroupoid
+
+#print axioms ComputationalPaths.PalomarWeakOmegaGroupoid.trace_is_observable
+#print axioms ComputationalPaths.PalomarWeakOmegaGroupoid.groupoid_laws
+#print axioms ComputationalPaths.PalomarWeakOmegaGroupoid.pentagon_route_counts
+#print axioms ComputationalPaths.PalomarWeakOmegaGroupoid.computational_paths_form_weak_omega_groupoid
+#print axioms ComputationalPaths.PalomarWeakOmegaGroupoid.contractibility3
+#print axioms ComputationalPaths.PalomarWeakOmegaGroupoid.contractibilityHigher
+#print axioms ComputationalPaths.PalomarWeakOmegaGroupoid.pentagon_coherence
+#print axioms ComputationalPaths.PalomarWeakOmegaGroupoid.triangle_coherence
+#print axioms ComputationalPaths.PalomarWeakOmegaGroupoid.interchange_coherence
+#print axioms ComputationalPaths.PalomarWeakOmegaGroupoid.eckmann_hilton_coherence

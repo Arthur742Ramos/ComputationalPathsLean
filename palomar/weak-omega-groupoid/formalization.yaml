@@ -1,0 +1,228 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/mathlib-initiative/formalization.yaml/main/schema/formalization.schema.json
+version: "v0.4"
+
+project:
+  name: "A proof-relevant weak omega-groupoid core for computational paths"
+  description: >-
+    A standalone Lean 4 formalization boundary for the central construction in
+    the accepted paper "Computational Paths Form a Weak omega-Groupoid: A
+    Constructive Proof". It defines trace-carrying paths, an explicit
+    proof-relevant rewrite equivalence, derivations between rewrite witnesses,
+    the canonical level-3 contraction obtained from proof irrelevance, and the
+    uniform higher contraction. It also checks the path groupoid laws and
+    supplies explicit proof-relevant associator, unit, inverse, pentagon,
+    triangle, interchange, and Eckmann-Hilton coherence witnesses. This is a
+    deliberately focused, independently compilable Palomar boundary: it does
+    not claim to formalize the paper's circle applications, confluence
+    development, stable-stem computations, or every declaration in the full
+    repository.
+  authors:
+    - "Arthur F. Ramos"
+    - "Tiago M. L. de Veras"
+    - "Ruy J. G. B. de Queiroz"
+    - "Anjolina G. de Oliveira"
+  license: "MIT"
+  responsible_maintainers:
+    - "Arthur F. Ramos"
+
+classification:
+  arxiv: ["math.CT", "math.LO", "cs.LO"]
+  msc2020: ["18N50", "03B38", "68V20"]
+
+sources:
+  - title: "Computational Paths Form a Weak omega-Groupoid: A Constructive Proof"
+    authors:
+      - "Arthur F. Ramos"
+      - "Tiago M. L. de Veras"
+      - "Ruy J. G. B. de Queiroz"
+      - "Anjolina G. de Oliveira"
+    type: "paper"
+    location: "Accepted manuscript supplied with this submission; Abstract, Sections 3, 6, 7, 10, and 11"
+    relationship: "formalizes"
+    note: >-
+      The selected declarations formalize the paper's central path/derivation
+      tower and its proof-irrelevance coherence principle. The manuscript's
+      applications and its full confluence development are outside this small
+      independently checked boundary.
+    author_endorsement: "n/a"
+
+related_formalizations:
+  - id: "https://github.com/Arthur742Ramos/ComputationalPathsLean/tree/f90943eecdde516817fbc33863486b681a0a9645/ComputationalPaths/Path/OmegaGroupoid"
+    relationship: "adapts"
+    note: >-
+      The selected project is a standalone Palomar mirror of the native
+      higher-groupoid boundary. It preserves the correspondence with the
+      repository's Path, RwEq, Derivation3, contractibility, and coherence
+      developments while avoiding repository-local imports in Challenge.lean.
+
+status:
+  scope: >-
+    The exact Comparator boundary covers trace observability; the four basic
+    path groupoid rewrite laws; two explicit pentagon routes and their step
+    counts; proof-irrelevance contractibility at levels 3 and above; and
+    proof-relevant pentagon, triangle, interchange, Eckmann-Hilton, and bundled
+    weak-groupoid witnesses. It is a focused core extraction, not a claim that
+    the entire 49-page manuscript or the broad companion repository is one
+    warning-free Palomar project.
+  sorry_count: 0
+  sorry_in_definitions: 0
+  axioms: ["propext"]
+  main_results:
+    - declaration: "ComputationalPaths.PalomarWeakOmegaGroupoid.trace_is_observable"
+      file: "Solution.lean"
+      sorry_count: 0
+      axioms: ["propext"]
+      comparator_config: "comparator.json"
+    - declaration: "ComputationalPaths.PalomarWeakOmegaGroupoid.groupoid_laws"
+      file: "Solution.lean"
+      sorry_count: 0
+      axioms: []
+      comparator_config: "comparator.json"
+    - declaration: "ComputationalPaths.PalomarWeakOmegaGroupoid.pentagon_route_counts"
+      file: "Solution.lean"
+      sorry_count: 0
+      axioms: []
+      comparator_config: "comparator.json"
+    - declaration: "ComputationalPaths.PalomarWeakOmegaGroupoid.computational_paths_form_weak_omega_groupoid"
+      file: "Solution.lean"
+      sorry_count: 0
+      axioms: []
+      comparator_config: "comparator.json"
+    - declaration: "ComputationalPaths.PalomarWeakOmegaGroupoid.contractibility3"
+      file: "Solution.lean"
+      sorry_count: 0
+      axioms: []
+      comparator_config: "comparator.json"
+    - declaration: "ComputationalPaths.PalomarWeakOmegaGroupoid.contractibilityHigher"
+      file: "Solution.lean"
+      sorry_count: 0
+      axioms: []
+      comparator_config: "comparator.json"
+    - declaration: "ComputationalPaths.PalomarWeakOmegaGroupoid.pentagon_coherence"
+      file: "Solution.lean"
+      sorry_count: 0
+      axioms: []
+      comparator_config: "comparator.json"
+    - declaration: "ComputationalPaths.PalomarWeakOmegaGroupoid.triangle_coherence"
+      file: "Solution.lean"
+      sorry_count: 0
+      axioms: []
+      comparator_config: "comparator.json"
+    - declaration: "ComputationalPaths.PalomarWeakOmegaGroupoid.interchange_coherence"
+      file: "Solution.lean"
+      sorry_count: 0
+      axioms: []
+      comparator_config: "comparator.json"
+    - declaration: "ComputationalPaths.PalomarWeakOmegaGroupoid.eckmann_hilton_coherence"
+      file: "Solution.lean"
+      sorry_count: 0
+      axioms: []
+      comparator_config: "comparator.json"
+
+automation:
+  methods:
+    - method: "manual"
+      tool_setup: >-
+        Mathematical scope selection, accepted-manuscript audit, native-source
+        correspondence review, and provenance/limitation review.
+    - method: "agent"
+      models: ["Codex"]
+      framework: "Lean 4.33.0, Lake, Mathlib, and Palomar Comparator/NanoDa"
+      tool_setup: >-
+        Independent Challenge/Solution construction, focused compilation,
+        import-closure inspection, exact axiom audit, and repository packaging.
+      cost:
+        wall_time: "local development"
+        spend_usd: "not tracked"
+        hardware: "local machine"
+      prompting_notes: >-
+        Keep the challenge small and human-auditable, mirror the native
+        declarations where meaningful, and state every excluded paper result.
+  spend_usd: "not tracked"
+  notes: >-
+    Lean and Mathlib are pinned by lean-toolchain and lake-manifest.json.
+    Challenge.lean imports only Mathlib.Data.List.Basic and Solution.lean
+    repeats the boundary independently. The proof-irrelevance route uses no
+    Classical.choice or Quot.sound; the exact selected axiom inventory is
+    recorded above.
+
+fidelity:
+  divergences: >-
+    The accepted manuscript's full repository formalization uses the native
+    Path/Derivation2/Derivation3 tower and many additional modules. Palomar's
+    Challenge import-closure rule prevents a repository-local import, so this
+    selected project reproduces the relevant path, rewrite, level-3, and
+    coherence interfaces in a compact standalone namespace. The central
+    proof-irrelevance argument is retained; circle/HIT applications,
+    Newman-style confluence, and stable-stem material are intentionally not
+    selected here.
+
+review:
+  status: "self-assessed"
+  reviewers: []
+  notes: >-
+    The accepted manuscript was read against the selected declarations; the
+    native repository modules were inspected for correspondence; Challenge
+    and Solution compile independently; the source closure, forbidden-marker,
+    and axiom audits are run by scripts/check.sh. Palomar's own mechanical
+    and editorial review is not claimed in advance.
+
+alignment:
+  namespace: "ComputationalPaths.PalomarWeakOmegaGroupoid"
+  statements:
+    - source: "Trace-carrying computational paths distinguish an explicit rewrite trace from reflexivity"
+      lean: "ComputationalPaths.PalomarWeakOmegaGroupoid.trace_is_observable"
+      module: "Challenge.lean"
+      status: "proved"
+      note: "The one-step path made by ofEq is not the empty trace made by refl."
+    - source: "Path groupoid laws"
+      lean: "ComputationalPaths.PalomarWeakOmegaGroupoid.groupoid_laws"
+      module: "Challenge.lean"
+      status: "proved"
+      note: "Unit and inverse laws are exposed as explicit RwProp witnesses."
+    - source: "Higher contractibility from proof irrelevance"
+      lean: "ComputationalPaths.PalomarWeakOmegaGroupoid.contractibility3"
+      module: "Challenge.lean"
+      status: "proved"
+      note: "Any two parallel rewrite witnesses receive a canonical level-3 cell."
+    - source: "Uniform higher-dimensional contraction"
+      lean: "ComputationalPaths.PalomarWeakOmegaGroupoid.contractibilityHigher"
+      module: "Challenge.lean"
+      status: "proved"
+      note: "The same mere-proposition argument supplies the higher tail."
+    - source: "Mac Lane pentagon routes"
+      lean: "ComputationalPaths.PalomarWeakOmegaGroupoid.pentagon_route_counts"
+      module: "Challenge.lean"
+      status: "proved"
+      note: "The two routes retain explicit two-step and three-step proof-relevant traces."
+    - source: "Pentagon coherence"
+      lean: "ComputationalPaths.PalomarWeakOmegaGroupoid.pentagon_coherence"
+      module: "Challenge.lean"
+      status: "proved"
+      note: "The route comparison uses the named MetaStep3.pentagon constructor."
+    - source: "Triangle coherence"
+      lean: "ComputationalPaths.PalomarWeakOmegaGroupoid.triangle_coherence"
+      module: "Challenge.lean"
+      status: "proved"
+      note: "The route comparison uses the named MetaStep3.triangle constructor."
+    - source: "Interchange coherence"
+      lean: "ComputationalPaths.PalomarWeakOmegaGroupoid.interchange_coherence"
+      module: "Challenge.lean"
+      status: "proved"
+      note: "The two horizontal-composition routes are connected by MetaStep3.interchange."
+    - source: "Eckmann-Hilton coherence for 2-loops"
+      lean: "ComputationalPaths.PalomarWeakOmegaGroupoid.eckmann_hilton_coherence"
+      module: "Challenge.lean"
+      status: "proved"
+      note: "Parallel loop composites are connected through the same proof-irrelevance cell."
+    - source: "Bundled weak omega-groupoid core"
+      lean: "ComputationalPaths.PalomarWeakOmegaGroupoid.computational_paths_form_weak_omega_groupoid"
+      module: "Challenge.lean"
+      status: "proved"
+      note: "The selected laws and contractions are assembled into one auditable certificate."
+
+acknowledgements: >-
+  The formalization authors acknowledge the Computational Paths authors, the
+  Lean 4 and Mathlib communities, and the Palomar Registry tooling. This
+  metadata records provenance and scope; it is not a novelty or endorsement
+  claim by the registry.
