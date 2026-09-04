@@ -4,16 +4,19 @@
   "theorem_names": [
     "ComputationalPaths.PalomarWeakOmegaGroupoid.trace_is_observable",
     "ComputationalPaths.PalomarWeakOmegaGroupoid.groupoid_laws",
+    "ComputationalPaths.PalomarWeakOmegaGroupoid.derivation_groupoid_laws",
     "ComputationalPaths.PalomarWeakOmegaGroupoid.pentagon_route_counts",
-    "ComputationalPaths.PalomarWeakOmegaGroupoid.computational_paths_form_weak_omega_groupoid"
+    "ComputationalPaths.PalomarWeakOmegaGroupoid.computational_paths_form_weak_omega_groupoid_boundary"
   ],
   "definition_names": [
     "ComputationalPaths.PalomarWeakOmegaGroupoid.contractibility3",
+    "ComputationalPaths.PalomarWeakOmegaGroupoid.contractibility4",
     "ComputationalPaths.PalomarWeakOmegaGroupoid.contractibilityHigher",
     "ComputationalPaths.PalomarWeakOmegaGroupoid.pentagon_coherence",
     "ComputationalPaths.PalomarWeakOmegaGroupoid.triangle_coherence",
     "ComputationalPaths.PalomarWeakOmegaGroupoid.interchange_coherence",
-    "ComputationalPaths.PalomarWeakOmegaGroupoid.eckmann_hilton_coherence"
+    "ComputationalPaths.PalomarWeakOmegaGroupoid.eckmann_hilton_coherence",
+    "ComputationalPaths.PalomarWeakOmegaGroupoid.compPathOmegaGroupoidBoundary"
   ],
   "permitted_axioms": ["propext"],
   "enable_nanoda": true
