@@ -10,4 +10,3 @@ lean_lib Challenge where
 @[default_target]
 lean_lib Solution where
   roots := #[`Solution]
-

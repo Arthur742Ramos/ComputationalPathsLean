@@ -16,4 +16,3 @@ import Solution
 #print axioms ComputationalPaths.RelativeCompletion.Globular.lift_identity
 #print axioms ComputationalPaths.RelativeCompletion.Globular.lift_comp
 #print axioms ComputationalPaths.RelativeCompletion.Globular.pentagon_distinct_connected
-

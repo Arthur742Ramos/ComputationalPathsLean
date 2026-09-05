@@ -43,6 +43,12 @@ identity, inversion and composition. It does not claim a bijection between
 all source meta-derivations and its expressions. Groupoid-law comparisons can
 be formed one dimension higher by the chosen generator.
 
+The generic generator uses equality of witnesses of `Nonempty L.Arr`, together
+with an explicit proof of parallelism. The manuscript uses the truncated
+rewrite-equivalence witness in a fixed fiber. Both equality premises are
+automatic, but these are not literally the same carrier; the adaptation is
+visible in CellDerivation.step and the boundary characterization theorem.
+
 There is no import bridge masquerading as a correspondence theorem. The
 exact retained syntax is visible in the submitted statement. The preserved
 2-skeleton is an explicit definition, and pentagon_distinct_connected proves
@@ -55,4 +61,3 @@ a concrete non-identification property.
 identity-type higher-category constructions. They are background, not results
 reproved by this package. A generator connecting parallel expressions must
 not be confused with an operadic action or with equality of those expressions.
-
