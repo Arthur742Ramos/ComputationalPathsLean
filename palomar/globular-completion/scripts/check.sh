@@ -26,6 +26,7 @@ raise 'Wrong axiom allowance' unless config['permitted_axioms'] == ['propext', '
 results = meta.fetch('status').fetch('main_results')
 raise 'Metadata selection mismatch' unless results.map { |r| r['declaration'] } == names
 raise 'Schema mismatch' unless meta['version'] == 'v0.4'
+raise 'Classification drift' unless meta['classification'] == {'arxiv'=>['math.CT', 'cs.LO'], 'msc2020'=>['18N20', '03B38', '68V20']}
 raise 'License mismatch' unless meta['project']['license'] == 'MIT' && File.read('../../LICENSE').include?('MIT License')
 report = ENV.fetch('AXIOM_REPORT')
 results.each do |r|

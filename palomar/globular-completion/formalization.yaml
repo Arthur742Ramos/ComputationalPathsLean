@@ -25,7 +25,7 @@ project:
   license: "MIT"
 classification:
   arxiv: ["math.CT", "cs.LO"]
-  msc2020: ["18N50", "03B38", "68V20"]
+  msc2020: ["18N20", "03B38", "68V20"]
 sources:
   - title: "Computational Paths Form a Weak omega-Groupoid: A Constructive Proof"
     authors: ["Arthur F. Ramos", "Tiago M. L. de Veras", "Ruy J. G. B. de Queiroz", "Anjolina G. de Oliveira"]
