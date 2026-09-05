@@ -1,5 +1,20 @@
 # Computational-path weak omega-groupoid coherence core
 
+## Preparation status: semantic repair in progress; not ready for intake
+
+The original Comparator surface below passes its mechanical checks but does
+not encode the claimed recursive globular structure. See `RESEARCH_AUDIT.md`.
+The new `GlobularCompletion.lean` fixes the dimensional recursion and proves
+globularity, identity/inverse boundary laws, parallel-boundary preservation,
+and chosen higher fillers. It also supplies higher vertical composition and
+its associativity, unit, and inverse comparisons. It is not yet a formalization
+of a published operadic weak omega-groupoid definition and is not selected by
+the existing Comparator. Do not treat either set of checks as intake readiness.
+
+Run `bash scripts/check-repair.sh` to reproduce the repair and adversarial checks.
+The accepted 49-page manuscript has been recovered locally and inspected;
+the source version and outstanding claim-alignment issues are recorded in the audit.
+
 This directory is a small, standalone Palomar project extracted from the
 accepted manuscript *Computational Paths Form a Weak omega-Groupoid: A
 Constructive Proof*. It is intentionally a focused formalization boundary,
@@ -21,8 +36,10 @@ The checked boundary contains:
 
 `MetaStep3.rweq_transport` is the sole primitive 3-cell. In particular,
 pentagon, triangle, interchange, and Eckmann-Hilton are derived through
-`contractibility3`; they are not constructors inserted to make the advertised
-coherences hold.
+`contractibility3`. However, the primitive transport premise is automatic for
+every parallel pair: this is a chosen universal-filler completion, not an
+independent proof that the original rewrite calculus intrinsically has those
+coherences. Definition 3.9 of the accepted manuscript explicitly specifies it.
 
 `Challenge.lean` is the human-auditable statement surface. `Solution.lean`
 repeats that surface independently and supplies every selected proof/value.

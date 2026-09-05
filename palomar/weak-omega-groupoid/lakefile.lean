@@ -14,3 +14,6 @@ lean_lib Challenge where
 @[default_target]
 lean_lib Solution where
   roots := #[`Solution]
+
+lean_lib GlobularCompletion where
+  roots := #[`GlobularCompletion]

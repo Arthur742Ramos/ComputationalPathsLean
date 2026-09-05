@@ -42,8 +42,10 @@ sources:
     location: "https://arxiv.org/abs/2512.00657"
     relationship: "formalizes"
     note: >-
-      The attached accepted-manuscript PDF supplied for this submission is the
-      primary source for the selected boundary. The public arXiv record is a
+      The privately supplied accepted-manuscript PDF is the primary source
+      for the selected boundary; it is not attached to this Git snapshot.
+      Its SHA-256 is f53d7b1241de79a216d4cd2c37a17f173142d21cf96204115c2535b1dd0a6109.
+      The public arXiv record is a
       stable locator for the earlier 24-page v1 and has a shorter title; it is
       not silently treated as identical to the accepted 49-page manuscript.
       The selected declarations track the manuscript's Sections 3, 6, 7, 10,
@@ -146,9 +148,9 @@ status:
 
 automation:
   methods:
-    - method: "manual"
+    - method: "agent"
       tool_setup: >-
-        Reading and visually checking the accepted-manuscript PDF, selecting
+        Agent-assisted reading and visual checking of the accepted-manuscript PDF, selecting
         the mathematical boundary, comparing it with the native source, and
         recording provenance and exclusions.
     - method: "agent"
@@ -177,7 +179,7 @@ automation:
 
 fidelity:
   divergences: >-
-    The attached manuscript describes a larger development with an explicit
+    The privately supplied manuscript describes a larger development with an explicit
     deep embedding, confluence/termination infrastructure, applications, and
     a full higher-cell presentation. This project mirrors the central
     proof-relevance split and the proof-irrelevance construction in a compact
@@ -189,9 +191,13 @@ fidelity:
     derivation boundaries.
 
 review:
-  status: "self-assessed"
+  status: "agent-reviewed; blocking semantic findings"
   reviewers: []
   notes: >-
+    A subsequent adversarial audit found that this Comparator boundary does
+    not certify the advertised recursive globular structure. It is not ready
+    for intake. RESEARCH_AUDIT.md records the blockers. GlobularCompletion.lean
+    is an in-progress repair and is not yet selected by this Comparator.
     The accepted manuscript was read against every selected declaration; the
     native ContractibilityIrrelevance and OmegaGroupoid developments were
     inspected for correspondence; both standalone modules compile; source

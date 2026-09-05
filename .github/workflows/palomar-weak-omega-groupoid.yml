@@ -27,6 +27,8 @@ jobs:
           build: false
       - name: Run the focused artifact quality gate
         run: palomar/weak-omega-groupoid/scripts/check.sh
+      - name: Check recursive repair and semantic regressions
+        run: bash palomar/weak-omega-groupoid/scripts/check-repair.sh
 
   comparator:
     name: Run pinned Comparator and NanoDa replay
