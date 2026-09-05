@@ -1,0 +1,48 @@
+name: Palomar Globular Completion
+
+on:
+  push:
+    branches: [codex/palomar-globular-repair]
+  pull_request:
+    paths: ['palomar/globular-completion/**', '.github/workflows/palomar-globular-completion.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: globular-completion-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: leanprover/lean-action@38fbc41a8c28c4cbaec22d7f7de508ec2e7c0dd9
+        with:
+          build: false
+      - name: Fetch pinned dependency cache
+        working-directory: palomar/globular-completion
+        run: lake exe cache get Mathlib.Data.List.Basic
+      - name: Check statements, regressions, and exact axiom inventory
+        run: bash palomar/globular-completion/scripts/check.sh
+  comparator:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: leanprover/lean-action@38fbc41a8c28c4cbaec22d7f7de508ec2e7c0dd9
+        with:
+          build: false
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e
+        with:
+          go-version: '1.24.0'
+          cache: false
+      - name: Replay Comparator, Lean, and NanoDa at explicit pins
+        run: bash palomar/globular-completion/scripts/verify-comparator.sh

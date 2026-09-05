@@ -1,0 +1,191 @@
+version: "v0.4"
+project:
+  name: "Relative globular completion of computational paths"
+  description: >-
+    A Lean construction of a recursive globular completion of an explicit
+    trace-decorated equality and rewrite-derivation 2-skeleton. Higher cells
+    are freely generated reversible composition expressions with one chosen
+    generator for each parallel boundary. We prove globularity, identity and
+    inverse boundary laws, and that higher derivations exist exactly between
+    parallel cells. Each extension has a unique interpretation in any typed
+    target supplying units, chosen parallel generators, inversion, and
+    composition; extension preserves identity and composition of layer maps
+    and does not erase syntax-node counts. Distinct pentagon routes in the
+    original 2-skeleton remain distinct while being connected by a 3-cell.
+    This is a scoped adaptation of the computational-path construction, not
+    a proof of an operadic weak omega-groupoid theorem or a comparison with
+    Martin-Lof identity types. Higher fillers are part of the chosen
+    completion, not consequences of rewrite normalization.
+  authors:
+    - "Arthur F. Ramos"
+    - "Tiago M. L. de Veras"
+    - "Ruy J. G. B. de Queiroz"
+    - "Anjolina G. de Oliveira"
+  responsible_maintainers: ["Arthur F. Ramos"]
+  license: "MIT"
+classification:
+  arxiv: ["math.CT", "cs.LO"]
+  msc2020: ["18N50", "03B38", "68V20"]
+sources:
+  - title: "Computational Paths Form a Weak omega-Groupoid: A Constructive Proof"
+    authors: ["Arthur F. Ramos", "Tiago M. L. de Veras", "Ruy J. G. B. de Queiroz", "Anjolina G. de Oliveira"]
+    type: "paper"
+    location: "https://arxiv.org/abs/2512.00657"
+    relationship: "adapts"
+    note: >-
+      The privately supplied 49-page accepted manuscript is identified by
+      SHA-256 f53d7b1241de79a216d4cd2c37a17f173142d21cf96204115c2535b1dd0a6109.
+      The public locator is the earlier 24-page version, not the same document.
+      Definitions 3.9 and 3.12 motivate the chosen generator and recursive
+      boundaries. This adaptation repairs dimensional indexing, supplies a
+      layerwise interpretation theorem, and explicitly excludes Theorem 10.2.
+      It does not claim the full Theorem 10.1. The private PDF is not included
+      in this Git snapshot or relicensed by its MIT license.
+  - title: "Weak omega-categories from intensional type theory"
+    authors: ["Peter LeFanu Lumsdaine"]
+    type: "paper"
+    location: "https://arxiv.org/abs/0812.0409"
+    relationship: "background"
+    note: "Context for the stronger operadic theorem, which is not formalized here."
+  - title: "Types are weak omega-groupoids"
+    authors: ["Benno van den Berg", "Richard Garner"]
+    type: "paper"
+    location: "https://arxiv.org/abs/0812.0298"
+    relationship: "background"
+    note: "The identity-type construction is not claimed to be equivalent to this completion."
+related_formalizations:
+  - id: "https://github.com/Arthur742Ramos/ComputationalPathsLean/tree/c5b35d854c4271f5216d33539526a28648d7dde9/palomar/weak-omega-groupoid"
+    relationship: "adapts"
+    note: >-
+      Retains that extract's Path, seven-rule Step fragment, RwEq derivation
+      syntax and explicit pentagon routes. Replaces its fixed-level tail and
+      unconstrained cell-family record with a recursive, boundary-sensitive
+      construction. No completeness claim for the full native rewrite system.
+  - id: "https://github.com/Arthur742Ramos/ComputationalPathsLean/tree/48eb008f27e485894b17a224a64f379e90711e1f/palomar/weak-omega-groupoid"
+    relationship: "builds-on"
+    note: >-
+      The immediately preceding audited recursive repair. This package adds
+      layerwise freeness, functorial extension, semantic regressions and a new
+      independent statement surface. SOURCE_MAP.md records exact correspondence.
+status:
+  scope: >-
+    Relative globular completion, not a full weak omega-groupoid formalization.
+    Freeness is layerwise for reversible composition syntax with chosen
+    parallel generators, not initiality among groupoids or operadic algebras.
+  sorry_count: 0
+  sorry_in_definitions: 0
+  axioms: ["propext", "Quot.sound"]
+  main_results:
+    - declaration: "ComputationalPaths.RelativeCompletion.Globular.source_globular"
+      file: "Solution.lean"
+      sorry_count: 0
+      axioms: []
+      comparator_config: "comparator.json"
+    - declaration: "ComputationalPaths.RelativeCompletion.Globular.target_globular"
+      file: "Solution.lean"
+      sorry_count: 0
+      axioms: []
+      comparator_config: "comparator.json"
+    - declaration: "ComputationalPaths.RelativeCompletion.Globular.identityCell_boundary"
+      file: "Solution.lean"
+      sorry_count: 0
+      axioms: []
+      comparator_config: "comparator.json"
+    - declaration: "ComputationalPaths.RelativeCompletion.Globular.inverseCell_boundary"
+      file: "Solution.lean"
+      sorry_count: 0
+      axioms: []
+      comparator_config: "comparator.json"
+    - declaration: "ComputationalPaths.RelativeCompletion.Globular.compose_boundary"
+      file: "Solution.lean"
+      sorry_count: 0
+      axioms: []
+      comparator_config: "comparator.json"
+    - declaration: "ComputationalPaths.RelativeCompletion.Globular.higher_filling"
+      file: "Solution.lean"
+      sorry_count: 0
+      axioms: []
+      comparator_config: "comparator.json"
+    - declaration: "ComputationalPaths.RelativeCompletion.Globular.inhabited_iff_parallel"
+      file: "Solution.lean"
+      sorry_count: 0
+      axioms: []
+      comparator_config: "comparator.json"
+    - declaration: "ComputationalPaths.RelativeCompletion.Globular.unique_interpretation"
+      file: "Solution.lean"
+      sorry_count: 0
+      axioms: ["Quot.sound"]
+      comparator_config: "comparator.json"
+    - declaration: "ComputationalPaths.RelativeCompletion.Globular.tower_unique_interpretation"
+      file: "Solution.lean"
+      sorry_count: 0
+      axioms: ["Quot.sound"]
+      comparator_config: "comparator.json"
+    - declaration: "ComputationalPaths.RelativeCompletion.Globular.higher_syntax_not_subsingleton"
+      file: "Solution.lean"
+      sorry_count: 0
+      axioms: []
+      comparator_config: "comparator.json"
+    - declaration: "ComputationalPaths.RelativeCompletion.Globular.map_identity"
+      file: "Solution.lean"
+      sorry_count: 0
+      axioms: []
+      comparator_config: "comparator.json"
+    - declaration: "ComputationalPaths.RelativeCompletion.Globular.map_comp"
+      file: "Solution.lean"
+      sorry_count: 0
+      axioms: []
+      comparator_config: "comparator.json"
+    - declaration: "ComputationalPaths.RelativeCompletion.Globular.map_preserves_nodes"
+      file: "Solution.lean"
+      sorry_count: 0
+      axioms: []
+      comparator_config: "comparator.json"
+    - declaration: "ComputationalPaths.RelativeCompletion.Globular.lift_identity"
+      file: "Solution.lean"
+      sorry_count: 0
+      axioms: ["Quot.sound"]
+      comparator_config: "comparator.json"
+    - declaration: "ComputationalPaths.RelativeCompletion.Globular.lift_comp"
+      file: "Solution.lean"
+      sorry_count: 0
+      axioms: ["Quot.sound"]
+      comparator_config: "comparator.json"
+    - declaration: "ComputationalPaths.RelativeCompletion.Globular.pentagon_distinct_connected"
+      file: "Solution.lean"
+      sorry_count: 0
+      axioms: ["propext"]
+      comparator_config: "comparator.json"
+automation:
+  methods:
+    - method: "agent"
+      models: ["Codex"]
+      tool_setup: >-
+        Agent-assisted source audit, Lean implementation, proof debugging,
+        manuscript comparison, statement packaging, regression design and
+        documentation. Checks use Lean 4.33.0 and pinned Mathlib, with a
+        separate pinned Comparator/NanoDa workflow.
+  notes: >-
+    Challenge and Solution intentionally duplicate the same complete proofs;
+    this is not an independent second formalization or human peer review.
+    No custom axioms, proof holes, native_decide or evaluator bypass is used.
+fidelity:
+  divergences: >-
+    The raw Path record has unconstrained list metadata and an ambient equality;
+    it is not an inductive deep embedding of the full source calculus.
+    Step is the seven-constructor groupoid fragment. The completion explicitly
+    adds universal parallel generators. It proves neither normalization-based
+    coherence nor an action of a contractible globular operad. No path-induction,
+    identity-type comparison, homotopy-group computation or full LND_EQ-TRS
+    completeness theorem is included.
+review:
+  status: "agent-reviewed"
+  reviewers: ["Codex"]
+  notes: >-
+    The audit distinguishes chosen completion from intrinsic coherence and
+    from identity of path records. Regression tests include nonparallel
+    boundaries, a nontrivial integer interpretation, syntax preservation,
+    dimension-six boundaries, and the failure of unrestricted rewrite-to-
+    identity reflection. This is agent review, not independent specialist
+    review, Palomar editorial clearance or registration. See REVIEW.md.
+

@@ -1,0 +1,28 @@
+{
+  "challenge_module": "Challenge",
+  "solution_module": "Solution",
+  "theorem_names": [
+    "ComputationalPaths.RelativeCompletion.Globular.source_globular",
+    "ComputationalPaths.RelativeCompletion.Globular.target_globular",
+    "ComputationalPaths.RelativeCompletion.Globular.identityCell_boundary",
+    "ComputationalPaths.RelativeCompletion.Globular.inverseCell_boundary",
+    "ComputationalPaths.RelativeCompletion.Globular.compose_boundary",
+    "ComputationalPaths.RelativeCompletion.Globular.higher_filling",
+    "ComputationalPaths.RelativeCompletion.Globular.inhabited_iff_parallel",
+    "ComputationalPaths.RelativeCompletion.Globular.unique_interpretation",
+    "ComputationalPaths.RelativeCompletion.Globular.tower_unique_interpretation",
+    "ComputationalPaths.RelativeCompletion.Globular.higher_syntax_not_subsingleton",
+    "ComputationalPaths.RelativeCompletion.Globular.map_identity",
+    "ComputationalPaths.RelativeCompletion.Globular.map_comp",
+    "ComputationalPaths.RelativeCompletion.Globular.map_preserves_nodes",
+    "ComputationalPaths.RelativeCompletion.Globular.lift_identity",
+    "ComputationalPaths.RelativeCompletion.Globular.lift_comp",
+    "ComputationalPaths.RelativeCompletion.Globular.pentagon_distinct_connected"
+  ],
+  "permitted_axioms": [
+    "propext",
+    "Quot.sound"
+  ],
+  "enable_nanoda": true
+}
+

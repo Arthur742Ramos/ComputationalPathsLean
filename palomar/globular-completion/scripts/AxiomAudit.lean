@@ -1,0 +1,19 @@
+import Solution
+
+#print axioms ComputationalPaths.RelativeCompletion.Globular.source_globular
+#print axioms ComputationalPaths.RelativeCompletion.Globular.target_globular
+#print axioms ComputationalPaths.RelativeCompletion.Globular.identityCell_boundary
+#print axioms ComputationalPaths.RelativeCompletion.Globular.inverseCell_boundary
+#print axioms ComputationalPaths.RelativeCompletion.Globular.compose_boundary
+#print axioms ComputationalPaths.RelativeCompletion.Globular.higher_filling
+#print axioms ComputationalPaths.RelativeCompletion.Globular.inhabited_iff_parallel
+#print axioms ComputationalPaths.RelativeCompletion.Globular.unique_interpretation
+#print axioms ComputationalPaths.RelativeCompletion.Globular.tower_unique_interpretation
+#print axioms ComputationalPaths.RelativeCompletion.Globular.higher_syntax_not_subsingleton
+#print axioms ComputationalPaths.RelativeCompletion.Globular.map_identity
+#print axioms ComputationalPaths.RelativeCompletion.Globular.map_comp
+#print axioms ComputationalPaths.RelativeCompletion.Globular.map_preserves_nodes
+#print axioms ComputationalPaths.RelativeCompletion.Globular.lift_identity
+#print axioms ComputationalPaths.RelativeCompletion.Globular.lift_comp
+#print axioms ComputationalPaths.RelativeCompletion.Globular.pentagon_distinct_connected
+

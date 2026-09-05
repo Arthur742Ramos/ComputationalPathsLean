@@ -1,22 +1,13 @@
 import Lake
 open Lake DSL
-
-package «weak_omega_groupoid» where
+package «globular_completion» where
   version := v!"0.1.0"
-
 require mathlib from git
   "https://github.com/leanprover-community/mathlib4.git" @ "v4.33.0"
-
 @[default_target]
 lean_lib Challenge where
   roots := #[`Challenge]
-
 @[default_target]
 lean_lib Solution where
   roots := #[`Solution]
 
-lean_lib GlobularCompletion where
-  roots := #[`GlobularCompletion]
-
-lean_lib CompletionUniversal where
-  roots := #[`CompletionUniversal]
