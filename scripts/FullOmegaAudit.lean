@@ -13,6 +13,20 @@ completion gate for the full weak omega-groupoid theorem. -/
 #print axioms Endomorphism.evaluation
 #print axioms Endomorphism.nativeChain_pair
 #print axioms Endomorphism.nativeContraction
+#print axioms Endomorphism.existsUnique_abstraction
+#print axioms Endomorphism.evaluation_injective
+#print axioms Endomorphism.unit
+#print axioms Endomorphism.multiplication
+#print axioms Endomorphism.evaluation_unit_input
+#print axioms Endomorphism.evaluation_multiplication_nested
+
+example (A : Type u) {a b : A} (p : Path a b) :
+    (Endomorphism.evaluation (NativeTower.globular A)).app (n := 1)
+      (((Endomorphism.unit (NativeTower.globular A)).application (NativeTower.globular A)).app (n := 1)
+        ((GlobularCollection.identityApplicationIn (NativeTower.globular A)).app (n := 1)
+          (ULift.up (⟨a, b, p⟩ : PathOne A)))) =
+      (ULift.up (⟨a, b, p⟩ : PathOne A) : NativeTower.Cell A 1) :=
+  Endomorphism.evaluation_unit_input (NativeTower.globular A) _
 
 example (A : Type u) {n : Nat}
     (p : GlobularSet.LiftingProblem (Endomorphism.arity (NativeTower.globular A)) n) :

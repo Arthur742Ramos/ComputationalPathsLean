@@ -660,10 +660,19 @@ application. For the native tower, `nativeContraction` supplies all the
 specified lifts over arities, including dimension-one empty diagrams.
 Those one-dimensional lifts fold actual `Path.trans` traces; the higher
 lifts evaluate the given boundary operations and use `fillPositive`.
-This is a contractible collection with evaluation, **not yet a contractible
-operad or its algebra**. Operadic units, substitution and their laws remain
-required, as do comparisons with the specified native compositions and
-coherence certificates.
+`existsUnique_abstraction` proves that every normalized globular evaluation
+is represented by a unique map into this collection. `evaluation_injective`
+detects collection-map equality by actual evaluation on all labelled inputs.
+This universal property now constructs concrete unit and multiplication
+maps: units extract singleton inputs, and multiplication recovers nested
+inputs through the substitution comparison and performs nested evaluation.
+`evaluation_unit_input` and `evaluation_multiplication_nested` prove those
+action equations in all dimensions; the audit also checks that the unit
+preserves a raw `Path` cell literally.
+This is a contractible collection with evaluation, unit and multiplication
+maps, **not yet a contractible operad or its algebra**. The operadic left and
+right unit laws and associativity law remain required, as do comparisons
+with the specified native compositions and coherence certificates.
 
 Completion requires the mathematical target above to be instantiated, all
 proof dependencies audited, the relevant modules built, and preservation of

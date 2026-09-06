@@ -6,8 +6,9 @@ import ComputationalPaths.Path.OmegaGroupoid.NativeGlobularTower
 
 Operations retain their pasting arity and evaluate labelled inputs of that
 arity. The zero-dimensional operation is normalized to the identity.
-This file constructs a collection and its evaluation, not yet an operad:
-substitution, units and contraction are separate obligations.
+This file constructs a collection, evaluation, unit and substitution maps,
+and a native contraction. The operadic coherence laws remain to be proved;
+the displayed maps alone do not yet constitute an operad.
 -/
 
 namespace ComputationalPaths.Path.OmegaFoundations
@@ -125,6 +126,245 @@ def evaluation (G : GlobularSet.{u}) : GlobularSet.Map ((collection G).applicati
 
 theorem evaluation_objects (G : GlobularSet.{u})
     (p : ((collection G).application G).Cell 0) : (evaluation G).app p = p.val.2 := rfl
+
+/-- The normalization needed to interpret a collection in these
+endomorphisms: every object operation returns its input object. -/
+def Normalized {C : GlobularCollection.{u}} {G : GlobularSet.{u}}
+    (e : GlobularSet.Map (C.application G) G) : Prop :=
+  ∀ p : (C.application G).Cell 0, e.app p = p.val.2
+
+/-- Two levels of abstraction, retaining the exact evaluation equation.
+This record supports dimension recursion, not an assumed operadic law. -/
+structure AbstractionStage {C : GlobularCollection.{u}} {G : GlobularSet.{u}}
+    (e : GlobularSet.Map (C.application G) G) (n : Nat) where
+  lower : C.operations.Cell n → (stages G n).lower
+  upper : C.operations.Cell (n + 1) → (stages G n).upper
+  source_upper : ∀ o, (stages G n).source (upper o) = lower (C.operations.source o)
+  target_upper : ∀ o, (stages G n).target (upper o) = lower (C.operations.target o)
+  lower_arity : ∀ o, (stages G n).lowerArity (lower o) = C.arity.app o
+  upper_arity : ∀ o, (stages G n).upperArity (upper o) = C.arity.app o
+  lower_eval : ∀ o p h, (stages G n).lowerEval (lower o) p ((lower_arity o).trans h) =
+    e.app ⟨⟨o, p⟩, h⟩
+  upper_eval : ∀ o p h, (stages G n).upperEval (upper o) p ((upper_arity o).trans h) =
+    e.app ⟨⟨o, p⟩, h⟩
+
+def AbstractionStage.next {C : GlobularCollection.{u}} {G : GlobularSet.{u}}
+    {e : GlobularSet.Map (C.application G) G} {n : Nat}
+    (R : AbstractionStage e n) : AbstractionStage e (n + 1) where
+  lower := R.upper
+  upper o := {
+    left := R.upper (C.operations.source o)
+    right := R.upper (C.operations.target o)
+    parallel_source := (R.source_upper _).trans
+      ((_root_.congrArg R.lower (C.operations.source_source o)).trans (R.source_upper _).symm)
+    parallel_target := (R.target_upper _).trans
+      ((_root_.congrArg R.lower (C.operations.target_source o)).trans (R.target_upper _).symm)
+    arity := C.arity.app o
+    source_arity := (C.arity.source_app o).trans (R.upper_arity _).symm
+    target_arity := (C.arity.target_app o).trans (R.upper_arity _).symm
+    eval := fun p h => e.app ⟨⟨o, p⟩, h⟩
+    source_eval := fun p h => (e.source_app ⟨⟨o, p⟩, h⟩).trans (R.upper_eval _ _ _).symm
+    target_eval := fun p h => (e.target_app ⟨⟨o, p⟩, h⟩).trans (R.upper_eval _ _ _).symm }
+  source_upper _ := rfl
+  target_upper _ := rfl
+  lower_arity := R.upper_arity
+  upper_arity _ := rfl
+  lower_eval := R.upper_eval
+  upper_eval _ _ _ := rfl
+
+def abstractionBase {C : GlobularCollection.{u}} {G : GlobularSet.{u}}
+    (e : GlobularSet.Map (C.application G) G) (h0 : Normalized e) : AbstractionStage e 0 where
+  lower _ := PUnit.unit
+  upper o := {
+    arity := C.arity.app o
+    eval := fun p h => e.app ⟨⟨o, p⟩, h⟩
+    source_eval := fun p h => (e.source_app ⟨⟨o, p⟩, h⟩).trans (h0 _)
+    target_eval := fun p h => (e.target_app ⟨⟨o, p⟩, h⟩).trans (h0 _) }
+  source_upper _ := rfl
+  target_upper _ := rfl
+  lower_arity _ := @Subsingleton.elim PUnit _ _ _
+  upper_arity _ := rfl
+  lower_eval o p h := (h0 ⟨⟨o, p⟩, h⟩).symm
+  upper_eval _ _ _ := rfl
+
+def abstractionStages {C : GlobularCollection.{u}} {G : GlobularSet.{u}}
+    (e : GlobularSet.Map (C.application G) G) (h0 : Normalized e) :
+    (n : Nat) → AbstractionStage e n
+  | 0 => abstractionBase e h0
+  | n + 1 => (abstractionStages e h0 n).next
+
+/-- Abstract an actual normalized globular evaluation into operations,
+without quotienting its values or imposing any new evaluation equations. -/
+def abstractionMap {C : GlobularCollection.{u}} {G : GlobularSet.{u}}
+    (e : GlobularSet.Map (C.application G) G) (h0 : Normalized e) :
+    GlobularSet.Map C.operations (operations G) where
+  app {n} := (abstractionStages e h0 n).lower
+  source_app {n} := (abstractionStages e h0 n).source_upper
+  target_app {n} := (abstractionStages e h0 n).target_upper
+
+def abstraction {C : GlobularCollection.{u}} {G : GlobularSet.{u}}
+    (e : GlobularSet.Map (C.application G) G) (h0 : Normalized e) :
+    GlobularCollection.Hom C (collection G) where
+  operations := abstractionMap e h0
+  arity := by
+    apply GlobularSet.Map.ext
+    intro n o
+    exact (abstractionStages e h0 n).lower_arity o
+
+/-- Abstraction followed by evaluation recovers the supplied map exactly,
+including its unquotiented higher-dimensional values. -/
+theorem evaluation_abstraction {C : GlobularCollection.{u}} {G : GlobularSet.{u}}
+    (e : GlobularSet.Map (C.application G) G) (h0 : Normalized e) :
+    GlobularSet.Map.comp (evaluation G) ((abstraction e h0).application G) = e := by
+  apply GlobularSet.Map.ext
+  intro n p
+  exact (abstractionStages e h0 n).lower_eval p.val.1 p.val.2 p.property
+
+theorem OneOperation.ext {G : GlobularSet.{u}} (o q : OneOperation G)
+    (ha : o.arity = q.arity)
+    (he : ∀ p h k, o.eval p h = q.eval p k) : o = q := by
+  rcases o with ⟨oa, oe, os, ot⟩
+  rcases q with ⟨qa, qe, qs, qt⟩
+  dsimp at ha he
+  cases ha
+  have hh : oe = qe := funext (fun p => funext (fun h => he p h h))
+  cases hh
+  rfl
+
+theorem NextOperation.ext {G : GlobularSet.{u}} {n : Nat} {S : Stage G n}
+    (o q : NextOperation S) (hl : o.left = q.left) (hr : o.right = q.right)
+    (ha : o.arity = q.arity)
+    (he : ∀ p h k, o.eval p h = q.eval p k) : o = q := by
+  rcases o with ⟨ol, or, ops, opt, oa, osa, ota, oe, ose, ote⟩
+  rcases q with ⟨ql, qr, qps, qpt, qa, qsa, qta, qe, qse, qte⟩
+  dsimp at hl hr ha he
+  cases hl
+  cases hr
+  cases ha
+  have hh : oe = qe := funext (fun p => funext (fun h => he p h h))
+  cases hh
+  rfl
+
+/-- Evaluation detects collection maps into the normalized endomorphisms.
+Thus later operadic laws can be proved by their actual action on inputs. -/
+theorem evaluation_injective {C : GlobularCollection.{u}} {G : GlobularSet.{u}}
+    (f g : GlobularCollection.Hom C (collection G))
+    (he : GlobularSet.Map.comp (evaluation G) (f.application G) =
+      GlobularSet.Map.comp (evaluation G) (g.application G)) : f = g := by
+  have fa {n} (o : C.operations.Cell n) :
+      (stages G n).lowerArity (f.operations.app o) = C.arity.app o :=
+    _root_.congrArg (fun k : GlobularSet.Map C.operations Shapes => k.app o) f.arity
+  have ga {n} (o : C.operations.Cell n) :
+      (stages G n).lowerArity (g.operations.app o) = C.arity.app o :=
+    _root_.congrArg (fun k : GlobularSet.Map C.operations Shapes => k.app o) g.arity
+  have ev {n} (o : C.operations.Cell n) (p : Pasting n G)
+      (h : C.arity.app o = (GlobularCollection.shape G).app (n := n) p) :
+      (stages G n).lowerEval (f.operations.app o) p ((fa o).trans h) =
+        (stages G n).lowerEval (g.operations.app o) p ((ga o).trans h) :=
+    _root_.congrArg (fun k : GlobularSet.Map (C.application G) G =>
+      k.app ⟨⟨o, p⟩, h⟩) he
+  apply GlobularCollection.Hom.ext
+  apply GlobularSet.Map.ext
+  intro n
+  induction n with
+  | zero => intro o; exact @Subsingleton.elim PUnit _ _ _
+  | succ n ih =>
+    intro o
+    cases n with
+    | zero =>
+      apply OneOperation.ext
+      · exact (fa o).trans (ga o).symm
+      · intro p h k
+        exact ev o p ((fa o).symm.trans h)
+    | succ n =>
+      apply NextOperation.ext
+      · exact (f.operations.source_app o).trans
+          ((ih (C.operations.source o)).trans (g.operations.source_app o).symm)
+      · exact (f.operations.target_app o).trans
+          ((ih (C.operations.target o)).trans (g.operations.target_app o).symm)
+      · exact (fa o).trans (ga o).symm
+      · intro p h k
+        exact ev o p ((fa o).symm.trans h)
+
+/-- The universal property is for normalized globular evaluations, not
+yet for algebras satisfying a unit or multiplication law. -/
+theorem existsUnique_abstraction {C : GlobularCollection.{u}} {G : GlobularSet.{u}}
+    (e : GlobularSet.Map (C.application G) G) (h0 : Normalized e) :
+    ∃! f : GlobularCollection.Hom C (collection G),
+      GlobularSet.Map.comp (evaluation G) (f.application G) = e := by
+  refine ⟨abstraction e h0, evaluation_abstraction e h0, ?_⟩
+  intro f hf
+  exact evaluation_injective f (abstraction e h0) (hf.trans (evaluation_abstraction e h0).symm)
+
+theorem identityEvaluation_normalized (G : GlobularSet.{u}) :
+    Normalized (GlobularCollection.identityApplicationOut G) := by
+  intro p
+  exact _root_.congrArg (fun k : GlobularSet.Map (GlobularCollection.identity.application G)
+    (Pasting.globular G) => k.app p) (GlobularCollection.identityApplicationOut_inputs G)
+
+/-- The unit operation extracts the singleton input, at every dimension. -/
+noncomputable def unit (G : GlobularSet.{u}) :
+    GlobularCollection.Hom GlobularCollection.identity (collection G) :=
+  abstraction (GlobularCollection.identityApplicationOut G) (identityEvaluation_normalized G)
+
+theorem evaluation_unit (G : GlobularSet.{u}) :
+    GlobularSet.Map.comp (evaluation G) ((unit G).application G) =
+      GlobularCollection.identityApplicationOut G :=
+  evaluation_abstraction _ _
+
+/-- Evaluate a substituted operation by recovering its nested labelled
+inputs, evaluating the inner operations, then evaluating the outer one. -/
+noncomputable def multiplicationEvaluation (G : GlobularSet.{u}) :
+    GlobularSet.Map (((collection G).substitute (collection G)).application G) G :=
+  GlobularSet.Map.comp (evaluation G)
+    (GlobularSet.Map.comp ((collection G).map (evaluation G))
+      ((collection G).substitutionComparisonInverse (collection G) G))
+
+theorem multiplicationEvaluation_normalized (G : GlobularSet.{u}) :
+    Normalized (multiplicationEvaluation G) := by
+  intro p
+  have h := ((collection G).substitutionComparison_unique_lift (collection G) G p).choose_spec.1
+  exact _root_.congrArg (fun q : (((collection G).substitute (collection G)).application G).Cell 0 =>
+    q.val.2) h
+
+/-- Concrete substitution of endomorphism operations. Its evaluation law
+is proved below; the monoid's coherence laws are still separate obligations. -/
+noncomputable def multiplication (G : GlobularSet.{u}) :
+    GlobularCollection.Hom ((collection G).substitute (collection G)) (collection G) :=
+  abstraction (multiplicationEvaluation G) (multiplicationEvaluation_normalized G)
+
+theorem evaluation_multiplication (G : GlobularSet.{u}) :
+    GlobularSet.Map.comp (evaluation G) ((multiplication G).application G) =
+      multiplicationEvaluation G := evaluation_abstraction _ _
+
+/-- The concrete unit acts as the identity on every input cell, not just
+on its boundary or equality proof. -/
+theorem evaluation_unit_input (G : GlobularSet.{u}) {n : Nat} (p : G.Cell n) :
+    (evaluation G).app (((unit G).application G).app
+      ((GlobularCollection.identityApplicationIn G).app p)) = p := by
+  have hu := _root_.congrArg (fun k : GlobularSet.Map
+    (GlobularCollection.identity.application G) G =>
+      k.app ((GlobularCollection.identityApplicationIn G).app p)) (evaluation_unit G)
+  exact hu.trans (_root_.congrArg (fun k : GlobularSet.Map G G => k.app p)
+    (GlobularCollection.identityApplicationIso G).inv_hom_id)
+
+/-- Substituting a nested operation and then evaluating equals nested
+evaluation, in every dimension and on the actual labelled pasting input. -/
+theorem evaluation_multiplication_nested (G : GlobularSet.{u}) {n : Nat}
+    (p : ((collection G).application ((collection G).application G)).Cell n) :
+    (evaluation G).app (((multiplication G).application G).app
+      (((collection G).substitutionComparison (collection G) G).app p)) =
+        (evaluation G).app (((collection G).map (evaluation G)).app p) := by
+  have hm := _root_.congrArg (fun k : GlobularSet.Map
+    (((collection G).substitute (collection G)).application G) G =>
+      k.app (((collection G).substitutionComparison (collection G) G).app p))
+    (evaluation_multiplication G)
+  have hi := _root_.congrArg (fun k : GlobularSet.Map
+    ((collection G).application ((collection G).application G))
+    ((collection G).application ((collection G).application G)) => k.app p)
+    ((collection G).substitutionComparisonIso (collection G) G).hom_inv_id
+  exact hm.trans (_root_.congrArg (fun q =>
+    (evaluation G).app (((collection G).map (evaluation G)).app q)) hi)
 
 /-- Recover the actual trace carried by a one-dimensional hom label. -/
 def nativeEdge {A : Type u} {a b : (NativeTower.globular A).Cell 0}
