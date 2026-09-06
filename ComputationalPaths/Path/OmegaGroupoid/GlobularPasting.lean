@@ -3501,6 +3501,71 @@ theorem evaluate_singletonLabels {G : GlobularSet.{u}} {n : Nat} (p : Pasting n 
         (Chain.mapAlong_identity_vertices _ p))).trans
           (_root_.congrArg Subtype.val (recursive_fold_single p))
 
+/-- A map preserving all cut operations is recovered by evaluating its
+restriction to generating cells. This holds in every dimension. -/
+theorem preserves_recovered {G H : GlobularSet.{u}} (C : CutOperations H)
+    (L : C.Compatible) (f : GlobularSet.Map (globular G) H)
+    (P : CutOperations.Preserves (cutOperations G) C f)
+    {n : Nat} (p : Pasting n G) :
+    f.app p = evaluate (C.recursive L) .root
+      (GlobularSet.Map.comp f (singletonGlobular G)) p := by
+  have hp := evaluate_postcompose (cutOperations G) C
+    (cutOperations_compatible G) L .root .root f P (singletonGlobular G) p
+  exact (_root_.congrArg (fun z => f.app z) (evaluate_singletonLabels p)).symm.trans hp
+
+/-- Composition-preserving maps out of labelled pastings are uniquely
+determined by their values on the original globular generators. -/
+theorem preserves_ext {G H : GlobularSet.{u}} (C : CutOperations H)
+    (L : C.Compatible) (f g : GlobularSet.Map (globular G) H)
+    (P : CutOperations.Preserves (cutOperations G) C f)
+    (Q : CutOperations.Preserves (cutOperations G) C g)
+    (h : GlobularSet.Map.comp f (singletonGlobular G) =
+      GlobularSet.Map.comp g (singletonGlobular G)) : f = g := by
+  apply GlobularSet.Map.ext
+  intro n p
+  exact (preserves_recovered C L f P p).trans
+    ((_root_.congrArg (fun k => evaluate (C.recursive L) .root k p) h).trans
+      (preserves_recovered C L g Q p).symm)
+
+/-- The recursive extension preserves all cut operations, including the
+iterated identities at every lower-dimensional boundary. -/
+theorem evaluateGlobular_preserves {G H : GlobularSet.{u}} (C : CutOperations H)
+    (L : C.Compatible) (U : C.LeftUnital) (A : C.Associative)
+    (I : C.Interchange) (J : C.UnitIdempotent) (V : C.UnitCompatible)
+    (f : GlobularSet.Map G H) :
+    CutOperations.Preserves (cutOperations G) C
+      (evaluateGlobular (C.recursive L) .root f) where
+  compose c p q h h' := evaluate_cutCompose C L U A I J c .root f p q _ _
+  unit c p := evaluate_cutUnit C L V c .root f p
+
+/-- Evaluation extends the given labels exactly. -/
+theorem evaluateGlobular_extends {G H : GlobularSet.{u}} (C : CutOperations H)
+    (L : C.Compatible) (R : C.RightUnital) (f : GlobularSet.Map G H) :
+    GlobularSet.Map.comp (evaluateGlobular (C.recursive L) .root f)
+      (singletonGlobular G) = f := by
+  apply GlobularSet.Map.ext
+  intro n p
+  exact evaluate_singleton (C.recursive L)
+    (fun {K} h {n a b} q => CutOperations.horizontal_right_unit
+      (L.inContext h) (R.inContext h) (n := n) (a := a) (b := b) q)
+    .root f p
+
+/-- The precise algebraic universal property of labelled pastings for
+targets with the stated cut laws. Identification with a standard presentation
+of strict omega-categories is a separate comparison obligation. -/
+theorem existsUnique_preserving_extension {G H : GlobularSet.{u}} (C : CutOperations H)
+    (L : C.Compatible) (U : C.LeftUnital) (R : C.RightUnital) (A : C.Associative)
+    (I : C.Interchange) (J : C.UnitIdempotent) (V : C.UnitCompatible)
+    (f : GlobularSet.Map G H) :
+    ∃! g : GlobularSet.Map (globular G) H,
+      CutOperations.Preserves (cutOperations G) C g ∧
+      GlobularSet.Map.comp g (singletonGlobular G) = f := by
+  refine ⟨evaluateGlobular (C.recursive L) .root f,
+    ⟨evaluateGlobular_preserves C L U A I J V f, evaluateGlobular_extends C L R f⟩, ?_⟩
+  intro g hg
+  exact preserves_ext C L g _ hg.1 (evaluateGlobular_preserves C L U A I J V f)
+    (hg.2.trans (evaluateGlobular_extends C L R f).symm)
+
 /-- The second multiplication unit equation: replacing every generating
 label by a singleton, then flattening, retains the entire original diagram. -/
 theorem flatten_map_singleton {G : GlobularSet.{u}} {n : Nat} (p : Pasting n G) :

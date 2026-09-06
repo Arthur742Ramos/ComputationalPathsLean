@@ -8,6 +8,19 @@ open ComputationalPaths.Path.OmegaFoundations
 /-! Incremental audit. This checks the foundations only; it is not yet a
 completion gate for the full weak omega-groupoid theorem. -/
 
+#print axioms Pasting.preserves_recovered
+#print axioms Pasting.preserves_ext
+#print axioms Pasting.existsUnique_preserving_extension
+
+example {G H : GlobularSet} (C : Pasting.CutOperations H)
+    (L : C.Compatible) (U : C.LeftUnital) (R : C.RightUnital) (A : C.Associative)
+    (I : C.Interchange) (J : C.UnitIdempotent) (V : C.UnitCompatible)
+    (f : GlobularSet.Map G H) :
+    ∃! g : GlobularSet.Map (Pasting.globular G) H,
+      Pasting.CutOperations.Preserves (Pasting.cutOperations G) C g ∧
+      GlobularSet.Map.comp g (Pasting.singletonGlobular G) = f :=
+  Pasting.existsUnique_preserving_extension C L U R A I J V f
+
 example (G : GlobularSet) (n k : Nat) (c : G.Cell (n + (k + 2))) :
     G.sourceIter (k + 1) (G.source c) = G.sourceIter (k + 1) (G.target c) :=
   G.sourceIter_globular k c

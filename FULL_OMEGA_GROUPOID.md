@@ -158,6 +158,16 @@ strict-category universal property and cartesian properties needed by the
 chosen globular-operadic framework are not yet verified. A lawful monad
 alone does not establish the required globular operad or its native action.
 
+The algebraic extension property is now verified:
+`existsUnique_preserving_extension` extends every globular labelling uniquely
+to a map preserving all cut compositions and identities, for targets with
+explicit compatibility, left/right unit, associativity, interchange,
+unit-idempotence, and unit-compatibility laws. `preserves_recovered` derives
+any preserving map by evaluation of its restriction to generators, and
+`preserves_ext` proves uniqueness in every dimension. This is not yet an
+identification of those target laws with an established strict omega-category
+presentation, nor a proof of cartesianness or a native weak operadic action.
+
 The multiplication associativity proof uses strict cut-operation
 associativity and interchange inherited through every hom context, alongside
 both unit laws. `CutOperations.fold_append` proves the evaluator's chain fold
@@ -266,7 +276,7 @@ four inner ones, and `cutCompose_interchange_grid` proves interchange using
 only those four hypotheses. This covers arbitrary ordered boundary dimensions;
 the outer composites are not assumed to exist independently. The chain proof
 retains the actual labels through `zipOver_grid`. The monad is now constructed;
-its free universal property, cartesian verification, and the eventual
+its standard free-category comparison, cartesian verification, and the eventual
 weak-groupoid operadic action remain incomplete. Native/coskeletal
 coinductive invertibility is proved separately below, not yet linked to an
 operadic action.
