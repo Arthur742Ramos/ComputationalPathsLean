@@ -2748,6 +2748,86 @@ noncomputable def cutCompose {n : Nat} (c : Cut n) {G : GlobularSet.{u}}
     exact pack (Chain.zipOver (fun e => cutTarget c e) (fun e => cutSource c e)
       (fun {x y} e d h => ih (G := G.hom x y) e d h) p q hp)
 
+/-- Both prescribed factors and their actual cut match are retained. -/
+def CutPair {n : Nat} (c : Cut n) (G : GlobularSet.{u}) :=
+  { p : Pasting n G × Pasting n G // cutTarget c p.1 = cutSource c p.2 }
+
+/-- The factor-pair chain underlying a lifted-cut composition. -/
+noncomputable def cutPairChain {n : Nat} (c : Cut n) {G : GlobularSet.{u}} {a b : G.Cell 0}
+    (p q : Horizontal n G a b)
+    (h : p.map (fun e => cutTarget c e) = q.map (fun e => cutSource c e)) :
+    Chain (fun x y => CutPair c (G.hom x y)) a b :=
+  Chain.zipOver (fun e => cutTarget c e) (fun e => cutSource c e)
+    (fun e f h => ⟨(e, f), h⟩) p q h
+
+theorem cutPairChain_left {n : Nat} (c : Cut n) {G : GlobularSet.{u}} {a b : G.Cell 0}
+    (p q : Horizontal n G a b)
+    (h : p.map (fun e => cutTarget c e) = q.map (fun e => cutSource c e)) :
+    (cutPairChain c p q h).map (fun r => r.val.1) = p :=
+  (Chain.map_zipOver_left (fun e => cutTarget c e) (fun e => cutSource c e)
+    (fun e f h => (⟨(e, f), h⟩ : CutPair c _)) (fun r => r.val.1) (fun e => e)
+    (fun _ _ _ => rfl) p q h).trans (Chain.map_id p)
+
+theorem cutPairChain_right {n : Nat} (c : Cut n) {G : GlobularSet.{u}} {a b : G.Cell 0}
+    (p q : Horizontal n G a b)
+    (h : p.map (fun e => cutTarget c e) = q.map (fun e => cutSource c e)) :
+    (cutPairChain c p q h).map (fun r => r.val.2) = q :=
+  (Chain.map_zipOver_right (fun e => cutTarget c e) (fun e => cutSource c e)
+    (fun e f h => (⟨(e, f), h⟩ : CutPair c _)) (fun r => r.val.2) (fun e => e)
+    (fun _ _ _ => rfl) p q h).trans (Chain.map_id q)
+
+theorem cutPairChain_composable {n : Nat} (c : Cut n) {G : GlobularSet.{u}} {a b : G.Cell 0}
+    (r : Chain (fun x y => CutPair c (G.hom x y)) a b) :
+    (r.map (fun p => p.val.1)).map (fun p => cutTarget c p) =
+      (r.map (fun p => p.val.2)).map (fun p => cutSource c p) :=
+  (Chain.map_map _ _ r).trans ((Chain.map_congr _ _ (fun p => p.property) r).trans
+    (Chain.map_map _ _ r).symm)
+
+/-- Packing both factors and recovering them loses no factor data. -/
+theorem cutPairChain_roundtrip {n : Nat} (c : Cut n) {G : GlobularSet.{u}} {a b : G.Cell 0}
+    (r : Chain (fun x y => CutPair c (G.hom x y)) a b) :
+    cutPairChain c (r.map (fun p => p.val.1)) (r.map (fun p => p.val.2))
+      (cutPairChain_composable c r) = r := by
+  induction r with
+  | nil => rfl
+  | cons p r ih =>
+    change Chain.cons p (cutPairChain c (r.map (fun p => p.val.1)) (r.map (fun p => p.val.2)) _) = _
+    exact _root_.congrArg (Chain.cons p) ih
+
+/-- Composing the retained factor pairs gives the implemented aligned
+composition, with each original matching witness still available. -/
+theorem cutPairChain_compose {n : Nat} (c : Cut n) {G : GlobularSet.{u}} {a b : G.Cell 0}
+    (p q : Horizontal n G a b)
+    (h : p.map (fun e => cutTarget c e) = q.map (fun e => cutSource c e)) :
+    (cutPairChain c p q h).map (fun r => cutCompose c r.val.1 r.val.2 r.property) =
+      Chain.zipOver (fun e => cutTarget c e) (fun e => cutSource c e)
+        (fun e f h => cutCompose c e f h) p q h := by
+  induction p with
+  | nil =>
+    cases q with
+    | nil => rfl
+    | cons e q => cases h
+  | @cons a d b e p ih =>
+    cases q with
+    | nil => cases h
+    | @cons _ d' _ f q =>
+      have hc := h
+      simp only [Chain.map] at hc
+      injection hc with _ hd _ he hp
+      cases hd
+      have he' := eq_of_heq he
+      have hp' := eq_of_heq hp
+      change Chain.cons (cutCompose c e f he')
+        ((cutPairChain c p q hp').map (fun r => cutCompose c r.val.1 r.val.2 r.property)) = _
+      exact _root_.congrArg (Chain.cons (cutCompose c e f he')) (ih q hp')
+
+theorem cutCompose_lift_pairs {n : Nat} (c : Cut n) {G : GlobularSet.{u}} {a b : G.Cell 0}
+    (p q : Horizontal n G a b)
+    (h : p.map (fun e => cutTarget c e) = q.map (fun e => cutSource c e)) :
+    cutCompose (.lift c) (pack p) (pack q) (_root_.congrArg pack h) =
+      pack ((cutPairChain c p q h).map (fun r => cutCompose c r.val.1 r.val.2 r.property)) :=
+  _root_.congrArg pack (cutPairChain_compose c p q h).symm
+
 theorem cutSource_cutCompose {n : Nat} (c : Cut n) {G : GlobularSet.{u}}
     (p q : Pasting n G) (h : cutTarget c p = cutSource c q) :
     cutSource c (cutCompose c p q h) = cutSource c p := by

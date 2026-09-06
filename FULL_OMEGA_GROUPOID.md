@@ -187,6 +187,15 @@ with `cutSource c p` as its explicit preimage. No injectivity hypothesis or
 general filler is assumed. This completes the primitive unit part, not the
 higher-cut composition or globular multiplication part.
 
+The higher-cut factor representation is now checked. `CutPair` retains both
+prescribed factors and their actual matching equation. `cutPairChain` aligns
+these pairs through the shared boundary chain; its left/right projections and
+`cutPairChain_roundtrip` recover the original data exactly.
+`cutCompose_lift_pairs` proves that the implemented lifted-cut composition is
+the chainwise composition of these retained pairs. This supplies the precise
+representation for a recursive lifting proof, but does not yet prove that
+the factor pairs themselves lift through arbitrary relabelling.
+
 `evaluate` now evaluates labelled diagrams by dimension recursion into a
 target equipped with horizontal operations in all its iterated hom contexts
 (`RecursiveComposition`). The evaluator is implemented, not a field assumed
