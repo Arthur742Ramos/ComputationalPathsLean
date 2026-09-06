@@ -5898,6 +5898,97 @@ theorem application_cartesian {C D : GlobularCollection.{u}} (f : Hom C D)
     (_root_.congrArg (fun z : (C.application H).Cell n => z.val.1) hs.2)
     (_root_.congrArg (fun z : (D.application G).Cell n => z.val.2) hs.1))
 
+/-- Substitute arity-preserving maps into both the outer and inner
+operation positions. Every labelled inner operation is retained. -/
+noncomputable def substitute {C D E F : GlobularCollection.{u}} (f : Hom C E) (g : Hom D F) :
+    Hom (C.substitute D) (E.substitute F) where
+  operations := GlobularSet.Map.comp (f.application F.operations) (C.map g.operations)
+  arity := by
+    apply GlobularSet.Map.ext
+    intro n p
+    change (Pasting.flattenGlobular GlobularSet.terminal).app
+      (Pasting.map F.arity (Pasting.map g.operations p.val.2)) =
+      (Pasting.flattenGlobular GlobularSet.terminal).app (Pasting.map D.arity p.val.2)
+    exact _root_.congrArg (Pasting.flattenGlobular GlobularSet.terminal).app
+      ((Pasting.map_comp g.operations F.arity p.val.2).trans
+        (_root_.congrArg (fun k => Pasting.map k p.val.2) g.arity))
+
+theorem substitute_id (C D : GlobularCollection.{u}) :
+    substitute (id C) (id D) = id (C.substitute D) := by
+  apply ext
+  apply GlobularSet.Map.ext
+  intro n p
+  exact Subtype.ext (Prod.ext rfl (Pasting.map_id D.operations p.val.2))
+
+theorem substitute_comp {C D E F J K : GlobularCollection.{u}}
+    (f : Hom C E) (g : Hom D F) (h : Hom E J) (k : Hom F K) :
+    substitute (comp h f) (comp k g) = comp (substitute h k) (substitute f g) := by
+  apply ext
+  apply GlobularSet.Map.ext
+  intro n p
+  exact Subtype.ext (Prod.ext rfl (Pasting.map_comp g.operations k.operations p.val.2).symm)
+
+/-- The comparison from nested applications is natural in both operation
+collections as well as in input labels. -/
+theorem substitute_comparison {C D E F : GlobularCollection.{u}} (f : Hom C E) (g : Hom D F)
+    (G : GlobularSet.{u}) :
+    GlobularSet.Map.comp ((substitute f g).application G) (C.substitutionComparison D G) =
+      GlobularSet.Map.comp (E.substitutionComparison F G)
+        (GlobularSet.Map.comp (f.application (F.application G)) (C.map (g.application G))) := by
+  have hop : GlobularSet.Map.comp (F.operation G) (g.application G) =
+      GlobularSet.Map.comp g.operations (D.operation G) := by
+    apply GlobularSet.Map.ext
+    intro n p
+    rfl
+  apply GlobularSet.Map.ext
+  intro n p
+  apply Subtype.ext
+  refine Prod.ext ?_ ?_
+  · apply Subtype.ext
+    refine Prod.ext rfl ?_
+    exact (Pasting.map_comp (D.operation G) g.operations p.val.2).trans
+      ((_root_.congrArg (fun k => Pasting.map k p.val.2) hop.symm).trans
+        (Pasting.map_comp (g.application G) (F.operation G) p.val.2).symm)
+  · exact _root_.congrArg (Pasting.flattenGlobular G).app
+      (((Pasting.map_comp (g.application G) (F.inputs G) p.val.2).trans
+        (_root_.congrArg (fun k => Pasting.map k p.val.2) (g.application_inputs G))).symm)
+
+noncomputable def leftUnit (C : GlobularCollection.{u}) : Hom (identity.substitute C) C where
+  operations := identityApplicationOut C.operations
+  arity := by
+    apply GlobularSet.Map.ext
+    intro n p
+    have hp := _root_.congrArg (fun k : GlobularSet.Map (identity.application C.operations)
+      (Pasting.globular C.operations) => k.app p) (identityApplicationOut_inputs C.operations)
+    change C.arity.app ((identityApplicationOut C.operations).app p) =
+      (Pasting.flattenGlobular GlobularSet.terminal).app (Pasting.map C.arity p.val.2)
+    exact ((Pasting.flatten_singleton (C.arity.app ((identityApplicationOut C.operations).app p))).symm.trans
+      (_root_.congrArg (Pasting.flattenGlobular GlobularSet.terminal).app
+        ((Pasting.map_singleton C.arity ((identityApplicationOut C.operations).app p)).symm.trans
+          (_root_.congrArg (Pasting.map C.arity) hp))))
+
+def leftUnitInv (C : GlobularCollection.{u}) : Hom C (identity.substitute C) where
+  operations := identityApplicationIn C.operations
+  arity := by
+    apply GlobularSet.Map.ext
+    intro n p
+    exact (_root_.congrArg (Pasting.flattenGlobular GlobularSet.terminal).app
+      (Pasting.map_singleton C.arity p)).trans (Pasting.flatten_singleton (C.arity.app p))
+
+def rightUnit (C : GlobularCollection.{u}) : Hom (C.substitute identity) C where
+  operations := C.operation GlobularSet.terminal
+  arity := by
+    apply GlobularSet.Map.ext
+    intro n p
+    exact p.property.trans ((shape_terminal p.val.2).trans (Pasting.flatten_map_singleton p.val.2).symm)
+
+def rightUnitInv (C : GlobularCollection.{u}) : Hom C (C.substitute identity) where
+  operations := C.atTerminal
+  arity := by
+    apply GlobularSet.Map.ext
+    intro n p
+    exact Pasting.flatten_map_singleton (C.arity.app p)
+
 end Hom
 
 instance : CategoryTheory.Category.{u} GlobularCollection.{u} where
@@ -5907,6 +5998,22 @@ instance : CategoryTheory.Category.{u} GlobularCollection.{u} where
   id_comp f := Hom.ext rfl
   comp_id f := Hom.ext rfl
   assoc f g h := Hom.ext rfl
+
+/-- Substituting a collection into the identity collection is isomorphic
+to the original collection, with exact preservation of arities. -/
+noncomputable def leftUnitIso (C : GlobularCollection.{u}) :
+    CategoryTheory.Iso (identity.substitute C) C where
+  hom := Hom.leftUnit C
+  inv := Hom.leftUnitInv C
+  hom_inv_id := Hom.ext (identityApplicationIso C.operations).hom_inv_id
+  inv_hom_id := Hom.ext (identityApplicationIso C.operations).inv_hom_id
+
+def rightUnitIso (C : GlobularCollection.{u}) :
+    CategoryTheory.Iso (C.substitute identity) C where
+  hom := Hom.rightUnit C
+  inv := Hom.rightUnitInv C
+  hom_inv_id := Hom.ext C.applicationTerminalIso.hom_inv_id
+  inv_hom_id := Hom.ext C.applicationTerminalIso.inv_hom_id
 
 end GlobularCollection
 

@@ -107,6 +107,24 @@ completion gate for the full weak omega-groupoid theorem. -/
 #print axioms GlobularCollection.Hom.application_comp
 #print axioms GlobularCollection.Hom.application_inputs
 #print axioms GlobularCollection.Hom.application_cartesian
+#print axioms GlobularCollection.Hom.substitute_id
+#print axioms GlobularCollection.Hom.substitute_comp
+#print axioms GlobularCollection.Hom.substitute_comparison
+#print axioms GlobularCollection.leftUnitIso
+#print axioms GlobularCollection.rightUnitIso
+
+noncomputable example (C : GlobularCollection.{u}) :
+    CategoryTheory.Iso (GlobularCollection.identity.substitute C) C := C.leftUnitIso
+
+example (C : GlobularCollection.{u}) :
+    CategoryTheory.Iso (C.substitute GlobularCollection.identity) C := C.rightUnitIso
+
+example {C D E F J K : GlobularCollection.{u}}
+    (f : GlobularCollection.Hom C E) (g : GlobularCollection.Hom D F)
+    (h : GlobularCollection.Hom E J) (k : GlobularCollection.Hom F K) :
+    GlobularCollection.Hom.substitute (GlobularCollection.Hom.comp h f) (GlobularCollection.Hom.comp k g) =
+      GlobularCollection.Hom.comp (GlobularCollection.Hom.substitute h k) (GlobularCollection.Hom.substitute f g) :=
+  GlobularCollection.Hom.substitute_comp f g h k
 
 example {C D : GlobularCollection.{u}} (f : GlobularCollection.Hom C D)
     {G H : GlobularSet.{u}} (g : GlobularSet.Map G H) {n : Nat}

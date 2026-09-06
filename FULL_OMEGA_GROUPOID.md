@@ -286,8 +286,9 @@ collections is asserted by the object-level terminal isomorphism alone.
 recover an original cell from an identity-labelled operation.
 `identityApplicationIso` proves both inverse equations as globular maps, and
 `identityApplicationOut_natural` proves compatibility with every relabelling.
-Thus the proposed substitution unit acts as the identity on globular sets;
-this does not yet establish either substitution unitor or associativity law.
+Thus the proposed substitution unit acts as the identity on globular sets.
+The collection-level unit isomorphisms are now proved below; associativity
+and the coherence laws remain separate obligations.
 
 `GlobularCollection.substitute C D` now has the carrier of outer operations
 labelled by inner operations. Its arity uses the actual pasting monad
@@ -303,7 +304,7 @@ labels. `substitutionComparisonInverse` respects both globular boundaries by
 uniqueness, and `substitutionComparisonIso` proves both inverse equations.
 `substitutionFunctorIso` packages the existing naturality law into an actual
 natural isomorphism between composed application functors and application of
-the substituted collection. Substitution unitors, associativity, and the
+the substituted collection. Substitution coherence, associativity, and the
 eventual operad multiplication remain unproved.
 
 `GlobularCollection.Hom` now requires a globular operation map preserving
@@ -315,6 +316,16 @@ and the input projection. `Hom.application_cartesian` proves unique lifts
 for its naturality squares at every dimension. These maps provide the typed
 interface for the future operad unit and multiplication; neither map nor
 its operad laws are assumed to exist merely from this interface.
+
+`Hom.substitute` applies collection maps in both operation positions,
+preserving the complete arity. `substitute_id` and `substitute_comp` establish
+its identity and composition laws, and `substitute_comparison` proves that
+the application comparison commutes with maps of both collections.
+`leftUnitIso` and `rightUnitIso` are now isomorphisms of collections, not just
+underlying carriers: the former uses the identity-application inverse and the
+latter terminal recovery, with their arity equations proved from the two
+pasting multiplication unit laws. The substitution associator, naturality
+of these unitors, and their triangle/pentagon coherence remain unproved.
 
 `evaluate` now evaluates labelled diagrams by dimension recursion into a
 target equipped with horizontal operations in all its iterated hom contexts
