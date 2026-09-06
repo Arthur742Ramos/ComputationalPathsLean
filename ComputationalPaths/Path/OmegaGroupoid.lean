@@ -1170,7 +1170,7 @@ noncomputable def inv_derivation₂_of_stepstar_to_inverse {p q : Path a b}
     Derivation₃ (.inv (derivation₂_of_stepstar st)) (inverse_derivation_of_stepstar st) := by
   induction st with
   | refl =>
-      simpa [derivation₂_of_stepstar, inverse_derivation_of_stepstar] using
+      simpa only [derivation₂_of_stepstar, inverse_derivation_of_stepstar, normalizeInv] using
         (to_normal_form_inv₃ (.refl p))
   | tail st s ih =>
       simpa [derivation₂_of_stepstar, inverse_derivation_of_stepstar] using
@@ -1238,7 +1238,7 @@ theorem derivation_to_stepstar_normalize_vcomp_step {p q r : Path a b}
               simp [derivation_to_stepstar?, hstR] at hst
               cases hst
               have htail := ih₂ hrest hstR s
-              simpa [stepstar_append, StepStar.single] using
+              simpa only [stepstar_append, StepStar.single, normalize_vcomp] using
                 (derivation_to_stepstar_prepend_step t htail)
       | cons_inv t hrest =>
           simp [derivation_to_stepstar?] at hst
@@ -3000,9 +3000,10 @@ theorem cell_tower_functor_whiskerLeft (f : Path a b) {p q : Path b c}
   | refl _ => rfl
   | step _ => rfl
   | inv _ ih =>
-      simp [whiskerLeft, Derivation₂.toRwEq, rweq_trans_congr_right, ih]
+      exact _root_.congrArg RwEq.symm ih
   | vcomp _ _ ih₁ ih₂ =>
-      simp [whiskerLeft, Derivation₂.toRwEq, rweq_trans_congr_right, ih₁, ih₂]
+      exact (_root_.congrArg (fun d => RwEq.trans d _) ih₁).trans
+        (_root_.congrArg (fun d => RwEq.trans _ d) ih₂)
 
 theorem cell_tower_functor_whiskerRight {p q : Path a b}
     (α : Derivation₂ p q) (g : Path b c) :
@@ -3012,9 +3013,10 @@ theorem cell_tower_functor_whiskerRight {p q : Path a b}
   | refl _ => rfl
   | step _ => rfl
   | inv _ ih =>
-      simp [whiskerRight, Derivation₂.toRwEq, rweq_trans_congr_left, ih]
+      exact _root_.congrArg RwEq.symm ih
   | vcomp _ _ ih₁ ih₂ =>
-      simp [whiskerRight, Derivation₂.toRwEq, rweq_trans_congr_left, ih₁, ih₂]
+      exact (_root_.congrArg (fun d => RwEq.trans d _) ih₁).trans
+        (_root_.congrArg (fun d => RwEq.trans _ d) ih₂)
 
 noncomputable def cell_tower_functor_hcomp {p p' : Path a b} {q q' : Path b c}
     (α : Derivation₂ p p') (β : Derivation₂ q q') :
@@ -3022,8 +3024,8 @@ noncomputable def cell_tower_functor_hcomp {p p' : Path a b} {q q' : Path b c}
       RwEq.trans
         (rweq_trans_congr_left q (Derivation₂.toRwEq α))
         (rweq_trans_congr_right p' (Derivation₂.toRwEq β)) := by
-  simp [hcomp, cell_tower_functor_whiskerRight, cell_tower_functor_whiskerLeft,
-    Derivation₂.toRwEq]
+  exact (_root_.congrArg (fun d => RwEq.trans d _) (cell_tower_functor_whiskerRight α q)).trans
+    (_root_.congrArg (fun d => RwEq.trans _ d) (cell_tower_functor_whiskerLeft p' β))
 
 /-! ### Truncation Preserves Coherence -/
 
