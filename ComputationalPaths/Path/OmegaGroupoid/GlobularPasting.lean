@@ -1,15 +1,16 @@
 import ComputationalPaths.Path.OmegaGroupoid.GlobularFoundations
 import Mathlib.CategoryTheory.Functor.Basic
 import Mathlib.CategoryTheory.NatTrans
+import Mathlib.CategoryTheory.Monad.Basic
 
 /-!
 # Recursively labelled globular pasting diagrams
 
 Objects label dimension zero. In dimension `n+1`, a diagram is a composable
 chain of `n`-diagrams in hom globular sets. The carrier and adjacent boundary
-maps are defined by genuine dimension recursion. Candidate multiplication
-is natural globular flattening with both verified unit equations; monad
-associativity and the free strict-category property are not yet claimed.
+maps are defined by genuine dimension recursion. Natural globular flattening
+satisfies both unit equations and associativity, giving a lawful monad. The
+free strict-category universal property is not yet claimed.
 -/
 
 namespace ComputationalPaths.Path.OmegaFoundations
@@ -2455,6 +2456,21 @@ inductive Cut.Below : {n : Nat} → Cut n → Cut n → Prop where
   | bottom {n : Nat} (c : Cut n) : Below .bottom (.lift c)
   | lift {n : Nat} {c d : Cut n} : Below c d → Below (.lift c) (.lift d)
 
+/-- Restrict a lower composition axis to the dimension of a higher cut. -/
+def Cut.restrict : {n : Nat} → (c d : Cut n) → Below c d → Cut d.height
+  | _, .bottom, .bottom, h => nomatch h
+  | _, .bottom, .lift _, _ => .bottom
+  | _, .lift _, .bottom, h => nomatch h
+  | _, .lift c, .lift d, h => .lift (restrict c d (by cases h; assumption))
+
+abbrev Cut.Below.restrict {n : Nat} {c d : Cut n} (h : Below c d) : Cut d.height := Cut.restrict c d h
+
+theorem Cut.Below.restrict_height {n : Nat} {c d : Cut n} (h : Below c d) :
+    h.restrict.height = c.height := by
+  induction h with
+  | bottom => rfl
+  | lift h ih => exact _root_.congrArg Nat.succ ih
+
 theorem Cut.height_lt {n : Nat} (c : Cut n) : c.height < n := by
   induction c with
   | bottom => exact Nat.zero_lt_succ _
@@ -2676,6 +2692,65 @@ theorem cutOperations_unitIdempotent (G : GlobularSet.{u}) : (cutOperations G).U
   intro n c d below p h
   exact cutCompose_unit_idempotent below p _
 
+/-- Identities at a higher cut preserve lower composition and lower
+identities. These are explicit laws, not consequences of boundaries alone. -/
+structure CutOperations.UnitCompatible {G : GlobularSet.{u}} (C : CutOperations G) : Prop where
+  compose : ∀ {n} {c d : Cut n} (w : Cut.Below c d) (p q : G.Cell d.height) h h',
+    C.unit d (C.compose w.restrict p q h) = C.compose c (C.unit d p) (C.unit d q) h'
+  unit : ∀ {n} {c d : Cut n} (w : Cut.Below c d)
+    (p : G.Cell w.restrict.height) (q : G.Cell c.height), HEq p q → C.unit d (C.unit w.restrict p) = C.unit c q
+
+theorem CutOperations.UnitCompatible.hom {G : GlobularSet.{u}} {C : CutOperations G}
+    (U : C.UnitCompatible) (a b : G.Cell 0) : (C.hom a b).UnitCompatible where
+  compose w p q h h' := Subtype.ext (U.compose w.lift p.val q.val _ _)
+  unit w p q hpq := Subtype.ext (U.unit w.lift p.val q.val (hom_val_heq p q w.restrict_height hpq))
+
+theorem cutUnit_compose {n : Nat} {c d : Cut n} (w : Cut.Below c d) {G : GlobularSet.{u}}
+    (p q : Pasting d.height G) (h : cutTarget w.restrict p = cutSource w.restrict q)
+    (h' : cutTarget c (cutUnit d p) = cutSource c (cutUnit d q)) :
+    cutUnit d (cutCompose w.restrict p q h) = cutCompose c (cutUnit d p) (cutUnit d q) h' := by
+  induction w generalizing G with
+  | bottom d =>
+    rcases p with ⟨a, b, p⟩
+    rcases q with ⟨c, d, q⟩
+    change b = c at h
+    cases h
+    exact _root_.congrArg pack (Chain.map_append _ p q)
+  | @lift n c d w ih =>
+    rcases p with ⟨a, b, p⟩
+    rcases q with ⟨e, f, q⟩
+    have ha : a = e := _root_.congrArg Sigma.fst h
+    have hb : b = f := _root_.congrArg (fun z => z.2.1) h
+    cases ha
+    cases hb
+    have hp : p.map (fun e => cutTarget w.restrict e) = q.map (fun e => cutSource w.restrict e) :=
+      eq_of_heq (Sigma.mk.inj (eq_of_heq (Sigma.mk.inj h).2)).2
+    have hp' : (p.map (fun e => cutUnit d e)).map (fun e => cutTarget c e) =
+        (q.map (fun e => cutUnit d e)).map (fun e => cutSource c e) :=
+      eq_of_heq (Sigma.mk.inj (eq_of_heq (Sigma.mk.inj h').2)).2
+    exact _root_.congrArg pack (Chain.map_zipOver _ _ _ _ _ _ _ (fun e f he hf => ih e f he hf) p q hp hp')
+
+theorem cutUnit_unit_reindex {n : Nat} {c d : Cut n} (w : Cut.Below c d) {G : GlobularSet.{u}}
+    (p : Pasting w.restrict.height G) :
+    cutUnit d (cutUnit w.restrict p) = cutUnit c (reindex w.restrict_height p) := by
+  induction w generalizing G with
+  | bottom d => rfl
+  | @lift n c d w ih =>
+    rcases p with ⟨a, b, p⟩
+    have hr := _root_.congrArg (fun z : Pasting (c.height + 1) G => cutUnit (.lift c) z)
+      (reindex_pack w.restrict_height p)
+    refine Eq.trans ?_ hr.symm
+    change pack ((p.map (fun e => cutUnit w.restrict e)).map (fun e => cutUnit d e)) =
+      pack ((p.map (fun e => reindex w.restrict_height e)).map (fun e => cutUnit c e))
+    exact _root_.congrArg pack ((Chain.map_map _ _ p).trans
+      ((Chain.map_congr _ _ (fun e => ih e) p).trans (Chain.map_map _ _ p).symm))
+
+theorem cutOperations_unitCompatible (G : GlobularSet.{u}) : (cutOperations G).UnitCompatible where
+  compose w p q h h' := cutUnit_compose w p q _ _
+  unit w p q hpq := by
+    have hq : reindex w.restrict_height p = q := eq_of_heq ((reindex_heq w.restrict_height p).trans hpq)
+    exact (cutUnit_unit_reindex w p).trans (_root_.congrArg (fun z => cutUnit _ z) hq)
+
 /-- Horizontal operations used to evaluate chains. Boundary preservation is
 part of the data; associativity is not silently assumed by the evaluator. -/
 structure HorizontalComposition (H : GlobularSet.{u}) where
@@ -2746,6 +2821,18 @@ theorem CutOperations.horizontal_interchange {H : GlobularSet.{u}} {C : CutOpera
       C.horizontalMul ((C.hom a b).compose c p r hpr) ((C.hom b d).compose c q s hqs) :=
   Subtype.ext (I (Cut.Below.bottom c) p.val q.val r.val s.val _ _ _ _ _ _)
 
+theorem CutOperations.horizontal_unit_compose {H : GlobularSet.{u}} {C : CutOperations H}
+    (U : C.UnitCompatible) {n : Nat} (c : Cut n) {a b d : H.Cell 0}
+    (p : (H.hom a b).Cell c.height) (q : (H.hom b d).Cell c.height) :
+    (C.hom a d).unit c (C.horizontalMul p q) =
+      C.horizontalMul ((C.hom a b).unit c p) ((C.hom b d).unit c q) :=
+  Subtype.ext (U.compose (Cut.Below.bottom c) p.val q.val _ _)
+
+theorem CutOperations.horizontal_unit_unit {H : GlobularSet.{u}} {C : CutOperations H}
+    (U : C.UnitCompatible) {n : Nat} (c : Cut n) (a : H.Cell 0) :
+    (C.hom a a).unit c (C.horizontalUnit c.height a) = C.horizontalUnit n a :=
+  Subtype.ext (U.unit (Cut.Below.bottom c) a a HEq.rfl)
+
 theorem CutOperations.Preserves.horizontal_unit {G H : GlobularSet.{u}}
     {C : CutOperations G} {D : CutOperations H} {f : GlobularSet.Map G H}
     (P : Preserves C D f) (n : Nat) (a : G.Cell 0) :
@@ -2809,6 +2896,12 @@ theorem CutOperations.Interchange.inContext {H K : GlobularSet.{u}} {C : CutOper
 
 theorem CutOperations.UnitIdempotent.inContext {H K : GlobularSet.{u}} {C : CutOperations H}
     (U : C.UnitIdempotent) (h : HomContext H K) : (C.inContext h).UnitIdempotent := by
+  induction h with
+  | root => exact U
+  | hom h a b ih => exact ih.hom a b
+
+theorem CutOperations.UnitCompatible.inContext {H K : GlobularSet.{u}} {C : CutOperations H}
+    (U : C.UnitCompatible) (h : HomContext H K) : (C.inContext h).UnitCompatible := by
   induction h with
   | root => exact U
   | hom h a b ih => exact ih.hom a b
@@ -2908,6 +3001,18 @@ theorem CutOperations.fold_zipOver {H : GlobularSet.{u}} (C : CutOperations H)
           ((C.horizontal L).fold (q.mapAlong (F := fun x y => (H.hom x y).Cell n) v f))
           (labelMatch e d he') (foldMatch p q hp')
           (foldMatch (.cons e p) (.cons d q) h)).symm
+
+/-- Higher identities commute with the actual horizontal chain fold. -/
+theorem CutOperations.fold_unit {H : GlobularSet.{u}} (C : CutOperations H) (L : C.Compatible)
+    (U : C.UnitCompatible) {n : Nat} (c : Cut n) {a b : H.Cell 0}
+    (p : Chain (fun x y => (H.hom x y).Cell c.height) a b) :
+    (C.horizontal L).fold (p.map (fun {x y} e => (C.hom x y).unit c e)) =
+      (C.hom a b).unit c ((C.horizontal L).fold p) := by
+  induction p with
+  | nil a => exact (C.horizontal_unit_unit U c a).symm
+  | cons e p ih =>
+    exact (_root_.congrArg (C.horizontalMul ((C.hom _ _).unit c e)) ih).trans
+      (C.horizontal_unit_compose U c e ((C.horizontal L).fold p)).symm
 
 theorem CutOperations.Preserves.fold {G H : GlobularSet.{u}}
     {C : CutOperations G} {D : CutOperations H} {f : GlobularSet.Map G H}
@@ -3087,6 +3192,34 @@ theorem evaluate_cutCompose {H : GlobularSet.{u}} (C : CutOperations H) (L : C.C
       f.app ev hm (fun {x y} e d he => ih (h.hom (f.app x) (f.app y)) (f.hom x y) e d he (hm e d he))
       hf p q hp)
 
+/-- Evaluation preserves identities at every cut. The proof uses the actual
+cross-dimensional identity laws, including the empty-chain case. -/
+theorem evaluate_cutUnit {H : GlobularSet.{u}} (C : CutOperations H) (L : C.Compatible)
+    (U : C.UnitCompatible) {n : Nat} (c : Cut n) {G K : GlobularSet.{u}}
+    (h : HomContext H K) (f : GlobularSet.Map G K) (p : Pasting c.height G) :
+    evaluate (C.recursive L) h f (cutUnit c p) =
+      (C.inContext h).unit c (evaluate (C.recursive L) h f p) := by
+  induction c generalizing G K with
+  | bottom => rfl
+  | @lift n c ih =>
+    rcases p with ⟨a, b, p⟩
+    let ev : {m : Nat} → {x y : G.Cell 0} → Pasting m (G.hom x y) →
+        (K.hom (f.app x) (f.app y)).Cell m :=
+      fun {m x y} e => evaluate (C.recursive L) (h.hom (f.app x) (f.app y)) (f.hom x y) e
+    have he : ∀ {x y : G.Cell 0} (e : Pasting c.height (G.hom x y)),
+        ev (cutUnit c e) = ((C.inContext h).hom (f.app x) (f.app y)).unit c (ev e) := by
+      intro x y e
+      exact ih (h.hom (f.app x) (f.app y)) (f.hom x y) e
+    change (((C.inContext h).horizontal (L.inContext h)).fold
+      ((p.map (fun e => cutUnit c e)).mapAlong f.app (fun e => ev e))).val = _
+    exact (_root_.congrArg (fun q => (((C.inContext h).horizontal (L.inContext h)).fold q).val)
+      (Chain.mapAlong_natural f.app (fun e => cutUnit c e)
+        (fun {x y} e => ((C.inContext h).hom x y).unit c e)
+        (fun e => ev e) (fun e => ev e) (fun e => (he e).symm) p).symm).trans
+      (_root_.congrArg Subtype.val (CutOperations.fold_unit (C.inContext h) (L.inContext h)
+        (CutOperations.UnitCompatible.inContext U h) c
+        (p.mapAlong f.app (fun e => ev e))))
+
 /-- Flatten genuinely nested labelled pasting diagrams in every dimension.
 This is the candidate monad multiplication as an actual globular map;
 its naturality and monad equations are separate proof obligations. -/
@@ -3150,6 +3283,37 @@ theorem flatten_cutCompose {G : GlobularSet.{u}} {n : Nat} (c : Cut n)
     (cutOperations_associative G) (cutOperations_interchange G) (cutOperations_unitIdempotent G)
     c .root (GlobularSet.Map.id (globular G)) p q h
     ((canonical_target_eq_cutTarget c _).trans (h'.trans (canonical_source_eq_cutSource c _).symm))
+
+theorem flatten_cutUnit {G : GlobularSet.{u}} {n : Nat} (c : Cut n)
+    (p : Pasting c.height (globular G)) :
+    (flattenGlobular G).app (n := n) (cutUnit c p) =
+      cutUnit c ((flattenGlobular G).app (n := c.height) p) :=
+  evaluate_cutUnit (cutOperations G) (cutOperations_compatible G) (cutOperations_unitCompatible G)
+    c .root (GlobularSet.Map.id (globular G)) p
+
+/-- The implemented multiplication preserves all cut compositions and
+identities; this is the strict-operation preservation needed for associativity. -/
+theorem flatten_preserves (G : GlobularSet.{u}) :
+    CutOperations.Preserves (cutOperations (globular G)) (cutOperations G) (flattenGlobular G) where
+  compose c p q h h' := flatten_cutCompose c p q _ _
+  unit c p := flatten_cutUnit c p
+
+/-- Associativity of the actual all-dimensional multiplication on triply
+nested labelled diagrams. Both sides evaluate the same original labels. -/
+theorem flatten_assoc (G : GlobularSet.{u}) {n : Nat} (p : Pasting n (globular (globular G))) :
+    (flattenGlobular G).app (n := n) ((flattenGlobular (globular G)).app (n := n) p) =
+      (flattenGlobular G).app (n := n) (map (flattenGlobular G) p) := by
+  have hpost := evaluate_postcompose (cutOperations (globular G)) (cutOperations G)
+    (cutOperations_compatible (globular G)) (cutOperations_compatible G) .root .root
+    (flattenGlobular G) (flatten_preserves G) (GlobularSet.Map.id (globular (globular G))) p
+  have hpre := evaluate_precompose (recursiveComposition G) .root
+    (GlobularSet.Map.id (globular G)) (flattenGlobular G) p
+  have he : GlobularSet.Map.comp (flattenGlobular G) (GlobularSet.Map.id (globular (globular G))) =
+      GlobularSet.Map.comp (GlobularSet.Map.id (globular G)) (flattenGlobular G) := by
+    apply GlobularSet.Map.ext
+    intro m c
+    rfl
+  exact hpost.trans ((_root_.congrArg (fun f => evaluate (recursiveComposition G) .root f p) he).trans hpre.symm)
 
 /-- Candidate multiplication is now a natural transformation, not just an
 objectwise family of boundary-preserving maps. The remaining monad equations
@@ -3370,6 +3534,20 @@ theorem flatten_unit_right (G : GlobularSet.{u}) :
   apply GlobularSet.Map.ext
   intro n p
   exact flatten_map_singleton p
+
+/-- The labelled-pasting endofunctor with its verified natural unit,
+natural flattening, and all three monad equations. This does not itself
+establish the free strict-category universal property or an operadic action. -/
+noncomputable def pastingMonad : CategoryTheory.Monad GlobularSet.{u} where
+  toFunctor := pastingFunctor
+  η := singletonNatTrans
+  μ := flattenNatTrans
+  assoc G := by
+    apply GlobularSet.Map.ext
+    intro n p
+    exact (flatten_assoc G p).symm
+  left_unit G := flatten_unit_left G
+  right_unit G := flatten_unit_right G
 
 end Pasting
 

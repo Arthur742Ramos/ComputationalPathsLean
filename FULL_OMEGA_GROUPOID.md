@@ -76,16 +76,18 @@ lake env lean scripts/FullOmegaAudit.lean
 The lifting interface follows the elementwise positive-dimensional square
 in Raftogianis, Definition 4.5 (pp. 35–36). It requires a specified arity cell
 and both commuting-boundary equations; it is not a general filler for domain
-parallel pairs. The strict-pasting monad, globular operad and algebra action
-are still unconstructed. The audit above checks only the current foundations.
+parallel pairs. The labelled-pasting monad is now constructed below. Its free
+strict-category characterization, cartesian properties, globular operad and
+algebra action still require verification. The audit is not a completion
+certificate for the full weak omega-groupoid objective.
 
 The subsequent `GlobularPasting.lean` constructs a genuinely recursive labelled
 pasting carrier: objects at dimension zero, then composable chains of smaller
 diagrams in hom globular sets. Its adjacent boundaries, both globularity laws,
 and identities in every dimension are checked. The hom construction preserves
 the original cells with fixed zero-dimensional endpoints and lowers dimension
-at every recursion. This is a candidate carrier for the strict-pasting monad,
-not yet a monad. Relabelling now forms the checked Mathlib endofunctor
+at every recursion. This carrier now has a proved labelled-pasting monad.
+Relabelling forms the checked Mathlib endofunctor
 `Pasting.pastingFunctor`, preserving both boundaries and respecting identity
 and composite maps. The singleton inclusion `Pasting.singletonGlobular` is now
 a boundary-preserving globular map, natural in the original globular set
@@ -93,8 +95,8 @@ a boundary-preserving globular map, natural in the original globular set
 The partial extractor `atom?` recovers original cells from these singleton
 diagrams; it rejects empty and composite chains. This provides the candidate
 unit without erasing original cells. Flattening is now constructed as
-described below; the full monad laws and free strict-category universal
-property remain to be established.
+described below, with the full monad laws; the free strict-category universal
+property remains to be established.
 
 `evaluate` now evaluates labelled diagrams by dimension recursion into a
 target equipped with horizontal operations in all its iterated hom contexts
@@ -107,7 +109,7 @@ The actual pasting carrier has `horizontalComposition` at its root context;
 cells in both directions. `horizontalComposition_fold` proves that this
 concrete fold is precisely chain substitution in every dimension. These
 operations now extend through every nested hom context using higher cuts;
-the full multiplication laws remain unfinished.
+the full multiplication laws are now verified below.
 
 The hom-restriction mechanism is now proved for all cuts on arbitrary
 globular sets. `CutBoundary` defines canonical boundaries by shifting the
@@ -149,10 +151,14 @@ factorization is exact. `evaluate_singletonLabels` and
 `recursive_fold_single` recover all the original labels and chain structure,
 including empty chains. `singletonNatTrans` packages the unit naturally;
 `flatten_unit_left` and `flatten_unit_right` are both equations of globular
-maps. Associativity and the free universal property remain unfinished.
-Consequently this is not yet a proved monad or globular operad.
+maps. `flatten_assoc` now proves multiplication associativity on triply
+nested diagrams, and `pastingMonad` packages the endofunctor, natural unit,
+natural multiplication, and all three equations as a Mathlib monad. The free
+strict-category universal property and cartesian properties needed by the
+chosen globular-operadic framework are not yet verified. A lawful monad
+alone does not establish the required globular operad or its native action.
 
-Work toward multiplication associativity now includes strict cut-operation
+The multiplication associativity proof uses strict cut-operation
 associativity and interchange inherited through every hom context, alongside
 both unit laws. `CutOperations.fold_append` proves the evaluator's chain fold
 respects concatenation; `evaluate_horizontal` applies this in every dimension
@@ -164,23 +170,28 @@ evaluator, not postulated by the concrete theorem. The empty-chain case uses
 `cutCompose_unit_idempotent`, proved for actual pasting identities and
 inherited through all hom contexts. `evaluate_cutCompose` and
 `flatten_cutCompose` therefore establish composition preservation at every
-cut and dimension. Preservation of identities is still needed for the planned
-associativity proof; this result alone is not multiplication associativity.
+cut and dimension. `UnitCompatible` adds the explicit cross-dimensional
+identity laws, proved by `cutUnit_compose` and `cutUnit_unit_reindex` and
+inherited through hom contexts. `fold_unit` and `evaluate_cutUnit` then prove
+identity preservation. `flatten_preserves` packages both preservation laws.
+Finally, evaluation's pre- and postcomposition equations identify both
+associativity composites with evaluation of the same labels. This proves
+the actual multiplication equation rather than just binary associativity.
 
 Endpoint-indexed chain substitution now has proved left/right unit and
 associativity laws (`Chain.bind_single`, `Chain.bind_id`, `Chain.bind_assoc`).
 Its interpretation by actual computational paths respects substitution
 (`evalPathChain_bind`). These are ingredients for flattening nested diagrams,
-not a substitute for the full globular monad laws.
+and are separate from the now-verified full globular monad laws.
 
 Horizontal composition along the zero-dimensional boundary is now defined
 for diagrams in every positive dimension (`Pasting.horizontal`). Its exposed
 endpoint fibres are exactly the chains in the existing pasting carrier;
 `sourceZero_pack` and `targetZero_pack` verify their iterated globular endpoints.
 Associativity, left/right units, adjacent-boundary compatibility, identity
-compatibility and compatibility with relabelling are proved. This does not
-yet supply composition along every intermediate-dimensional boundary or the
-interchange laws required for the strict-pasting monad.
+compatibility and compatibility with relabelling are proved. The all-cut
+operations and interchange laws are supplied below; these horizontal laws
+alone do not give the free strict-category characterization.
 
 Adjacent-boundary composition is now constructed separately by dimension
 recursion (`Pasting.vertical`). Dimension one concatenates chains; higher
@@ -196,7 +207,7 @@ are now proved in every positive dimension (`vertical_left_unit`,
 diagrams, not just boundary projections. The proofs lift the corresponding
 label laws through boundary-aligned chains (`zipOver_map_left`,
 `zipOver_map_right`, `zipOver_assoc`). The general intermediate-boundary
-operations are described below; full interchange and monad laws remain outstanding.
+operations are described below, together with full interchange and monad laws.
 The extreme-boundary interchange law is now checked separately:
 `vertical_horizontal_interchange` commutes zero-boundary concatenation with
 adjacent-boundary composition in all dimensions at least two. Its endpoint
@@ -218,8 +229,9 @@ arithmetic transport `reindex` changes only the dimension expression, never the
 diagram. One-step recursion, globularity and consecutive-lower-boundary laws
 are also checked. Identification of the general composition/identity operations
 with the previous special cases, their compatibility across truncation levels,
-and interchange between every pair of distinct composition dimensions still
-require proofs before claiming a free strict omega-category or its monad.
+and interchange between every pair of distinct composition dimensions are
+established below. The free strict omega-category characterization remains
+a separate obligation from the verified monad equations.
 
 Relabelling now preserves all arbitrary-boundary maps, identities and
 compositions (`sourceAt_map`, `targetAt_map`, `map_identityAt`,
@@ -253,9 +265,11 @@ arbitrary-boundary API, deriving the translated composability proof.
 four inner ones, and `cutCompose_interchange_grid` proves interchange using
 only those four hypotheses. This covers arbitrary ordered boundary dimensions;
 the outer composites are not assumed to exist independently. The chain proof
-retains the actual labels through `zipOver_grid`. Constructing the monad and
-its universal property, and supplying the eventual weak-groupoid action and
-invertibility, remain incomplete.
+retains the actual labels through `zipOver_grid`. The monad is now constructed;
+its free universal property, cartesian verification, and the eventual
+weak-groupoid operadic action remain incomplete. Native/coskeletal
+coinductive invertibility is proved separately below, not yet linked to an
+operadic action.
 
 ## Semantic audit and completion gates
 

@@ -404,6 +404,25 @@ example {A : Type} {n : Nat} (p : NativeTower.Cell A (n + 1)) :
 #print axioms Pasting.evaluate_cutCompose
 #print axioms Pasting.flatten_cutCompose
 
+#print axioms Pasting.cutUnit_compose
+#print axioms Pasting.cutUnit_unit_reindex
+#print axioms Pasting.cutOperations_unitCompatible
+#print axioms Pasting.CutOperations.UnitCompatible.inContext
+#print axioms Pasting.CutOperations.fold_unit
+#print axioms Pasting.evaluate_cutUnit
+#print axioms Pasting.flatten_cutUnit
+#print axioms Pasting.flatten_preserves
+#print axioms Pasting.flatten_assoc
+#print axioms Pasting.pastingMonad
+
+example (G : GlobularSet) {n : Nat} (p : Pasting n (Pasting.globular (Pasting.globular G))) :
+    (Pasting.flattenGlobular G).app (n := n)
+        ((Pasting.flattenGlobular (Pasting.globular G)).app (n := n) p) =
+      (Pasting.flattenGlobular G).app (n := n) (Pasting.map (Pasting.flattenGlobular G) p) :=
+  Pasting.flatten_assoc G p
+
+noncomputable example : CategoryTheory.Monad GlobularSet := Pasting.pastingMonad
+
 example {G : GlobularSet} {n : Nat} (c : Pasting.Cut n)
     (p q : Pasting n (Pasting.globular G)) (h : Pasting.cutTarget c p = Pasting.cutSource c q)
     (h' : Pasting.cutTarget c ((Pasting.flattenGlobular G).app (n := n) p) =
