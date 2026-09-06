@@ -344,6 +344,23 @@ example {A : Type} {n : Nat} (p : NativeTower.Cell A (n + 1)) :
 #print axioms Pasting.CutOperations.hom_unit_val
 #print axioms Pasting.CutOperations.inContext
 
+#print axioms Pasting.canonical_source_eq_cutSource
+#print axioms Pasting.canonical_target_eq_cutTarget
+#print axioms Pasting.cutSource_cutCompose
+#print axioms Pasting.cutTarget_cutCompose
+#print axioms Pasting.cutSource_cutUnit
+#print axioms Pasting.cutTarget_cutUnit
+#print axioms Pasting.cutCompose_left_unit
+#print axioms Pasting.cutCompose_right_unit
+#print axioms Pasting.cutOperations
+
+example {G H : GlobularSet} (h : Pasting.HomContext (Pasting.globular G) H)
+    {n : Nat} (c : Pasting.Cut n) (p q : H.Cell n)
+    (hpq : Pasting.CutBoundary.target c H p = Pasting.CutBoundary.source c H q) :
+    Pasting.CutBoundary.source c H (((Pasting.cutOperations G).inContext h).compose c p q hpq) =
+      Pasting.CutBoundary.source c H p :=
+  ((Pasting.cutOperations G).inContext h).source_compose c p q hpq
+
 example {G H : GlobularSet} (C : Pasting.CutOperations G)
     (h : Pasting.HomContext G H) {n : Nat} (c : Pasting.Cut n)
     (p q : H.Cell n) (hpq : Pasting.CutBoundary.target c H p = Pasting.CutBoundary.source c H q) :

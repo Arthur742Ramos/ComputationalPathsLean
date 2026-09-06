@@ -114,11 +114,18 @@ actual tower and proves their naturality and compatibility with hom
 inclusion. `CutOperations.hom` inherits composition and units one cut higher
 from the parent, with checked fixed endpoints; `hom_compose_val` and
 `hom_unit_val` show that the underlying cells are unchanged. `inContext`
-iterates this restriction to any hom depth. This interface currently includes
-cut-boundary laws only: adjacent-boundary compatibility still needs to be
-added, and the existing pasting operations still need to be identified with
-these canonical boundaries and instantiated. Thus this is not yet a
-`RecursiveComposition` instance for the pasting carrier or monad multiplication.
+iterates this restriction to any hom depth.
+
+`canonical_source_eq_cutSource` and `canonical_target_eq_cutTarget` now prove
+that the existing pasting boundaries agree with the canonical cuts on every
+diagram. The proof identifies the shifted pasting carrier with chains of
+hom-pasting labels and retains all those labels. `cutOperations` instantiates
+the interface with the actual `cutCompose` and `cutUnit`; source and target
+laws and both unit laws are checked for all cuts. These concrete operations
+therefore restrict through arbitrary hom depth. The interface currently
+includes cut-boundary laws only: adjacent-boundary compatibility still needs
+to be added before obtaining the full `RecursiveComposition` instance and
+monad multiplication.
 
 Endpoint-indexed chain substitution now has proved left/right unit and
 associativity laws (`Chain.bind_single`, `Chain.bind_id`, `Chain.bind_assoc`).

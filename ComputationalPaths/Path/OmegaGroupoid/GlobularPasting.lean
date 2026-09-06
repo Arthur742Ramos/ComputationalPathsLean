@@ -1746,6 +1746,45 @@ def Cut.at : (k n : Nat) → Cut (n + k + 1)
 
 namespace CutBoundary
 
+/-- A globular chain of globular labels. The shifted pasting carrier is
+exactly this construction applied to the pasting carriers of hom sets. -/
+def chainGlobular {O : Type u} (E : O → O → GlobularSet.{u}) : GlobularSet.{u} where
+  Cell n := Σ a b : O, Chain (fun x y => (E x y).Cell n) a b
+  source p := ⟨p.1, p.2.1, p.2.2.map (fun {x y} e => (E x y).source e)⟩
+  target p := ⟨p.1, p.2.1, p.2.2.map (fun {x y} e => (E x y).target e)⟩
+  source_source p := by
+    rcases p with ⟨a, b, p⟩
+    apply _root_.congrArg (fun q => (⟨a, b, q⟩ : Σ a b : O, Chain (fun x y => (E x y).Cell _) a b))
+    exact (Chain.map_map _ _ p).trans
+      ((Chain.map_congr _ _ (fun {x y} e => (E x y).source_source e) p).trans
+        (Chain.map_map _ _ p).symm)
+  target_source p := by
+    rcases p with ⟨a, b, p⟩
+    apply _root_.congrArg (fun q => (⟨a, b, q⟩ : Σ a b : O, Chain (fun x y => (E x y).Cell _) a b))
+    exact (Chain.map_map _ _ p).trans
+      ((Chain.map_congr _ _ (fun {x y} e => (E x y).target_source e) p).trans
+        (Chain.map_map _ _ p).symm)
+
+theorem sourceZero_chain {O : Type u} (E : O → O → GlobularSet.{u})
+    {n : Nat} {a b : O} (p : Chain (fun x y => (E x y).Cell n) a b) :
+    (chainGlobular E).sourceZero (⟨a, b, p⟩ : (chainGlobular E).Cell n) =
+      ⟨a, b, p.map (fun {x y} e => (E x y).sourceZero e)⟩ := by
+  induction n with
+  | zero => exact _root_.congrArg (fun q => (⟨a, b, q⟩ : (chainGlobular E).Cell 0)) (Chain.map_id p).symm
+  | succ n ih =>
+    exact (ih (p.map (fun {x y} e => (E x y).source e))).trans
+      (_root_.congrArg (fun q => (⟨a, b, q⟩ : (chainGlobular E).Cell 0)) (Chain.map_map _ _ p))
+
+theorem targetZero_chain {O : Type u} (E : O → O → GlobularSet.{u})
+    {n : Nat} {a b : O} (p : Chain (fun x y => (E x y).Cell n) a b) :
+    (chainGlobular E).targetZero (⟨a, b, p⟩ : (chainGlobular E).Cell n) =
+      ⟨a, b, p.map (fun {x y} e => (E x y).targetZero e)⟩ := by
+  induction n with
+  | zero => exact _root_.congrArg (fun q => (⟨a, b, q⟩ : (chainGlobular E).Cell 0)) (Chain.map_id p).symm
+  | succ n ih =>
+    exact (ih (p.map (fun {x y} e => (E x y).target e))).trans
+      (_root_.congrArg (fun q => (⟨a, b, q⟩ : (chainGlobular E).Cell 0)) (Chain.map_map _ _ p))
+
 /-- Canonical cut boundaries on any globular set. Lifting a cut forgets one
 object level; it does not replace the cells by formal pasting syntax. -/
 def source : {n : Nat} → (c : Cut n) → (G : GlobularSet.{u}) → G.Cell n → G.Cell c.height
@@ -1755,6 +1794,22 @@ def source : {n : Nat} → (c : Cut n) → (G : GlobularSet.{u}) → G.Cell n �
 def target : {n : Nat} → (c : Cut n) → (G : GlobularSet.{u}) → G.Cell n → G.Cell c.height
   | _, .bottom, G, p => G.targetZero p
   | _, .lift c, G, p => target c G.shift p
+
+theorem source_chain {O : Type u} {n : Nat} (c : Cut n)
+    (E : O → O → GlobularSet.{u}) {a b : O} (p : Chain (fun x y => (E x y).Cell n) a b) :
+    source c (chainGlobular E) ⟨a, b, p⟩ =
+      ⟨a, b, p.map (fun {x y} e => source c (E x y) e)⟩ := by
+  induction c generalizing E with
+  | bottom => exact sourceZero_chain E p
+  | lift c ih => exact ih (fun x y => (E x y).shift) p
+
+theorem target_chain {O : Type u} {n : Nat} (c : Cut n)
+    (E : O → O → GlobularSet.{u}) {a b : O} (p : Chain (fun x y => (E x y).Cell n) a b) :
+    target c (chainGlobular E) ⟨a, b, p⟩ =
+      ⟨a, b, p.map (fun {x y} e => target c (E x y) e)⟩ := by
+  induction c generalizing E with
+  | bottom => exact targetZero_chain E p
+  | lift c ih => exact ih (fun x y => (E x y).shift) p
 
 theorem source_map {n : Nat} (c : Cut n) {G H : GlobularSet.{u}}
     (f : GlobularSet.Map G H) (p : G.Cell n) : source c H (f.app p) = f.app (source c G p) := by
@@ -1899,6 +1954,30 @@ def cutTarget : {n : Nat} → (c : Cut n) → {G : GlobularSet.{u}} → Pasting 
   | _, .bottom, _, ⟨_, b, _⟩ => b
   | _, .lift c, G, ⟨a, b, p⟩ => ⟨a, b, p.map (fun {x y} e => cutTarget c (G := G.hom x y) e)⟩
 
+/-- The implemented pasting boundary is the canonical globular cut, on
+all diagrams and every cut, not only on singleton generators. -/
+theorem canonical_source_eq_cutSource {n : Nat} (c : Cut n) {G : GlobularSet.{u}}
+    (p : Pasting n G) : CutBoundary.source c (globular G) p = cutSource c p := by
+  induction c generalizing G with
+  | bottom => rcases p with ⟨a, b, p⟩; exact sourceZero_pack p
+  | lift c ih =>
+    rcases p with ⟨a, b, p⟩
+    change CutBoundary.source c (CutBoundary.chainGlobular (fun x y => globular (G.hom x y)))
+      ⟨a, b, p⟩ = pack (p.map (fun e => cutSource c e))
+    exact (CutBoundary.source_chain c (fun x y => globular (G.hom x y)) p).trans
+      (_root_.congrArg pack (Chain.map_congr _ _ (fun e => ih e) p))
+
+theorem canonical_target_eq_cutTarget {n : Nat} (c : Cut n) {G : GlobularSet.{u}}
+    (p : Pasting n G) : CutBoundary.target c (globular G) p = cutTarget c p := by
+  induction c generalizing G with
+  | bottom => rcases p with ⟨a, b, p⟩; exact targetZero_pack p
+  | lift c ih =>
+    rcases p with ⟨a, b, p⟩
+    change CutBoundary.target c (CutBoundary.chainGlobular (fun x y => globular (G.hom x y)))
+      ⟨a, b, p⟩ = pack (p.map (fun e => cutTarget c e))
+    exact (CutBoundary.target_chain c (fun x y => globular (G.hom x y)) p).trans
+      (_root_.congrArg pack (Chain.map_congr _ _ (fun e => ih e) p))
+
 noncomputable def cutCompose {n : Nat} (c : Cut n) {G : GlobularSet.{u}}
     (p q : Pasting n G) (h : cutTarget c p = cutSource c q) : Pasting n G := by
   induction c generalizing G with
@@ -1919,6 +1998,118 @@ noncomputable def cutCompose {n : Nat} (c : Cut n) {G : GlobularSet.{u}}
       eq_of_heq (Sigma.mk.inj (eq_of_heq (Sigma.mk.inj h).2)).2
     exact pack (Chain.zipOver (fun e => cutTarget c e) (fun e => cutSource c e)
       (fun {x y} e d h => ih (G := G.hom x y) e d h) p q hp)
+
+theorem cutSource_cutCompose {n : Nat} (c : Cut n) {G : GlobularSet.{u}}
+    (p q : Pasting n G) (h : cutTarget c p = cutSource c q) :
+    cutSource c (cutCompose c p q h) = cutSource c p := by
+  induction c generalizing G with
+  | bottom =>
+    rcases p with ⟨a, b, p⟩
+    rcases q with ⟨c, d, q⟩
+    change b = c at h
+    cases h
+    rfl
+  | lift c ih =>
+    rcases p with ⟨a, b, p⟩
+    rcases q with ⟨d, e, q⟩
+    have ha : a = d := _root_.congrArg Sigma.fst h
+    have hb : b = e := _root_.congrArg (fun z => z.2.1) h
+    cases ha
+    cases hb
+    have hp : p.map (fun e => cutTarget c e) = q.map (fun e => cutSource c e) :=
+      eq_of_heq (Sigma.mk.inj (eq_of_heq (Sigma.mk.inj h).2)).2
+    exact _root_.congrArg pack (Chain.map_zipOver_left _ _ _ _ _ (fun e f he => ih e f he) p q hp)
+
+theorem cutTarget_cutCompose {n : Nat} (c : Cut n) {G : GlobularSet.{u}}
+    (p q : Pasting n G) (h : cutTarget c p = cutSource c q) :
+    cutTarget c (cutCompose c p q h) = cutTarget c q := by
+  induction c generalizing G with
+  | bottom =>
+    rcases p with ⟨a, b, p⟩
+    rcases q with ⟨c, d, q⟩
+    change b = c at h
+    cases h
+    rfl
+  | lift c ih =>
+    rcases p with ⟨a, b, p⟩
+    rcases q with ⟨d, e, q⟩
+    have ha : a = d := _root_.congrArg Sigma.fst h
+    have hb : b = e := _root_.congrArg (fun z => z.2.1) h
+    cases ha
+    cases hb
+    have hp : p.map (fun e => cutTarget c e) = q.map (fun e => cutSource c e) :=
+      eq_of_heq (Sigma.mk.inj (eq_of_heq (Sigma.mk.inj h).2)).2
+    exact _root_.congrArg pack (Chain.map_zipOver_right _ _ _ _ _ (fun e f he => ih e f he) p q hp)
+
+/-- Iterated identity diagram at a specified cut of any dimension. -/
+noncomputable def cutUnit {n : Nat} (c : Cut n) {G : GlobularSet.{u}} (p : Pasting c.height G) : Pasting n G := by
+  induction c generalizing G with
+  | bottom => exact ⟨p, p, .nil p⟩
+  | lift c ih =>
+    rcases p with ⟨a, b, p⟩
+    exact pack (p.map (fun {x y} e => ih (G := G.hom x y) e))
+
+theorem cutSource_cutUnit {n : Nat} (c : Cut n) {G : GlobularSet.{u}} (p : Pasting c.height G) :
+    cutSource c (cutUnit c p) = p := by
+  induction c generalizing G with
+  | bottom => rfl
+  | lift c ih =>
+    rcases p with ⟨a, b, p⟩
+    exact _root_.congrArg pack ((Chain.map_map _ _ p).trans
+      ((Chain.map_congr _ (fun e => e) (fun e => ih e) p).trans (Chain.map_id p)))
+
+theorem cutTarget_cutUnit {n : Nat} (c : Cut n) {G : GlobularSet.{u}} (p : Pasting c.height G) :
+    cutTarget c (cutUnit c p) = p := by
+  induction c generalizing G with
+  | bottom => rfl
+  | lift c ih =>
+    rcases p with ⟨a, b, p⟩
+    exact _root_.congrArg pack ((Chain.map_map _ _ p).trans
+      ((Chain.map_congr _ (fun e => e) (fun e => ih e) p).trans (Chain.map_id p)))
+
+/-- The cut-indexed identity is a left unit for the existing composition. -/
+theorem cutCompose_left_unit {n : Nat} (c : Cut n) {G : GlobularSet.{u}} (p : Pasting n G) :
+    cutCompose c (cutUnit c (cutSource c p)) p (cutTarget_cutUnit c (cutSource c p)) = p := by
+  induction c generalizing G with
+  | bottom => rcases p with ⟨a, b, p⟩; rfl
+  | lift c ih =>
+    rcases p with ⟨a, b, p⟩
+    change cutCompose (.lift c) (pack ((p.map (fun e => cutSource c e)).map (fun e => cutUnit c e)))
+      (pack p) _ = pack p
+    simp only [Chain.map_map]
+    exact _root_.congrArg pack (Chain.zipOver_map_left
+      (fun e => cutTarget c e) (fun e => cutSource c e) (fun e f h => cutCompose c e f h)
+      (fun e => cutUnit c (cutSource c e)) (fun e => cutTarget_cutUnit c (cutSource c e))
+      (fun e => ih e) p)
+
+theorem cutCompose_right_unit {n : Nat} (c : Cut n) {G : GlobularSet.{u}} (p : Pasting n G) :
+    cutCompose c p (cutUnit c (cutTarget c p)) (cutSource_cutUnit c (cutTarget c p)).symm = p := by
+  induction c generalizing G with
+  | bottom => rcases p with ⟨a, b, p⟩; exact _root_.congrArg pack (Chain.append_nil p)
+  | lift c ih =>
+    rcases p with ⟨a, b, p⟩
+    change cutCompose (.lift c) (pack p)
+      (pack ((p.map (fun e => cutTarget c e)).map (fun e => cutUnit c e))) _ = pack p
+    simp only [Chain.map_map]
+    exact _root_.congrArg pack (Chain.zipOver_map_right
+      (fun e => cutTarget c e) (fun e => cutSource c e) (fun e f h => cutCompose c e f h)
+      (fun e => cutUnit c (cutTarget c e)) (fun e => (cutSource_cutUnit c (cutTarget c e)).symm)
+      (fun e => ih e) p)
+
+/-- The actual labelled pasting operations satisfy the canonical cut
+interface and can therefore be restricted to every iterated hom set. -/
+noncomputable def cutOperations (G : GlobularSet.{u}) : CutOperations (globular G) where
+  compose c p q h := cutCompose c p q
+    ((canonical_target_eq_cutTarget c p).symm.trans (h.trans (canonical_source_eq_cutSource c q)))
+  source_compose c p q h :=
+    (canonical_source_eq_cutSource c _).trans
+      ((cutSource_cutCompose c p q _).trans (canonical_source_eq_cutSource c p).symm)
+  target_compose c p q h :=
+    (canonical_target_eq_cutTarget c _).trans
+      ((cutTarget_cutCompose c p q _).trans (canonical_target_eq_cutTarget c q).symm)
+  unit c p := cutUnit (G := G) c p
+  source_unit c p := (canonical_source_eq_cutSource c (cutUnit c p)).trans (cutSource_cutUnit c p)
+  target_unit c p := (canonical_target_eq_cutTarget c (cutUnit c p)).trans (cutTarget_cutUnit c p)
 
 theorem cutSource_at (k n : Nat) {G : GlobularSet.{u}} (p : Pasting (n + k + 1) G) :
     HEq (cutSource (Cut.at k n) p) (sourceAt k n p) := by
