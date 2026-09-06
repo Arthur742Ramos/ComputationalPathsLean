@@ -3283,6 +3283,167 @@ theorem cutCompositionCartesian_bottom {G H : GlobularSet.{u}}
   cases hr'
   rfl
 
+/-- Assemble the two factors of a lifted cut from their aligned pair chain. -/
+def packCutPairChain {n : Nat} (c : Cut n) {G : GlobularSet.{u}} {a b : G.Cell 0}
+    (r : Chain (fun x y => CutPair c (G.hom x y)) a b) : CutPair (.lift c) G :=
+  ⟨(pack (r.map (fun p => p.val.1)), pack (r.map (fun p => p.val.2))),
+    _root_.congrArg pack (cutPairChain_composable c r)⟩
+
+theorem packCutPairChain_compose {n : Nat} (c : Cut n) {G : GlobularSet.{u}} {a b : G.Cell 0}
+    (r : Chain (fun x y => CutPair c (G.hom x y)) a b) :
+    cutPairCompose (.lift c) (packCutPairChain c r) = pack (r.map (fun p => cutPairCompose c p)) :=
+  (cutCompose_lift_pairs c _ _ (cutPairChain_composable c r)).trans
+    (_root_.congrArg (fun r => pack (r.map (fun p => cutPairCompose c p))) (cutPairChain_roundtrip c r))
+
+theorem packCutPairChain_roundtrip {n : Nat} (c : Cut n) {G : GlobularSet.{u}} {a b : G.Cell 0}
+    (p q : Horizontal n G a b)
+    (h : p.map (fun e => cutTarget c e) = q.map (fun e => cutSource c e)) :
+    packCutPairChain c (cutPairChain c p q h) =
+      (⟨(pack p, pack q), _root_.congrArg pack h⟩ : CutPair (.lift c) G) :=
+  Subtype.ext (Prod.ext (_root_.congrArg pack (cutPairChain_left c p q h))
+    (_root_.congrArg pack (cutPairChain_right c p q h)))
+
+theorem packCutPairChain_map {n : Nat} (c : Cut n) {G H : GlobularSet.{u}}
+    (f : GlobularSet.Map G H) {a b : G.Cell 0}
+    (r : Chain (fun x y => CutPair c (G.hom x y)) a b) :
+    cutPairMap (.lift c) f (packCutPairChain c r) =
+      packCutPairChain c (r.mapAlong f.app (fun {x y} p => cutPairMap c (f.hom x y) p)) := by
+  apply Subtype.ext
+  apply Prod.ext
+  · exact _root_.congrArg pack (Chain.mapAlong_natural
+      (E := fun x y => CutPair c (G.hom x y)) (D := fun x y => Pasting n (G.hom x y))
+      (F := fun x y => CutPair c (H.hom x y)) (K := fun x y => Pasting n (H.hom x y)) f.app (fun p => p.val.1)
+      (fun p => p.val.1) (fun {x y} p => cutPairMap c (f.hom x y) p)
+      (fun {x y} p => map (f.hom x y) p) (fun p => rfl) r).symm
+  · exact _root_.congrArg pack (Chain.mapAlong_natural
+      (E := fun x y => CutPair c (G.hom x y)) (D := fun x y => Pasting n (G.hom x y))
+      (F := fun x y => CutPair c (H.hom x y)) (K := fun x y => Pasting n (H.hom x y)) f.app (fun p => p.val.2)
+      (fun p => p.val.2) (fun {x y} p => cutPairMap c (f.hom x y) p)
+      (fun {x y} p => map (f.hom x y) p) (fun p => rfl) r).symm
+
+theorem packCutPairChain_injective {n : Nat} (c : Cut n) {G : GlobularSet.{u}} {a b : G.Cell 0} :
+    Function.Injective (packCutPairChain c (G := G) (a := a) (b := b)) := by
+  intro p q h
+  have hl : p.map (fun r => r.val.1) = q.map (fun r => r.val.1) :=
+    eq_of_heq (Chain.packed_eq_heq _ _ (_root_.congrArg (fun r => r.val.1) h))
+  have hr : p.map (fun r => r.val.2) = q.map (fun r => r.val.2) :=
+    eq_of_heq (Chain.packed_eq_heq _ _ (_root_.congrArg (fun r => r.val.2) h))
+  exact Chain.mapAlong_joint_injective (E := fun x y => CutPair c (G.hom x y))
+    (F := fun x y => Pasting n (G.hom x y))
+    (D := fun x y => Pasting n (G.hom x y)) (fun x => x) (fun x => x)
+    (fun p => p.val.1) (fun p => p.val.2) (fun _ _ h _ => h)
+    (fun p q h₁ h₂ => Subtype.ext (Prod.ext h₁ h₂)) p q
+    ((Chain.mapAlong_identity_vertices _ p).trans (hl.trans (Chain.mapAlong_identity_vertices _ q).symm))
+    ((Chain.mapAlong_identity_vertices _ p).trans (hr.trans (Chain.mapAlong_identity_vertices _ q).symm))
+
+theorem cutPair_hom_reindex {n : Nat} (c : Cut n) {H : GlobularSet.{u}}
+    {a b a' b' : H.Cell 0} (p : Pasting n (H.hom a b)) (q : CutPair c (H.hom a' b'))
+    (ha : a = a') (hb : b = b') (h : HEq p (cutPairCompose c q)) :
+    ∃ q' : CutPair c (H.hom a b), p = cutPairCompose c q' ∧ HEq q' q := by
+  cases ha
+  cases hb
+  exact ⟨q, eq_of_heq h, HEq.rfl⟩
+
+/-- Every prescribed cut factorization after relabelling lifts to actual
+factors in the original globular pasting carrier. Uniqueness is separate. -/
+theorem cutComposition_lift_exists {n : Nat} (c : Cut n) {G H : GlobularSet.{u}}
+    (f : GlobularSet.Map G H) (p : Pasting n G) (q : CutPair c H)
+    (h : map f p = cutPairCompose c q) :
+    ∃ r : CutPair c G, cutPairCompose c r = p ∧ cutPairMap c f r = q := by
+  induction c generalizing G H with
+  | bottom => exact (cutCompositionCartesian_bottom f _ p q h).exists
+  | @lift n c ih =>
+    rcases p with ⟨a, b, p⟩
+    rcases q with ⟨⟨⟨x, y, q₁⟩, ⟨x', y', q₂⟩⟩, hq⟩
+    have hx : x = x' := _root_.congrArg Sigma.fst hq
+    have hy : y = y' := _root_.congrArg (fun z => z.2.1) hq
+    cases hx
+    cases hy
+    have hq' : q₁.map (fun e => cutTarget c e) = q₂.map (fun e => cutSource c e) :=
+      eq_of_heq (Chain.packed_eq_heq _ _ hq)
+    let t := cutPairChain c q₁ q₂ hq'
+    have hp : map f (pack p) = pack (t.map (fun e => cutPairCompose c e)) :=
+      h.trans (cutCompose_lift_pairs c q₁ q₂ hq')
+    have ha : f.app a = x := _root_.congrArg Sigma.fst hp
+    have hb : f.app b = y := _root_.congrArg (fun z => z.2.1) hp
+    have hc := Chain.packed_eq_heq _ _ hp
+    obtain ⟨s, hs, hsm⟩ := Chain.lift_mapAlong_square
+      (R := fun x y => CutPair c (G.hom x y))
+      (F := fun x y => Pasting n (H.hom x y)) (D := fun x y => CutPair c (H.hom x y))
+      f.app (fun {x y} e => map (f.hom x y) e) (fun e => cutPairCompose c e)
+      (fun e => cutPairCompose c e) (fun {x y} e => cutPairMap c (f.hom x y) e) (by
+        intro a b x y e d ha hb he
+        obtain ⟨d', hd, hdd⟩ := cutPair_hom_reindex c _ d ha hb he
+        obtain ⟨r, hr, hs⟩ := ih (f.hom a b) e d' hd
+        exact ⟨r, hr, HEq.trans (heq_of_eq hs) hdd⟩) p t ha hb hc
+    refine ⟨packCutPairChain c s, (packCutPairChain_compose c s).trans (_root_.congrArg pack hs), ?_⟩
+    have hm : (⟨f.app a, f.app b, s.mapAlong f.app (fun {x y} e => cutPairMap c (f.hom x y) e)⟩ :
+        Σ x y : H.Cell 0, Chain (fun x y => CutPair c (H.hom x y)) x y) = ⟨x, y, t⟩ :=
+      Chain.packed_eq_of_heq _ _ ha hb hsm
+    exact (packCutPairChain_map c f s).trans
+      ((_root_.congrArg (fun z : Σ x y : H.Cell 0, Chain (fun x y => CutPair c (H.hom x y)) x y =>
+        packCutPairChain c z.2.2) hm).trans (packCutPairChain_roundtrip c q₁ q₂ hq'))
+
+/-- A cut factor pair is determined by its composite and its prescribed
+relabelled pair. This proves uniqueness independently of chosen lifts. -/
+theorem cutComposition_lift_unique {n : Nat} (c : Cut n) {G H : GlobularSet.{u}}
+    (f : GlobularSet.Map G H) (p q : CutPair c G)
+    (hc : cutPairCompose c p = cutPairCompose c q) (hm : cutPairMap c f p = cutPairMap c f q) : p = q := by
+  induction c generalizing G H with
+  | bottom =>
+    exact (cutCompositionCartesian_bottom f _ (cutPairCompose _ q) (cutPairMap _ f q)
+      (cutPairMap_compose _ f q)).unique ⟨hc, hm⟩ ⟨rfl, rfl⟩
+  | @lift n c ih =>
+    rcases p with ⟨⟨⟨a, b, p₁⟩, ⟨a', b', p₂⟩⟩, hp⟩
+    have ha : a = a' := _root_.congrArg Sigma.fst hp
+    have hb : b = b' := _root_.congrArg (fun z => z.2.1) hp
+    cases ha
+    cases hb
+    rcases q with ⟨⟨⟨x, y, q₁⟩, ⟨x', y', q₂⟩⟩, hq⟩
+    have hx : x = x' := _root_.congrArg Sigma.fst hq
+    have hy : y = y' := _root_.congrArg (fun z => z.2.1) hq
+    cases hx
+    cases hy
+    have ha : a = x := _root_.congrArg Sigma.fst hc
+    have hb : b = y := _root_.congrArg (fun z => z.2.1) hc
+    cases ha
+    cases hb
+    have hp' : p₁.map (fun e => cutTarget c e) = p₂.map (fun e => cutSource c e) :=
+      eq_of_heq (Chain.packed_eq_heq _ _ hp)
+    have hq' : q₁.map (fun e => cutTarget c e) = q₂.map (fun e => cutSource c e) :=
+      eq_of_heq (Chain.packed_eq_heq _ _ hq)
+    let r := cutPairChain c p₁ p₂ hp'
+    let s := cutPairChain c q₁ q₂ hq'
+    have hr := packCutPairChain_roundtrip c p₁ p₂ hp'
+    have hs := packCutPairChain_roundtrip c q₁ q₂ hq'
+    have heval : r.map (fun e => cutPairCompose c e) = s.map (fun e => cutPairCompose c e) :=
+      eq_of_heq (Chain.packed_eq_heq _ _ ((cutCompose_lift_pairs c p₁ p₂ hp').symm.trans
+        (hc.trans (cutCompose_lift_pairs c q₁ q₂ hq'))))
+    have hmap : r.mapAlong (F := fun x y => CutPair c (H.hom x y)) f.app
+        (fun {x y} e => cutPairMap c (f.hom x y) e) =
+        s.mapAlong (F := fun x y => CutPair c (H.hom x y)) f.app
+          (fun {x y} e => cutPairMap c (f.hom x y) e) := by
+      apply packCutPairChain_injective c
+      exact (packCutPairChain_map c f r).symm.trans
+        ((_root_.congrArg (cutPairMap (.lift c) f) hr).trans
+          (hm.trans ((_root_.congrArg (cutPairMap (.lift c) f) hs).symm.trans (packCutPairChain_map c f s))))
+    have hrs : r = s := Chain.mapAlong_joint_injective
+      (F := fun x y => Pasting n (G.hom x y)) (D := fun x y => CutPair c (H.hom x y))
+      (fun x => x) f.app (fun p => cutPairCompose c p)
+      (fun {x y} p => cutPairMap c (f.hom x y) p) (fun _ _ h _ => h)
+      (fun {x y} p q h₁ h₂ => ih (f.hom x y) p q h₁ h₂) r s
+      ((Chain.mapAlong_identity_vertices _ r).trans
+        (heval.trans (Chain.mapAlong_identity_vertices _ s).symm)) hmap
+    exact hr.symm.trans ((_root_.congrArg (packCutPairChain c) hrs).trans hs)
+
+theorem cutComposition_cartesian {n : Nat} (c : Cut n) {G H : GlobularSet.{u}}
+    (f : GlobularSet.Map G H) : CutCompositionCartesian c f := by
+  intro p q h
+  obtain ⟨r, hr, hs⟩ := cutComposition_lift_exists c f p q h
+  refine ⟨r, ⟨hr, hs⟩, ?_⟩
+  intro s ht
+  exact cutComposition_lift_unique c f s r (ht.1.trans hr.symm) (ht.2.trans hs.symm)
+
 theorem cutUnit_hom_heq {n : Nat} (c : Cut n) {H : GlobularSet.{u}}
     {a b a' b' : H.Cell 0} (p : Pasting n (H.hom a b))
     (q : Pasting c.height (H.hom a' b')) (ha : a = a') (hb : b = b')

@@ -175,8 +175,8 @@ dimension. `horizontal_unit_cartesian` reflects the actual empty-chain
 `cutUnit .bottom`, and `horizontal_cut_cartesian` reconstructs the original
 intermediate vertex and both horizontal factors from a specified factorization
 after relabelling. These proofs allow non-injective relabellings and preserve
-empty factors. Higher-cut composition lifting and the resulting positive-
-dimensional hom-evaluation lifting theorem remain open.
+empty factors. Higher-cut composition lifting is now established below;
+the resulting positive-dimensional hom-evaluation lifting theorem remains open.
 
 Unit lifting now extends to every cut. `cutUnit_retract_of_map` proves that
 if a relabelled diagram is a cut unit, the original diagram is the cut unit
@@ -185,7 +185,7 @@ on its own cut source. It descends through actual hom globular sets using
 `cutUnit_cartesian` gives the unique prescribed lift for arbitrary `Cut n`,
 with `cutSource c p` as its explicit preimage. No injectivity hypothesis or
 general filler is assumed. This completes the primitive unit part, not the
-higher-cut composition or globular multiplication part.
+globular multiplication part.
 
 The higher-cut factor representation is now checked. `CutPair` retains both
 prescribed factors and their actual matching equation. `cutPairChain` aligns
@@ -193,8 +193,7 @@ these pairs through the shared boundary chain; its left/right projections and
 `cutPairChain_roundtrip` recover the original data exactly.
 `cutCompose_lift_pairs` proves that the implemented lifted-cut composition is
 the chainwise composition of these retained pairs. This supplies the precise
-representation for a recursive lifting proof, but does not yet prove that
-the factor pairs themselves lift through arbitrary relabelling.
+representation for the recursive lifting proof described below.
 
 `cutPairMap` now relabels both factors and their matching witness, and
 `cutPairMap_compose` verifies compatibility with their actual composition.
@@ -202,9 +201,19 @@ the factor pairs themselves lift through arbitrary relabelling.
 a prescribed output and target factor pair. `cutCompositionCartesian_bottom`
 proves this exact interface for every horizontal dimension.
 `Chain.lift_mapAlong_square` assembles lifts of labels into a chain while
-retaining its original vertices and prescribed relabelled labels. Applying
-that assembly to the lower-cut induction hypothesis, and proving uniqueness
-for the lifted cut, remain to be completed.
+retaining its original vertices and prescribed relabelled labels.
+
+That induction is now complete for primitive compositions.
+`packCutPairChain` assembles higher-cut pairs, with verified composition,
+round-trip, injectivity, and relabelling equations.
+`cutComposition_lift_exists` constructs lifts through all cuts by descending
+into actual homs and applying the chain assembly lemma.
+`cutComposition_lift_unique` compares factor chains through both their
+composites and their prescribed relabelled pairs, using the lower-cut
+uniqueness theorem on each label. `cutComposition_cartesian` combines these
+into the full unique-lifting statement for arbitrary `Cut n` and arbitrary
+globular relabellings. Recursive evaluation and monad multiplication
+cartesianness still require their own proof from these primitive results.
 
 `evaluate` now evaluates labelled diagrams by dimension recursion into a
 target equipped with horizontal operations in all its iterated hom contexts
