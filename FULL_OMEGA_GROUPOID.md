@@ -106,8 +106,8 @@ square, without assuming the relabelling map is injective.
 `singleton_globular_pullback` assembles these lifts into a globular map,
 checks both adjacent boundaries, and proves the unique lifting property for
 arbitrary globular cones. This establishes the actual universal property of
-the unit squares. Preservation of pullbacks by the pasting functor and
-cartesianness of multiplication remain separate, unproved obligations.
+the unit squares. Pullback preservation is established below; cartesianness
+of multiplication remains a separate, unproved obligation.
 
 `GlobularSet.pullback` now constructs matched pairs of original cells with
 componentwise boundaries, both globularity laws, and no added fillers.
@@ -115,8 +115,8 @@ Its projections, choice-free cone lift, and `pullback_universal` establish
 the unique globular lifting property. `Pasting.pullbackComparison` is the
 canonical map from pastings of matched labels to matched pastings; its two
 projection equations and exact action on singleton labels are checked.
-The comparison has not yet been proved invertible. In particular, its
-existence and these equations alone do not prove functor pullback preservation.
+Its invertibility is now proved below; the comparison's existence and these
+projection equations alone would not establish pullback preservation.
 
 For the dimension-recursive inverse, `pullbackHomForward` and
 `pullbackHomBackward` now identify a fixed-endpoint hom of the pullback with
@@ -131,9 +131,15 @@ relabelled chain. Its two projection theorems recover the original chains.
 `pullback_pasting_exists` uses this zipper and the hom-pullback inverse by
 dimension recursion to reconstruct a pasting from any two matching pastings.
 `pullbackComparison_surjective` therefore proves surjectivity at every
-dimension, including empty chains. Injectivity remains unproved, so the
-comparison is not yet verified invertible and full pullback preservation
-remains open.
+dimension, including empty chains. `Chain.mapAlong_joint_injective` and the
+dimension-recursive `pullback_pasting_ext` now prove that the two projections
+jointly determine the entire pasting. `pullbackComparison_injective` completes
+the cellwise bijection; `pullbackComparisonInverse` checks both globular
+boundaries of the inverse, and `pullbackComparisonIso` is an actual Mathlib
+isomorphism. Finally, `pasting_pullback_universal` proves the full unique
+globular lifting property for each image pullback cone. Thus the pasting
+functor preserves the constructed globular pullbacks, not merely their
+zero-dimensional vertices. Multiplication cartesianness is still unproved.
 
 `evaluate` now evaluates labelled diagrams by dimension recursion into a
 target equipped with horizontal operations in all its iterated hom contexts

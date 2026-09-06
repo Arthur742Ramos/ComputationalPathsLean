@@ -31,6 +31,25 @@ completion gate for the full weak omega-groupoid theorem. -/
 #print axioms Chain.zipAlong_right
 #print axioms Pasting.pullback_pasting_exists
 #print axioms Pasting.pullbackComparison_surjective
+#print axioms Chain.mapAlong_joint_injective
+#print axioms Pasting.pullback_pasting_ext
+#print axioms Pasting.pullbackComparisonIso
+#print axioms Pasting.pasting_pullback_universal
+
+noncomputable example {G H K : GlobularSet.{u}}
+    (f : GlobularSet.Map G K) (g : GlobularSet.Map H K) :
+    CategoryTheory.Iso (Pasting.globular (GlobularSet.pullback f g))
+      (GlobularSet.pullback (Pasting.mapGlobular f) (Pasting.mapGlobular g)) :=
+  Pasting.pullbackComparisonIso f g
+
+example {G H K X : GlobularSet.{u}} (f : GlobularSet.Map G K) (g : GlobularSet.Map H K)
+    (p : GlobularSet.Map X (Pasting.globular G)) (q : GlobularSet.Map X (Pasting.globular H))
+    (h : GlobularSet.Map.comp (Pasting.mapGlobular f) p =
+      GlobularSet.Map.comp (Pasting.mapGlobular g) q) :
+    ∃! d : GlobularSet.Map X (Pasting.globular (GlobularSet.pullback f g)),
+      GlobularSet.Map.comp (Pasting.mapGlobular (GlobularSet.pullbackFst f g)) d = p ∧
+      GlobularSet.Map.comp (Pasting.mapGlobular (GlobularSet.pullbackSnd f g)) d = q :=
+  Pasting.pasting_pullback_universal f g p q h
 
 example {G H K : GlobularSet.{u}} (f : GlobularSet.Map G K) (g : GlobularSet.Map H K)
     (n : Nat) : Function.Surjective ((Pasting.pullbackComparison f g).app (n := n)) :=

@@ -700,6 +700,36 @@ theorem zipAlong_right {O P Q : Type u}
       exact _root_.congrArg₂ Chain.cons
         (law (a := ⟨(x, x'), hx⟩) (b := ⟨(z, z'), hc.1⟩) e f hc.2.1) (ih q hc.1 hy hc.2.2)
 
+/-- Two relabellings jointly determine a chain when they jointly determine
+its vertices and each of its labels. -/
+theorem mapAlong_joint_injective {O P Q : Type u}
+    {E : O → O → Type u} {F : P → P → Type u} {D : Q → Q → Type u}
+    (s : O → P) (t : O → Q)
+    (se : {x y : O} → E x y → F (s x) (s y))
+    (te : {x y : O} → E x y → D (t x) (t y))
+    (hv : ∀ x y, s x = s y → t x = t y → x = y)
+    (he : ∀ {x y} (a b : E x y), se a = se b → te a = te b → a = b)
+    {x y : O} (p q : Chain E x y)
+    (hs : p.mapAlong s se = q.mapAlong s se)
+    (ht : p.mapAlong t te = q.mapAlong t te) : p = q := by
+  induction p with
+  | nil x =>
+    cases q with
+    | nil => rfl
+    | cons b q => cases hs
+  | @cons x z y a p ih =>
+    cases q with
+    | nil => cases hs
+    | @cons _ z' _ b q =>
+      have h₁ := cons_heq_components (se a) (p.mapAlong s se) (se b) (q.mapAlong s se)
+        rfl rfl (heq_of_eq hs)
+      have h₂ := cons_heq_components (te a) (p.mapAlong t te) (te b) (q.mapAlong t te)
+        rfl rfl (heq_of_eq ht)
+      have hz := hv z z' h₁.1 h₂.1
+      cases hz
+      exact _root_.congrArg₂ Chain.cons (he a b (eq_of_heq h₁.2.1) (eq_of_heq h₂.2.1))
+        (ih q (eq_of_heq h₁.2.2) (eq_of_heq h₂.2.2))
+
 end Chain
 
 /-- The dimension-recursive labelled pasting carrier. -/
@@ -1015,8 +1045,8 @@ def pastingFunctor : CategoryTheory.Functor GlobularSet.{u} GlobularSet.{u} wher
     exact (map_comp f g c).symm
 
 /-- The canonical comparison from pastings of matched labels to matched
-pastings. Invertibility of this map is the remaining pullback-preservation
-obligation; merely constructing it is not a proof of preservation. -/
+pastings. Its invertibility and the full image-cone universal property are
+proved below; the comparison alone would not establish preservation. -/
 def pullbackComparison {G H K : GlobularSet.{u}}
     (f : GlobularSet.Map G K) (g : GlobularSet.Map H K) :
     GlobularSet.Map (globular (GlobularSet.pullback f g))
@@ -1116,12 +1146,141 @@ theorem pullback_pasting_exists {n : Nat} {G H K : GlobularSet.{u}}
         (fun {x y} r => map ((GlobularSet.pullbackSnd f g).hom x y) r)
         (fun e d he => (edge e d he).choose_spec.2) p q ha hb hc
 
+/-- Both pullback projections jointly determine the complete labelled
+pasting, including every internal vertex and higher-dimensional label. -/
+theorem pullback_pasting_ext {n : Nat} {G H K : GlobularSet.{u}}
+    (f : GlobularSet.Map G K) (g : GlobularSet.Map H K)
+    (p q : Pasting n (GlobularSet.pullback f g))
+    (hs : map (GlobularSet.pullbackFst f g) p = map (GlobularSet.pullbackFst f g) q)
+    (ht : map (GlobularSet.pullbackSnd f g) p = map (GlobularSet.pullbackSnd f g) q) : p = q := by
+  induction n generalizing G H K with
+  | zero => exact Subtype.ext (Prod.ext hs ht)
+  | succ n ih =>
+    rcases p with ⟨a, b, p⟩
+    rcases q with ⟨a', b', q⟩
+    have ha : a = a' := Subtype.ext (Prod.ext (_root_.congrArg Sigma.fst hs)
+      (_root_.congrArg Sigma.fst ht))
+    have hb : b = b' := Subtype.ext (Prod.ext (_root_.congrArg (fun z => z.2.1) hs)
+      (_root_.congrArg (fun z => z.2.1) ht))
+    cases ha
+    cases hb
+    have edge {x y : (GlobularSet.pullback f g).Cell 0}
+        (e d : Pasting n ((GlobularSet.pullback f g).hom x y))
+        (h₁ : map ((GlobularSet.pullbackFst f g).hom x y) e =
+          map ((GlobularSet.pullbackFst f g).hom x y) d)
+        (h₂ : map ((GlobularSet.pullbackSnd f g).hom x y) e =
+          map ((GlobularSet.pullbackSnd f g).hom x y) d) : e = d := by
+      let f' := GlobularSet.Map.comp f.shift (GlobularSet.homInclusion G x.val.1 y.val.1)
+      let g' := GlobularSet.Map.comp g.shift (GlobularSet.homInclusion H x.val.2 y.val.2)
+      let F := GlobularSet.pullbackHomForward f g x y
+      let B := GlobularSet.pullbackHomBackward f g x y
+      have hF : map F e = map F d := ih f' g' _ _
+        ((map_comp F (GlobularSet.pullbackFst f' g') e).trans
+          (h₁.trans (map_comp F (GlobularSet.pullbackFst f' g') d).symm))
+        ((map_comp F (GlobularSet.pullbackSnd f' g') e).trans
+          (h₂.trans (map_comp F (GlobularSet.pullbackSnd f' g') d).symm))
+      have inverse (z : Pasting n ((GlobularSet.pullback f g).hom x y)) :
+          map B (map F z) = z :=
+        (map_comp F B z).trans
+          ((_root_.congrArg (fun k => map k z) (GlobularSet.pullbackHom_backward_forward f g x y)).trans
+            (map_id _ z))
+      exact (inverse e).symm.trans ((_root_.congrArg (map B) hF).trans (inverse d))
+    apply _root_.congrArg (fun z => (⟨a, b, z⟩ : Pasting (n + 1) (GlobularSet.pullback f g)))
+    exact Chain.mapAlong_joint_injective
+      (F := fun x y => Pasting n (G.hom x y)) (D := fun x y => Pasting n (H.hom x y))
+      (fun x : (GlobularSet.pullback f g).Cell 0 => x.val.1) (fun x => x.val.2)
+      (fun {x y} e => map ((GlobularSet.pullbackFst f g).hom x y) e)
+      (fun {x y} e => map ((GlobularSet.pullbackSnd f g).hom x y) e)
+      (fun x y hx hy => Subtype.ext (Prod.ext hx hy)) (fun e d h₁ h₂ => edge e d h₁ h₂)
+      p q (eq_of_heq (Chain.packed_eq_heq _ _ hs)) (eq_of_heq (Chain.packed_eq_heq _ _ ht))
+
+theorem pullbackComparison_injective {G H K : GlobularSet.{u}}
+    (f : GlobularSet.Map G K) (g : GlobularSet.Map H K) (n : Nat) :
+    Function.Injective ((pullbackComparison f g).app (n := n)) := by
+  intro p q h
+  exact pullback_pasting_ext f g p q (_root_.congrArg (fun z => z.val.1) h)
+    (_root_.congrArg (fun z => z.val.2) h)
+
 theorem pullbackComparison_surjective {G H K : GlobularSet.{u}}
     (f : GlobularSet.Map G K) (g : GlobularSet.Map H K) (n : Nat) :
     Function.Surjective ((pullbackComparison f g).app (n := n)) := by
   intro p
   obtain ⟨r, hr, hs⟩ := pullback_pasting_exists f g p.val.1 p.val.2 p.property
   exact ⟨r, Subtype.ext (Prod.ext hr hs)⟩
+
+noncomputable def pullbackComparisonEquiv {G H K : GlobularSet.{u}}
+    (f : GlobularSet.Map G K) (g : GlobularSet.Map H K) (n : Nat) :
+    Pasting n (GlobularSet.pullback f g) ≃
+      (GlobularSet.pullback (mapGlobular f) (mapGlobular g)).Cell n :=
+  Equiv.ofBijective ((pullbackComparison f g).app (n := n))
+    ⟨pullbackComparison_injective f g n, pullbackComparison_surjective f g n⟩
+
+/-- The cellwise inverse respects adjacent boundaries because the forward
+comparison is globular and injective in every dimension. -/
+noncomputable def pullbackComparisonInverse {G H K : GlobularSet.{u}}
+    (f : GlobularSet.Map G K) (g : GlobularSet.Map H K) :
+    GlobularSet.Map (GlobularSet.pullback (mapGlobular f) (mapGlobular g))
+      (globular (GlobularSet.pullback f g)) where
+  app {n} := (pullbackComparisonEquiv f g n).symm
+  source_app {n} p := by
+    apply pullbackComparison_injective f g n
+    exact ((pullbackComparison f g).source_app _).symm.trans
+      ((_root_.congrArg (GlobularSet.pullback (mapGlobular f) (mapGlobular g)).source
+        ((pullbackComparisonEquiv f g (n + 1)).apply_symm_apply p)).trans
+          ((pullbackComparisonEquiv f g n).apply_symm_apply _).symm)
+  target_app {n} p := by
+    apply pullbackComparison_injective f g n
+    exact ((pullbackComparison f g).target_app _).symm.trans
+      ((_root_.congrArg (GlobularSet.pullback (mapGlobular f) (mapGlobular g)).target
+        ((pullbackComparisonEquiv f g (n + 1)).apply_symm_apply p)).trans
+          ((pullbackComparisonEquiv f g n).apply_symm_apply _).symm)
+
+/-- Pasting commutes with the actual matched-cell pullback up to a globular
+isomorphism. This does not assert cartesianness of monad multiplication. -/
+noncomputable def pullbackComparisonIso {G H K : GlobularSet.{u}}
+    (f : GlobularSet.Map G K) (g : GlobularSet.Map H K) :
+    CategoryTheory.Iso (globular (GlobularSet.pullback f g))
+      (GlobularSet.pullback (mapGlobular f) (mapGlobular g)) where
+  hom := pullbackComparison f g
+  inv := pullbackComparisonInverse f g
+  hom_inv_id := by
+    apply GlobularSet.Map.ext
+    intro n p
+    exact (pullbackComparisonEquiv f g n).symm_apply_apply p
+  inv_hom_id := by
+    apply GlobularSet.Map.ext
+    intro n p
+    exact (pullbackComparisonEquiv f g n).apply_symm_apply p
+
+/-- The image of every canonical globular pullback cone has the full
+universal property. This is stronger than a cellwise bijection alone. -/
+theorem pasting_pullback_universal {G H K X : GlobularSet.{u}}
+    (f : GlobularSet.Map G K) (g : GlobularSet.Map H K)
+    (p : GlobularSet.Map X (globular G)) (q : GlobularSet.Map X (globular H))
+    (h : GlobularSet.Map.comp (mapGlobular f) p = GlobularSet.Map.comp (mapGlobular g) q) :
+    ∃! d : GlobularSet.Map X (globular (GlobularSet.pullback f g)),
+      GlobularSet.Map.comp (mapGlobular (GlobularSet.pullbackFst f g)) d = p ∧
+      GlobularSet.Map.comp (mapGlobular (GlobularSet.pullbackSnd f g)) d = q := by
+  let l := GlobularSet.pullbackLift (mapGlobular f) (mapGlobular g) p q h
+  let d := GlobularSet.Map.comp (pullbackComparisonInverse f g) l
+  have hd {n : Nat} (x : X.Cell n) :
+      ((pullbackComparison f g).app (d.app x)).val = (p.app x, q.app x) :=
+    _root_.congrArg Subtype.val ((pullbackComparisonEquiv f g n).apply_symm_apply (l.app x))
+  refine ⟨d, ⟨?_, ?_⟩, ?_⟩
+  · apply GlobularSet.Map.ext
+    intro n x
+    exact _root_.congrArg Prod.fst (hd x)
+  · apply GlobularSet.Map.ext
+    intro n x
+    exact _root_.congrArg Prod.snd (hd x)
+  · intro e he
+    apply GlobularSet.Map.ext
+    intro n x
+    exact pullback_pasting_ext f g _ _
+      ((_root_.congrArg (fun k : GlobularSet.Map X (globular G) => k.app x) he.1).trans
+        (_root_.congrArg Prod.fst (hd x)).symm)
+      ((_root_.congrArg (fun k : GlobularSet.Map X (globular H) => k.app x) he.2).trans
+        (_root_.congrArg Prod.snd (hd x)).symm)
 
 /-- Identity pastings in every dimension: the empty chain on an object,
 and recursively the identity on each label in higher dimensions. -/
