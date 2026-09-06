@@ -152,6 +152,16 @@ including empty chains. `singletonNatTrans` packages the unit naturally;
 maps. Associativity and the free universal property remain unfinished.
 Consequently this is not yet a proved monad or globular operad.
 
+Work toward multiplication associativity now includes strict cut-operation
+associativity and interchange inherited through every hom context, alongside
+both unit laws. `CutOperations.fold_append` proves the evaluator's chain fold
+respects concatenation; `evaluate_horizontal` applies this in every dimension
+and hom context. `flatten_cutCompose_bottom` specializes it to the actual
+flattening map. This establishes the zero-cut preservation case only.
+Preservation of higher-cut composition and identities, needed for the planned
+associativity proof, is still unfinished; strict associativity of the target's
+binary operations is not a substitute for multiplication associativity.
+
 Endpoint-indexed chain substitution now has proved left/right unit and
 associativity laws (`Chain.bind_single`, `Chain.bind_id`, `Chain.bind_assoc`).
 Its interpretation by actual computational paths respects substitution
