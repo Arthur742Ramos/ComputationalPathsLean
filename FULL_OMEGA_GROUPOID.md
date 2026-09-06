@@ -174,10 +174,13 @@ cuts, and `Cut.below_iff_height` identifies this order with numerical boundary
 order. Cuts only index the same existing `Pasting` carrier. `cutSource_at`,
 `cutTarget_at` and `cutCompose_at_eq` identify their operations with the existing
 arbitrary-boundary API, deriving the translated composability proof.
-The interchange theorem currently takes six explicit grid-composability
-witnesses (four inner and two outer). Deriving the outer witnesses from the
-inner ones, constructing the monad, and supplying the eventual weak-groupoid
-action and invertibility remain incomplete.
+`cutGrid_composable` now derives both outer composability witnesses from the
+four inner ones, and `cutCompose_interchange_grid` proves interchange using
+only those four hypotheses. This covers arbitrary ordered boundary dimensions;
+the outer composites are not assumed to exist independently. The chain proof
+retains the actual labels through `zipOver_grid`. Constructing the monad and
+its universal property, and supplying the eventual weak-groupoid action and
+invertibility, remain incomplete.
 
 ## Semantic audit and completion gates
 

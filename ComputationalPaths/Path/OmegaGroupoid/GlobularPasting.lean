@@ -377,6 +377,68 @@ theorem zipOver_interchange {O : Type u} {E D B : O → O → Type v}
           exact _root_.congrArg₂ Chain.cons (law e f g d hef hgd heg hfd hrh hch)
             (ih q r u hpq' hru' hpr' hqu' hrt hct)
 
+/-- If composable label grids have composable rows and columns, the same
+holds for aligned chains. The outer witnesses are constructed, not assumed. -/
+theorem zipOver_grid {O : Type u} {E D B : O → O → Type v}
+    (s t : {x y : O} → E x y → D x y)
+    (s' t' : {x y : O} → E x y → B x y)
+    (op : {x y : O} → (e d : E x y) → s e = t d → E x y)
+    (op' : {x y : O} → (e d : E x y) → s' e = t' d → E x y)
+    (law : ∀ {x y} (e f g d : E x y)
+      (hef : s e = t f) (hgd : s g = t d) (heg : s' e = t' g) (hfd : s' f = t' d),
+      s' (op e f hef) = t' (op g d hgd) ∧ s (op' e g heg) = t (op' f d hfd))
+    {x y : O} (p q r u : Chain E x y)
+    (hpq : p.map s = q.map t) (hru : r.map s = u.map t)
+    (hpr : p.map s' = r.map t') (hqu : q.map s' = u.map t') :
+    (zipOver s t op p q hpq).map s' = (zipOver s t op r u hru).map t' ∧
+      (zipOver s' t' op' p r hpr).map s = (zipOver s' t' op' q u hqu).map t := by
+  induction p with
+  | nil x =>
+    cases q with
+    | cons f q => cases hpq
+    | nil =>
+      cases r with
+      | cons g r => cases hpr
+      | nil =>
+        cases u with
+        | cons d u => cases hru
+        | nil => exact ⟨rfl, rfl⟩
+  | @cons x z y e p ih =>
+    cases q with
+    | nil => cases hpq
+    | @cons _ zq _ f q =>
+      have h := hpq
+      simp only [map] at h
+      injection h with hx hz hy he hf
+      cases hz
+      have hef := eq_of_heq he
+      have hpq' := eq_of_heq hf
+      cases r with
+      | nil => cases hpr
+      | @cons _ zr _ g r =>
+        have h := hpr
+        simp only [map] at h
+        injection h with hx hz hy he hf
+        cases hz
+        have heg := eq_of_heq he
+        have hpr' := eq_of_heq hf
+        cases u with
+        | nil => cases hru
+        | @cons _ zu _ d u =>
+          have h := hru
+          simp only [map] at h
+          injection h with hx hz hy he hf
+          cases hz
+          have hgd := eq_of_heq he
+          have hru' := eq_of_heq hf
+          have h := hqu
+          simp only [map] at h
+          injection h with hx hz hy hfd hqu'
+          have heads := law e f g d hef hgd heg hfd
+          have tails := ih q r u hpq' hru' hpr' hqu'
+          exact ⟨_root_.congrArg₂ Chain.cons heads.1 tails.1,
+            _root_.congrArg₂ Chain.cons heads.2 tails.2⟩
+
 variable {O : Type u} {E : O → O → Type v} {F : O → O → Type w}
 
 def single {x y : O} (e : E x y) : Chain E x y := .cons e (.nil y)
@@ -1791,6 +1853,68 @@ theorem Cut.below_iff_height {n : Nat} (c d : Cut n) : Below c d ↔ c.height < 
       | bottom => exact False.elim (Nat.not_lt_zero _ h)
       | lift d => exact .lift (ih d (Nat.lt_of_succ_lt_succ h))
 
+/-- The four inner composability equations imply both outer equations,
+for every pair of strictly ordered boundary dimensions. -/
+theorem cutGrid_composable {n : Nat} {c d : Cut n} (below : Cut.Below c d)
+    {G : GlobularSet.{u}} (p q r s : Pasting n G)
+    (hpq : cutTarget c p = cutSource c q) (hrs : cutTarget c r = cutSource c s)
+    (hpr : cutTarget d p = cutSource d r) (hqs : cutTarget d q = cutSource d s) :
+    cutTarget d (cutCompose c p q hpq) = cutSource d (cutCompose c r s hrs) ∧
+      cutTarget c (cutCompose d p r hpr) = cutSource c (cutCompose d q s hqs) := by
+  induction below generalizing G with
+  | bottom d =>
+    rcases p with ⟨a, b, p⟩
+    rcases q with ⟨c, e, q⟩
+    rcases r with ⟨f, g, r⟩
+    rcases s with ⟨i, j, s⟩
+    change b = c at hpq
+    change g = i at hrs
+    cases hpq
+    cases hrs
+    have ha : a = f := _root_.congrArg Sigma.fst hpr
+    have hb : b = g := _root_.congrArg (fun z => z.2.1) hpr
+    cases ha
+    cases hb
+    have he : e = j := _root_.congrArg (fun z => z.2.1) hqs
+    cases he
+    have hp : p.map (fun e => cutTarget d e) = r.map (fun e => cutSource d e) :=
+      eq_of_heq (Sigma.mk.inj (eq_of_heq (Sigma.mk.inj hpr).2)).2
+    have hq : q.map (fun e => cutTarget d e) = s.map (fun e => cutSource d e) :=
+      eq_of_heq (Sigma.mk.inj (eq_of_heq (Sigma.mk.inj hqs).2)).2
+    exact ⟨_root_.congrArg pack ((Chain.map_append _ p q).trans
+      ((_root_.congrArg₂ Chain.append hp hq).trans (Chain.map_append _ r s).symm)), rfl⟩
+  | @lift n c d below ih =>
+    rcases p with ⟨a, b, p⟩
+    rcases q with ⟨e, f, q⟩
+    rcases r with ⟨g, i, r⟩
+    rcases s with ⟨j, k, s⟩
+    have ha : a = e := _root_.congrArg Sigma.fst hpq
+    have hb : b = f := _root_.congrArg (fun z => z.2.1) hpq
+    have hc : a = g := _root_.congrArg Sigma.fst hpr
+    have hd : b = i := _root_.congrArg (fun z => z.2.1) hpr
+    have he : g = j := _root_.congrArg Sigma.fst hrs
+    have hf : i = k := _root_.congrArg (fun z => z.2.1) hrs
+    cases ha
+    cases hb
+    cases hc
+    cases hd
+    cases he
+    cases hf
+    have hpq' : p.map (fun e => cutTarget c e) = q.map (fun e => cutSource c e) :=
+      eq_of_heq (Sigma.mk.inj (eq_of_heq (Sigma.mk.inj hpq).2)).2
+    have hrs' : r.map (fun e => cutTarget c e) = s.map (fun e => cutSource c e) :=
+      eq_of_heq (Sigma.mk.inj (eq_of_heq (Sigma.mk.inj hrs).2)).2
+    have hpr' : p.map (fun e => cutTarget d e) = r.map (fun e => cutSource d e) :=
+      eq_of_heq (Sigma.mk.inj (eq_of_heq (Sigma.mk.inj hpr).2)).2
+    have hqs' : q.map (fun e => cutTarget d e) = s.map (fun e => cutSource d e) :=
+      eq_of_heq (Sigma.mk.inj (eq_of_heq (Sigma.mk.inj hqs).2)).2
+    have hg := Chain.zipOver_grid
+      (fun e => cutTarget c e) (fun e => cutSource c e)
+      (fun e => cutTarget d e) (fun e => cutSource d e)
+      (fun e f h => cutCompose c e f h) (fun e f h => cutCompose d e f h)
+      (fun e f g h a b c d => ih e f g h a b c d) p q r s hpq' hrs' hpr' hqs'
+    exact ⟨_root_.congrArg pack hg.1, _root_.congrArg pack hg.2⟩
+
 /-- All-dimensional interchange, for any strictly ordered pair of cuts.
 The six equalities specify the four inner and two outer composites. -/
 theorem cutCompose_interchange {n : Nat} {c d : Cut n} (below : Cut.Below c d)
@@ -1862,6 +1986,18 @@ theorem cutCompose_interchange {n : Nat} {c d : Cut n} (below : Cut.Below c d)
       (fun e => cutTarget d e) (fun e => cutSource d e)
       (fun e f h => cutCompose c e f h) (fun e f h => cutCompose d e f h)
       (fun e f g h a b c d r s => ih e f g h a b c d r s) p q r s hpq' hrs' hpr' hqs' hrow' hcol')
+
+/-- Interchange on a composable grid, with both outer composites justified
+by the four supplied inner composability equations. -/
+theorem cutCompose_interchange_grid {n : Nat} {c d : Cut n} (below : Cut.Below c d)
+    {G : GlobularSet.{u}} (p q r s : Pasting n G)
+    (hpq : cutTarget c p = cutSource c q) (hrs : cutTarget c r = cutSource c s)
+    (hpr : cutTarget d p = cutSource d r) (hqs : cutTarget d q = cutSource d s) :
+    cutCompose d (cutCompose c p q hpq) (cutCompose c r s hrs)
+      (cutGrid_composable below p q r s hpq hrs hpr hqs).1 =
+    cutCompose c (cutCompose d p r hpr) (cutCompose d q s hqs)
+      (cutGrid_composable below p q r s hpq hrs hpr hqs).2 :=
+  cutCompose_interchange below p q r s hpq hrs hpr hqs _ _
 
 end Pasting
 

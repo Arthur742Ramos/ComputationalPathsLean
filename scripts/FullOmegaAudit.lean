@@ -244,3 +244,19 @@ example {G : GlobularSet} {n : Nat} (c d : Pasting.Cut n) (hc : Pasting.Cut.Belo
 #print axioms Pasting.cutTarget_at
 #print axioms Pasting.cutCompose_at_eq
 #print axioms Pasting.cutCompose_interchange
+
+example {G : GlobularSet} {n : Nat} (c d : Pasting.Cut n) (hc : Pasting.Cut.Below c d)
+    (p q r s : Pasting n G)
+    (hpq : Pasting.cutTarget c p = Pasting.cutSource c q)
+    (hrs : Pasting.cutTarget c r = Pasting.cutSource c s)
+    (hpr : Pasting.cutTarget d p = Pasting.cutSource d r)
+    (hqs : Pasting.cutTarget d q = Pasting.cutSource d s) :
+    Pasting.cutCompose d (Pasting.cutCompose c p q hpq) (Pasting.cutCompose c r s hrs)
+      (Pasting.cutGrid_composable hc p q r s hpq hrs hpr hqs).1 =
+    Pasting.cutCompose c (Pasting.cutCompose d p r hpr) (Pasting.cutCompose d q s hqs)
+      (Pasting.cutGrid_composable hc p q r s hpq hrs hpr hqs).2 :=
+  Pasting.cutCompose_interchange_grid hc p q r s hpq hrs hpr hqs
+
+#print axioms Chain.zipOver_grid
+#print axioms Pasting.cutGrid_composable
+#print axioms Pasting.cutCompose_interchange_grid
