@@ -107,6 +107,18 @@ compatibility and compatibility with relabelling are proved. This does not
 yet supply composition along every intermediate-dimensional boundary or the
 interchange laws required for the strict-pasting monad.
 
+Adjacent-boundary composition is now constructed separately by dimension
+recursion (`Pasting.vertical`). Dimension one concatenates chains; higher
+dimensions align the common boundary chain and recursively compose its labels
+in hom globular sets. `Chain.zipOver` derives individual label compatibility
+and intermediate-vertex equality from the supplied equality of boundary chains;
+it does not assume fillers or erase labels. The checked source and target laws
+package the result in its exact composite-boundary fibre (`verticalCell`).
+Alignment distributes over concatenation (`Chain.zipOver_append`), an ingredient
+for interchange. Associativity and units for this new vertical operation,
+composition at arbitrary intermediate boundaries, and the full interchange
+and monad laws remain outstanding.
+
 ## Semantic audit and completion gates
 
 The current rewrite theory has a totality theorem for `RwEq` on parallel

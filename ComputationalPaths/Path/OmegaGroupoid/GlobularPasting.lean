@@ -68,6 +68,117 @@ end Chain
 
 namespace Chain
 
+/-- Pair labels only when their images in a common boundary chain agree.
+The equality of chains supplies both matching intermediate vertices and
+the individual boundary equalities required by the label operation. -/
+noncomputable def zipOver {O : Type u} {E F D R : O → O → Type v}
+    (s : {x y : O} → E x y → D x y)
+    (t : {x y : O} → F x y → D x y)
+    (op : {x y : O} → (e : E x y) → (f : F x y) → s e = t f → R x y)
+    {x y : O} (p : Chain E x y) (q : Chain F x y)
+    (h : p.map s = q.map t) : Chain R x y := by
+  induction p with
+  | nil x =>
+    cases q with
+    | nil => exact .nil x
+    | cons f q => cases h
+  | @cons x z y e p ih =>
+    cases q with
+    | nil => cases h
+    | @cons _ z' _ f q =>
+      simp only [map] at h
+      have hi : z = z' ∧ HEq (s e) (t f) ∧ HEq (p.map s) (q.map t) := by
+        injection h with hx hz hy he hp
+        exact ⟨hz, he, hp⟩
+      have hz := hi.1
+      have he := hi.2.1
+      have hp := hi.2.2
+      cases hz
+      have he' := eq_of_heq he
+      have hp' := eq_of_heq hp
+      exact .cons (op e f he') (ih q hp')
+
+theorem map_zipOver_left {O : Type u} {E F D R B : O → O → Type v}
+    (s : {x y : O} → E x y → D x y)
+    (t : {x y : O} → F x y → D x y)
+    (op : {x y : O} → (e : E x y) → (f : F x y) → s e = t f → R x y)
+    (b : {x y : O} → R x y → B x y) (l : {x y : O} → E x y → B x y)
+    (law : ∀ {x y} (e : E x y) (f : F x y) (h : s e = t f), b (op e f h) = l e)
+    {x y : O} (p : Chain E x y) (q : Chain F x y) (h : p.map s = q.map t) :
+    (zipOver s t op p q h).map b = p.map l := by
+  induction p with
+  | nil x =>
+    cases q with
+    | nil => rfl
+    | cons f q => cases h
+  | @cons x z y e p ih =>
+    cases q with
+    | nil => cases h
+    | @cons _ z' _ f q =>
+      have hc := h
+      simp only [map] at hc
+      injection hc with hx hz hy he hp
+      cases hz
+      have he' := eq_of_heq he
+      have hp' := eq_of_heq hp
+      change Chain.cons (b (op e f he')) ((zipOver s t op p q hp').map b) = Chain.cons (l e) (p.map l)
+      exact _root_.congrArg₂ Chain.cons (law e f he') (ih q hp')
+
+theorem map_zipOver_right {O : Type u} {E F D R B : O → O → Type v}
+    (s : {x y : O} → E x y → D x y)
+    (t : {x y : O} → F x y → D x y)
+    (op : {x y : O} → (e : E x y) → (f : F x y) → s e = t f → R x y)
+    (b : {x y : O} → R x y → B x y) (r : {x y : O} → F x y → B x y)
+    (law : ∀ {x y} (e : E x y) (f : F x y) (h : s e = t f), b (op e f h) = r f)
+    {x y : O} (p : Chain E x y) (q : Chain F x y) (h : p.map s = q.map t) :
+    (zipOver s t op p q h).map b = q.map r := by
+  induction p with
+  | nil x =>
+    cases q with
+    | nil => rfl
+    | cons f q => cases h
+  | @cons x z y e p ih =>
+    cases q with
+    | nil => cases h
+    | @cons _ z' _ f q =>
+      have hc := h
+      simp only [map] at hc
+      injection hc with hx hz hy he hp
+      cases hz
+      have he' := eq_of_heq he
+      have hp' := eq_of_heq hp
+      change Chain.cons (b (op e f he')) ((zipOver s t op p q hp').map b) = Chain.cons (r f) (q.map r)
+      exact _root_.congrArg₂ Chain.cons (law e f he') (ih q hp')
+
+/-- Alignment distributes over concatenation; this is the chain-level
+interchange ingredient for horizontal and adjacent-boundary composition. -/
+theorem zipOver_append {O : Type u} {E F D R : O → O → Type v}
+    (s : {x y : O} → E x y → D x y)
+    (t : {x y : O} → F x y → D x y)
+    (op : {x y : O} → (e : E x y) → (f : F x y) → s e = t f → R x y)
+    {x y z : O} (p : Chain E x y) (q : Chain F x y) (h : p.map s = q.map t)
+    (p' : Chain E y z) (q' : Chain F y z) (h' : p'.map s = q'.map t) :
+    zipOver s t op (p.append p') (q.append q')
+      ((map_append s p p').trans ((_root_.congrArg₂ Chain.append h h').trans
+        (map_append t q q').symm)) =
+      (zipOver s t op p q h).append (zipOver s t op p' q' h') := by
+  induction p with
+  | nil x =>
+    cases q with
+    | nil => rfl
+    | cons f q => cases h
+  | @cons x v y e p ih =>
+    cases q with
+    | nil => cases h
+    | @cons _ v' _ f q =>
+      have hc := h
+      simp only [map] at hc
+      injection hc with hx hv hy he hp
+      cases hv
+      have he' := eq_of_heq he
+      have hp' := eq_of_heq hp
+      exact _root_.congrArg (Chain.cons (op e f he')) (ih q hp' p' q' h')
+
 variable {O : Type u} {E : O → O → Type v} {F : O → O → Type w}
 
 def single {x y : O} (e : E x y) : Chain E x y := .cons e (.nil y)
@@ -482,6 +593,87 @@ theorem source_horizontal_one {G : GlobularSet.{u}} {a b c : G.Cell 0}
 theorem target_horizontal_one {G : GlobularSet.{u}} {a b c : G.Cell 0}
     (p : Horizontal 0 G a b) (q : Horizontal 0 G b c) :
     target (pack (horizontal p q)) = c := rfl
+
+/-- Composition along the adjacent boundary. At dimension one this is
+concatenation; higher dimensions align boundary chains and recursively
+compose their labels in the corresponding hom globular set. -/
+noncomputable def vertical {n : Nat} {G : GlobularSet.{u}}
+    (p q : Pasting (n + 1) G) (h : target p = source q) : Pasting (n + 1) G := by
+  induction n generalizing G with
+  | zero =>
+    rcases p with ⟨a, b, p⟩
+    rcases q with ⟨c, d, q⟩
+    change b = c at h
+    cases h
+    exact pack (horizontal p q)
+  | succ n ih =>
+    rcases p with ⟨a, b, p⟩
+    rcases q with ⟨c, d, q⟩
+    have ha : a = c := _root_.congrArg Sigma.fst h
+    have hb : b = d := _root_.congrArg (fun z => z.2.1) h
+    cases ha
+    cases hb
+    have hp : p.map (fun e => target e) = q.map (fun e => source e) :=
+      eq_of_heq (Sigma.mk.inj (eq_of_heq (Sigma.mk.inj h).2)).2
+    exact pack (Chain.zipOver (fun e => target e) (fun e => source e)
+      (fun {x y} e f he => ih (G := G.hom x y) e f he) p q hp)
+
+theorem source_vertical {n : Nat} {G : GlobularSet.{u}}
+    (p q : Pasting (n + 1) G) (h : target p = source q) :
+    source (vertical p q h) = source p := by
+  induction n generalizing G with
+  | zero =>
+    rcases p with ⟨a, b, p⟩
+    rcases q with ⟨c, d, q⟩
+    change b = c at h
+    cases h
+    rfl
+  | succ n ih =>
+    rcases p with ⟨a, b, p⟩
+    rcases q with ⟨c, d, q⟩
+    have ha : a = c := _root_.congrArg Sigma.fst h
+    have hb : b = d := _root_.congrArg (fun z => z.2.1) h
+    cases ha
+    cases hb
+    have hp : p.map (fun e => target e) = q.map (fun e => source e) :=
+      eq_of_heq (Sigma.mk.inj (eq_of_heq (Sigma.mk.inj h).2)).2
+    change pack ((Chain.zipOver (fun e => target e) (fun e => source e)
+      (fun e f he => vertical e f he) p q hp).map (fun e => source e)) =
+        pack (p.map (fun e => source e))
+    exact _root_.congrArg pack (Chain.map_zipOver_left _ _ _ _ _
+      (fun e f he => ih e f he) p q hp)
+
+theorem target_vertical {n : Nat} {G : GlobularSet.{u}}
+    (p q : Pasting (n + 1) G) (h : target p = source q) :
+    target (vertical p q h) = target q := by
+  induction n generalizing G with
+  | zero =>
+    rcases p with ⟨a, b, p⟩
+    rcases q with ⟨c, d, q⟩
+    change b = c at h
+    cases h
+    rfl
+  | succ n ih =>
+    rcases p with ⟨a, b, p⟩
+    rcases q with ⟨c, d, q⟩
+    have ha : a = c := _root_.congrArg Sigma.fst h
+    have hb : b = d := _root_.congrArg (fun z => z.2.1) h
+    cases ha
+    cases hb
+    have hp : p.map (fun e => target e) = q.map (fun e => source e) :=
+      eq_of_heq (Sigma.mk.inj (eq_of_heq (Sigma.mk.inj h).2)).2
+    change pack ((Chain.zipOver (fun e => target e) (fun e => source e)
+      (fun e f he => vertical e f he) p q hp).map (fun e => target e)) =
+        pack (q.map (fun e => target e))
+    exact _root_.congrArg pack (Chain.map_zipOver_right _ _ _ _ _
+      (fun e f he => ih e f he) p q hp)
+
+/-- The recursive operation inhabits the prescribed globular composite
+boundary, rather than merely returning an unrelated cell of the same dimension. -/
+noncomputable def verticalCell {n : Nat} {G : GlobularSet.{u}}
+    (p q : Pasting (n + 1) G) (h : target p = source q) :
+    (globular G).CellOver ((globular G).compositeBoundary (n := n) p q h) :=
+  ⟨vertical p q h, source_vertical p q h, target_vertical p q h⟩
 
 end Pasting
 
