@@ -2593,6 +2593,29 @@ structure Preserves {G H : GlobularSet.{u}} (C : CutOperations G) (D : CutOperat
     f.app (C.compose c p q h) = D.compose c (f.app p) (f.app q) h'
   unit : ∀ {n} (c : Cut n) (p : G.Cell c.height), f.app (C.unit c p) = D.unit c (f.app p)
 
+/-- Composable pairs in the underlying globular set of cut operations. -/
+def Pair {G : GlobularSet.{u}} (_C : CutOperations G) {n : Nat} (c : Cut n) :=
+  { p : G.Cell n × G.Cell n // CutBoundary.target c G p.1 = CutBoundary.source c G p.2 }
+
+def pairMap {G H : GlobularSet.{u}} (C : CutOperations G) (D : CutOperations H)
+    (f : GlobularSet.Map G H) {n : Nat} (c : Cut n) (p : C.Pair c) : D.Pair c :=
+  ⟨(f.app p.val.1, f.app p.val.2), (CutBoundary.target_map c f p.val.1).trans
+    ((_root_.congrArg f.app p.property).trans (CutBoundary.source_map c f p.val.2).symm)⟩
+
+def composePair {G : GlobularSet.{u}} (C : CutOperations G) {n : Nat} (c : Cut n)
+    (p : C.Pair c) : G.Cell n := C.compose c p.val.1 p.val.2 p.property
+
+/-- A preserving map with unique lifts of all primitive cut operations.
+This is an explicit premise for recursive-evaluation lifting, not an axiom
+about arbitrary maps or arbitrary globular cells. -/
+structure Cartesian {G H : GlobularSet.{u}} (C : CutOperations G) (D : CutOperations H)
+    (f : GlobularSet.Map G H) : Prop extends Preserves C D f where
+  unit_lift : ∀ {n} (c : Cut n) (p : G.Cell n) (q : H.Cell c.height),
+    f.app p = D.unit c q → ∃! r : G.Cell c.height, C.unit c r = p ∧ f.app r = q
+  compose_lift : ∀ {n} (c : Cut n) (p : G.Cell n) (q : D.Pair c),
+    f.app p = D.composePair c q →
+    ∃! r : C.Pair c, C.composePair c r = p ∧ pairMap C D f c r = q
+
 def RightUnital {G : GlobularSet.{u}} (C : CutOperations G) : Prop :=
   ∀ {n} (c : Cut n) (p : G.Cell n),
     C.compose c p (C.unit c (CutBoundary.target c G p))
@@ -2719,6 +2742,90 @@ theorem Preserves.hom {G H : GlobularSet.{u}} {C : CutOperations G} {D : CutOper
     Preserves (C.hom a b) (D.hom (f.app a) (f.app b)) (f.hom a b) where
   compose c p q h h' := Subtype.ext (P.compose (.lift c) p.val q.val _ _)
   unit c p := Subtype.ext (P.unit (.lift c) p.val)
+
+/-- Primitive unit lifts restrict to the actual fixed-endpoint homs.
+The endpoint witnesses are derived from the lifted unit equation. -/
+theorem Cartesian.unit_lift_hom {G H : GlobularSet.{u}} {C : CutOperations G} {D : CutOperations H}
+    {f : GlobularSet.Map G H} (K : Cartesian C D f) (a b : G.Cell 0)
+    {n : Nat} (c : Cut n) (p : (G.hom a b).Cell n)
+    (q : (H.hom (f.app a) (f.app b)).Cell c.height)
+    (h : (f.hom a b).app p = (D.hom (f.app a) (f.app b)).unit c q) :
+    ∃! r : (G.hom a b).Cell c.height,
+      (C.hom a b).unit c r = p ∧ (f.hom a b).app r = q := by
+  obtain ⟨r, ⟨hr, hf⟩, hu⟩ := K.unit_lift (.lift c) p.val q.val (_root_.congrArg Subtype.val h)
+  have hs : G.sourceZero r = a :=
+    (_root_.congrArg G.sourceZero (C.source_unit (.lift c) r)).symm.trans
+      ((CutBoundary.sourceZero_source_lift c G (C.unit (.lift c) r)).trans
+        ((_root_.congrArg G.sourceZero hr).trans p.property.1))
+  have ht : G.targetZero r = b :=
+    (_root_.congrArg G.targetZero (C.target_unit (.lift c) r)).symm.trans
+      ((CutBoundary.targetZero_target_lift c G (C.unit (.lift c) r)).trans
+        ((_root_.congrArg G.targetZero hr).trans p.property.2))
+  refine ⟨⟨r, hs, ht⟩, ⟨Subtype.ext hr, Subtype.ext hf⟩, ?_⟩
+  intro s hs
+  exact Subtype.ext (hu s.val ⟨_root_.congrArg Subtype.val hs.1, _root_.congrArg Subtype.val hs.2⟩)
+
+def homPairVal {G : GlobularSet.{u}} (C : CutOperations G) (a b : G.Cell 0)
+    {n : Nat} (c : Cut n) (p : (C.hom a b).Pair c) : C.Pair (.lift c) :=
+  ⟨(p.val.1.val, p.val.2.val), (CutBoundary.target_hom c G p.val.1).trans
+    ((_root_.congrArg Subtype.val p.property).trans (CutBoundary.source_hom c G p.val.2).symm)⟩
+
+/-- A lifted-cut composite has the zero-boundaries of each factor. -/
+theorem compose_lift_endpoints {G : GlobularSet.{u}} (C : CutOperations G) {n : Nat} (c : Cut n)
+    (r : C.Pair (.lift c)) :
+    (G.sourceZero (C.composePair (.lift c) r) = G.sourceZero r.val.1 ∧
+      G.targetZero (C.composePair (.lift c) r) = G.targetZero r.val.1) ∧
+    (G.sourceZero (C.composePair (.lift c) r) = G.sourceZero r.val.2 ∧
+      G.targetZero (C.composePair (.lift c) r) = G.targetZero r.val.2) := by
+  refine ⟨⟨?_, ?_⟩, ⟨?_, ?_⟩⟩
+  · exact (CutBoundary.sourceZero_source_lift c G _).symm.trans
+      ((_root_.congrArg G.sourceZero (C.source_compose (.lift c) r.val.1 r.val.2 r.property)).trans
+        (CutBoundary.sourceZero_source_lift c G _))
+  · exact (CutBoundary.targetZero_source_lift c G _).symm.trans
+      ((_root_.congrArg G.targetZero (C.source_compose (.lift c) r.val.1 r.val.2 r.property)).trans
+        (CutBoundary.targetZero_source_lift c G _))
+  · exact (CutBoundary.sourceZero_target_lift c G _).symm.trans
+      ((_root_.congrArg G.sourceZero (C.target_compose (.lift c) r.val.1 r.val.2 r.property)).trans
+        (CutBoundary.sourceZero_target_lift c G _))
+  · exact (CutBoundary.targetZero_target_lift c G _).symm.trans
+      ((_root_.congrArg G.targetZero (C.target_compose (.lift c) r.val.1 r.val.2 r.property)).trans
+        (CutBoundary.targetZero_target_lift c G _))
+
+theorem Cartesian.compose_lift_hom {G H : GlobularSet.{u}} {C : CutOperations G} {D : CutOperations H}
+    {f : GlobularSet.Map G H} (K : Cartesian C D f) (a b : G.Cell 0)
+    {n : Nat} (c : Cut n) (p : (G.hom a b).Cell n)
+    (q : (D.hom (f.app a) (f.app b)).Pair c)
+    (h : (f.hom a b).app p = (D.hom (f.app a) (f.app b)).composePair c q) :
+    ∃! r : (C.hom a b).Pair c, (C.hom a b).composePair c r = p ∧
+      pairMap (C.hom a b) (D.hom (f.app a) (f.app b)) (f.hom a b) c r = q := by
+  obtain ⟨r, ⟨hr, hf⟩, hu⟩ := K.compose_lift (.lift c) p.val
+    (homPairVal D (f.app a) (f.app b) c q) (_root_.congrArg Subtype.val h)
+  have ep := compose_lift_endpoints C c r
+  have es := (_root_.congrArg G.sourceZero hr).trans p.property.1
+  have et := (_root_.congrArg G.targetZero hr).trans p.property.2
+  let r₁ : (G.hom a b).Cell n := ⟨r.val.1, ep.1.1.symm.trans es, ep.1.2.symm.trans et⟩
+  let r₂ : (G.hom a b).Cell n := ⟨r.val.2, ep.2.1.symm.trans es, ep.2.2.symm.trans et⟩
+  let s : (C.hom a b).Pair c := ⟨(r₁, r₂), Subtype.ext
+    ((CutBoundary.target_hom c G r₁).symm.trans (r.property.trans (CutBoundary.source_hom c G r₂)))⟩
+  refine ⟨s, ⟨Subtype.ext hr, ?_⟩, ?_⟩
+  · exact Subtype.ext (Prod.ext
+      (Subtype.ext (_root_.congrArg (fun z : D.Pair (.lift c) => z.val.1) hf))
+      (Subtype.ext (_root_.congrArg (fun z : D.Pair (.lift c) => z.val.2) hf)))
+  · intro t ht
+    have he : homPairVal C a b c t = r := hu (homPairVal C a b c t)
+      ⟨_root_.congrArg Subtype.val ht.1,
+        _root_.congrArg (homPairVal D (f.app a) (f.app b) c) ht.2⟩
+    exact Subtype.ext (Prod.ext
+      (Subtype.ext (_root_.congrArg (fun z : C.Pair (.lift c) => z.val.1) he))
+      (Subtype.ext (_root_.congrArg (fun z : C.Pair (.lift c) => z.val.2) he)))
+
+/-- Unique primitive lifts survive every genuine hom restriction. -/
+theorem Cartesian.hom {G H : GlobularSet.{u}} {C : CutOperations G} {D : CutOperations H}
+    {f : GlobularSet.Map G H} (K : Cartesian C D f) (a b : G.Cell 0) :
+    Cartesian (C.hom a b) (D.hom (f.app a) (f.app b)) (f.hom a b) where
+  toPreserves := K.toPreserves.hom a b
+  unit_lift := K.unit_lift_hom a b
+  compose_lift := K.compose_lift_hom a b
 
 end CutOperations
 
@@ -3488,6 +3595,32 @@ theorem cutUnit_cartesian {n : Nat} (c : Cut n) {G H : GlobularSet.{u}}
       ((_root_.congrArg (cutSource c) h).trans (cutSource_cutUnit c q))
   · intro r hr
     exact (cutSource_cutUnit c r).symm.trans (_root_.congrArg (cutSource c) hr.1)
+
+/-- Convert canonical-boundary pairs to the concrete pasting presentation. -/
+def cutOperationsPairToCutPair {n : Nat} (c : Cut n) {G : GlobularSet.{u}}
+    (p : (cutOperations G).Pair c) : CutPair c G :=
+  ⟨p.val, (canonical_target_eq_cutTarget c p.val.1).symm.trans
+    (p.property.trans (canonical_source_eq_cutSource c p.val.2))⟩
+
+def cutPairToCutOperationsPair {n : Nat} (c : Cut n) {G : GlobularSet.{u}}
+    (p : CutPair c G) : (cutOperations G).Pair c :=
+  ⟨p.val, (canonical_target_eq_cutTarget c p.val.1).trans
+    (p.property.trans (canonical_source_eq_cutSource c p.val.2).symm)⟩
+
+/-- The proved primitive lifting results instantiate the generic interface
+on every relabelling of the actual pasting globular sets. -/
+theorem mapGlobular_cartesian {G H : GlobularSet.{u}} (f : GlobularSet.Map G H) :
+    CutOperations.Cartesian (cutOperations G) (cutOperations H) (mapGlobular f) where
+  toPreserves := mapGlobular_preserves f
+  unit_lift c p q h := cutUnit_cartesian c f p q h
+  compose_lift c p q h := by
+    obtain ⟨r, ⟨hr, hm⟩, hu⟩ := cutComposition_cartesian c f p (cutOperationsPairToCutPair c q) h
+    refine ⟨cutPairToCutOperationsPair c r,
+      ⟨hr, Subtype.ext (_root_.congrArg (fun p : CutPair c H => p.val) hm)⟩, ?_⟩
+    intro s hs
+    have he : cutOperationsPairToCutPair c s = r := hu (cutOperationsPairToCutPair c s)
+      ⟨hs.1, Subtype.ext (_root_.congrArg (fun p : (cutOperations H).Pair c => p.val) hs.2)⟩
+    exact Subtype.ext (_root_.congrArg (fun p : CutPair c G => p.val) he)
 
 theorem cutSource_at (k n : Nat) {G : GlobularSet.{u}} (p : Pasting (n + k + 1) G) :
     HEq (cutSource (Cut.at k n) p) (sourceAt k n p) := by

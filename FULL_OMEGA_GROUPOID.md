@@ -215,6 +215,18 @@ into the full unique-lifting statement for arbitrary `Cut n` and arbitrary
 globular relabellings. Recursive evaluation and monad multiplication
 cartesianness still require their own proof from these primitive results.
 
+`CutOperations.Cartesian` now packages preservation and unique lifts of
+primitive units and composable pairs for general cut-operation targets.
+`mapGlobular_cartesian` instantiates it on the actual pasting relabellings
+using the proved cut-unit and cut-composition theorems, with explicit
+conversion between canonical-boundary and pasting-boundary factor pairs.
+`Cartesian.unit_lift_hom` and `Cartesian.compose_lift_hom` derive the lifted
+cells' fixed endpoints from the unit/composite equations.
+`Cartesian.hom` therefore proves closure under genuine hom restriction,
+including both existence and uniqueness; it does not postulate endpoint
+fillers. This supplies the hom-stable premise needed for recursive-evaluation
+lifting. The latter and monad multiplication cartesianness remain unproved.
+
 `evaluate` now evaluates labelled diagrams by dimension recursion into a
 target equipped with horizontal operations in all its iterated hom contexts
 (`RecursiveComposition`). The evaluator is implemented, not a field assumed
