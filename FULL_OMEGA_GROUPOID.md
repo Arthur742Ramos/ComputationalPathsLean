@@ -7,8 +7,10 @@ Current milestone: the normalized native endomorphism operad now has a
 verified contraction and an actual algebra action on the native tower.
 Contraction-selected adjacent operations now have coinductive invertibility
 and explicit comparison cells to the earlier native operations. The full
-associativity/pentagon/interchange certificate comparisons remain completion
-gates. The free-category definition bridge is now verified through the
+associativity, pentagon, and interchange certificate comparisons are now
+constructed below, with their exact boundary bridges. The final
+definition-level packaging and requirement-by-requirement completion audit
+remain open. The free-category definition bridge is verified through the
 adjacent-identity strict presentation and its actual free/forgetful adjunction.
 
 ## Mathematical target
@@ -634,7 +636,7 @@ arbitrary dimension. These are actual operations of the candidate tower,
 but this native construction alone does not establish their operadic origin
 or compare them with the independent associativity certificate. The later
 sections construct the selected operations and their pentagon comparison;
-the selected interchange comparison remains open.
+the final definition-level packaging and completion audit remain open.
 
 The current rewrite theory has a totality theorem for `RwEq` on parallel
 paths. A structural weak omega-groupoid theorem does not automatically give a
@@ -928,5 +930,26 @@ using selected operadic composition. The comparison is a weakly invertible
 histories or a faithfulness theorem. `certificatePentagonBoundary_trace_counts`
 and `certificatePentagonBoundary_targets_distinct` verify that the preserved
 boundary traces still have two and three steps and remain unequal. This
-discharges the explicit selected pentagon comparison. The selected
-interchange comparison remains open.
+discharges the explicit selected pentagon comparison.
+
+`operationInterchangeLeft` and `operationInterchangeRight` form the two
+sequential whiskering routes from arbitrary 2-operations. They are not
+restricted to identity arities. Strict pasting interchange and unit laws
+prove that both routes have the full horizontal composite of the input
+arities. `operationInterchange` contracts those actual operation composites;
+its boundaries and identity arity are verified.
+
+`rewriteInterchange` instantiates this operation on the complete horizontal
+diagram labelled by two arbitrary Type-valued `RwEq` histories. The two unit
+2-operations preserve these raw labels exactly (`rewriteUnit_evaluation`).
+The input arity is proved, and both route actions have the exact path
+boundaries `Path.trans p q` and `Path.trans p' q'`.
+`NativeAssociativity.certificateInterchangeComparison` then supplies a
+weakly invertible 4-cell comparing this selected interchange with the image
+of the **unchanged independent `AssocHigher.interchange` certificate**,
+relative to the two explicitly named signed-trace boundary comparisons.
+The central certificate is not replaced with a parallel filler. As with
+the pentagon, the comparison lies in the declared coskeletal fourth layer;
+it does not assert equality of raw histories or faithful higher semantics.
+The explicit selected interchange comparison is now verified. The final
+definition-level package and full completion audit remain open.

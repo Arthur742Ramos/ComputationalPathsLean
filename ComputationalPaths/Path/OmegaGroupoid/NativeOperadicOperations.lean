@@ -1714,6 +1714,364 @@ theorem fourPathPentagon_boundary {A : Type u} {a b c d e : A}
   · exact (fourPathPentagon p q r s).property.2.trans
       (applyOperation_congr rfl (Pasting.target_identity (carrier A) (Pasting.identity (fourPathDiagram p q r s))) _ _)
 
+/-- The two sequential whiskering routes used by interchange. Their inputs
+are arbitrary 2-operations, not restricted to identity-arity coherences. -/
+noncomputable def operationInterchangeLeft {A : Type u}
+    {o r s t : (collection A).operations.Cell 1}
+    (p : Operation2Between o r) (q : Operation2Between s t) :
+    Operation2Between (operationBinary o s) (operationBinary r t) :=
+  operationVerticalArrow (operationHorizontalArrow p (operationIdentityArrow s))
+    (operationHorizontalArrow (operationIdentityArrow r) q)
+
+noncomputable def operationInterchangeRight {A : Type u}
+    {o r s t : (collection A).operations.Cell 1}
+    (p : Operation2Between o r) (q : Operation2Between s t) :
+    Operation2Between (operationBinary o s) (operationBinary r t) :=
+  operationVerticalArrow (operationHorizontalArrow (operationIdentityArrow o) q)
+    (operationHorizontalArrow p (operationIdentityArrow t))
+
+noncomputable def horizontalArityTwo (p q : Pasting 2 GlobularSet.terminal.{u + 1}) :
+    Pasting 2 GlobularSet.terminal :=
+  (Pasting.cutOperations GlobularSet.terminal).compose .bottom p q (@Subsingleton.elim PUnit _ _ _)
+
+noncomputable def verticalArityTwo (p q : Pasting 2 GlobularSet.terminal.{u + 1})
+    (h : Pasting.target p = Pasting.source q) : Pasting 2 GlobularSet.terminal :=
+  (Pasting.cutOperations GlobularSet.terminal).compose (.lift .bottom) p q h
+
+set_option backward.isDefEq.respectTransparency false in
+theorem verticalArityTwo_rightUnit (p : Pasting 2 GlobularSet.terminal.{u + 1}) h :
+    verticalArityTwo p (Pasting.identity (Pasting.target p)) h = p := by
+  let C := Pasting.CutModel.free GlobularSet.terminal
+  let c : Pasting.Cut 2 := .lift .bottom
+  let h' := (C.operations.source_unit c (Pasting.CutBoundary.target c C.carrier p)).symm
+  exact (eq_of_heq (C.compose_heq rfl c c rfl _ _ _ _ (HEq.refl p)
+    (heq_of_eq (identity_one_cutUnit (Pasting.target p))) h h')).trans
+    (Pasting.cutOperations_rightUnital GlobularSet.terminal c p)
+
+set_option backward.isDefEq.respectTransparency false in
+theorem verticalArityTwo_leftUnit (p : Pasting 2 GlobularSet.terminal.{u + 1}) h :
+    verticalArityTwo (Pasting.identity (Pasting.source p)) p h = p := by
+  let C := Pasting.CutModel.free GlobularSet.terminal
+  let c : Pasting.Cut 2 := .lift .bottom
+  let h' := C.operations.target_unit c (Pasting.CutBoundary.source c C.carrier p)
+  exact (eq_of_heq (C.compose_heq rfl c c rfl _ _ _ _
+    (heq_of_eq (identity_one_cutUnit (Pasting.source p))) (HEq.refl p) h h')).trans
+    (Pasting.cutOperations_leftUnital GlobularSet.terminal c p)
+
+theorem interchangeArity_left (p q : Pasting 2 GlobularSet.terminal.{u + 1}) h :
+    verticalArityTwo (horizontalArityTwo p (Pasting.identity (Pasting.source q)))
+      (horizontalArityTwo (Pasting.identity (Pasting.target p)) q) h = horizontalArityTwo p q := by
+  have hp : Pasting.target p = Pasting.source (Pasting.identity (Pasting.target p)) :=
+    (Pasting.source_identity _ _).symm
+  have hq : Pasting.target (Pasting.identity (Pasting.source q)) = Pasting.source q :=
+    Pasting.target_identity _ _
+  have he := Pasting.cutOperations_interchange GlobularSet.terminal
+    (Pasting.Cut.Below.bottom (.bottom : Pasting.Cut 1))
+    p (Pasting.identity (Pasting.source q)) (Pasting.identity (Pasting.target p)) q
+    (@Subsingleton.elim PUnit _ _ _) (@Subsingleton.elim PUnit _ _ _) hp hq h
+    (@Subsingleton.elim PUnit _ _ _)
+  exact he.trans (eq_of_heq ((Pasting.CutModel.free GlobularSet.terminal).compose_heq
+    rfl (.bottom : Pasting.Cut 2) (.bottom : Pasting.Cut 2) rfl _ _ p q
+    (heq_of_eq (verticalArityTwo_rightUnit p hp)) (heq_of_eq (verticalArityTwo_leftUnit q hq)) _ _))
+
+theorem interchangeArity_right (p q : Pasting 2 GlobularSet.terminal.{u + 1}) h :
+    verticalArityTwo (horizontalArityTwo (Pasting.identity (Pasting.source p)) q)
+      (horizontalArityTwo p (Pasting.identity (Pasting.target q))) h = horizontalArityTwo p q := by
+  have hp : Pasting.target (Pasting.identity (Pasting.source p)) = Pasting.source p :=
+    Pasting.target_identity _ _
+  have hq : Pasting.target q = Pasting.source (Pasting.identity (Pasting.target q)) :=
+    (Pasting.source_identity _ _).symm
+  have he := Pasting.cutOperations_interchange GlobularSet.terminal
+    (Pasting.Cut.Below.bottom (.bottom : Pasting.Cut 1))
+    (Pasting.identity (Pasting.source p)) q p (Pasting.identity (Pasting.target q))
+    (@Subsingleton.elim PUnit _ _ _) (@Subsingleton.elim PUnit _ _ _) hp hq h
+    (@Subsingleton.elim PUnit _ _ _)
+  exact he.trans (eq_of_heq ((Pasting.CutModel.free GlobularSet.terminal).compose_heq
+    rfl (.bottom : Pasting.Cut 2) (.bottom : Pasting.Cut 2) rfl _ _ p q
+    (heq_of_eq (verticalArityTwo_leftUnit p hp)) (heq_of_eq (verticalArityTwo_rightUnit q hq)) _ _))
+
+theorem Operation2Between.arity_source {A : Type u}
+    {o r : (collection A).operations.Cell 1} (p : Operation2Between o r) :
+    Pasting.source ((collection A).arity.app (n := 2) p.cell) = (collection A).arity.app (n := 1) o :=
+  ((collection A).arity.source_app p.cell).trans
+    (_root_.congrArg ((collection A).arity.app (n := 1)) p.source_cell)
+
+theorem Operation2Between.arity_target {A : Type u}
+    {o r : (collection A).operations.Cell 1} (p : Operation2Between o r) :
+    Pasting.target ((collection A).arity.app (n := 2) p.cell) = (collection A).arity.app (n := 1) r :=
+  ((collection A).arity.target_app p.cell).trans
+    (_root_.congrArg ((collection A).arity.app (n := 1)) p.target_cell)
+
+theorem Operation2Between.arity_matching {A : Type u}
+    {o r s : (collection A).operations.Cell 1} (p : Operation2Between o r) (q : Operation2Between r s) :
+    Pasting.target ((collection A).arity.app (n := 2) p.cell) =
+      Pasting.source ((collection A).arity.app (n := 2) q.cell) :=
+  p.arity_target.trans q.arity_source.symm
+
+theorem operationHorizontalArrow_arity {A : Type u}
+    {o r s t : (collection A).operations.Cell 1}
+    (p : Operation2Between o r) (q : Operation2Between s t) :
+    (collection A).arity.app (n := 2) (operationHorizontalArrow p q).cell =
+      horizontalArityTwo ((collection A).arity.app (n := 2) p.cell) ((collection A).arity.app (n := 2) q.cell) :=
+  operationComposeAt_arity .bottom p.cell q.cell _ _
+
+theorem Operation2Between.vertical_arity_congr {A : Type u}
+    {o r s : (collection A).operations.Cell 1} (p : Operation2Between o r) (q : Operation2Between r s)
+    {d e : Pasting 2 GlobularSet.terminal}
+    (hp : (collection A).arity.app (n := 2) p.cell = d)
+    (hq : (collection A).arity.app (n := 2) q.cell = e) h :
+    (collection A).arity.app (n := 2) (operationVerticalArrow p q).cell = verticalArityTwo d e h :=
+  (operationCompose_two_arity p.cell q.cell (p.target_cell.trans q.source_cell.symm) (p.arity_matching q)).trans
+    (eq_of_heq ((Pasting.CutModel.free GlobularSet.terminal).compose_heq rfl
+      (.lift .bottom : Pasting.Cut 2) (.lift .bottom : Pasting.Cut 2) rfl
+      _ _ d e (heq_of_eq hp) (heq_of_eq hq) (p.arity_matching q) h))
+
+theorem operationInterchangeLeft_arity {A : Type u}
+    {o r s t : (collection A).operations.Cell 1}
+    (p : Operation2Between o r) (q : Operation2Between s t) :
+    (collection A).arity.app (n := 2) (operationInterchangeLeft p q).cell =
+      horizontalArityTwo ((collection A).arity.app (n := 2) p.cell) ((collection A).arity.app (n := 2) q.cell) := by
+  let u := operationHorizontalArrow p (operationIdentityArrow s)
+  let v := operationHorizontalArrow (operationIdentityArrow r) q
+  have hu : (collection A).arity.app (n := 2) u.cell =
+      horizontalArityTwo ((collection A).arity.app (n := 2) p.cell)
+        (Pasting.identity (Pasting.source ((collection A).arity.app (n := 2) q.cell))) :=
+    (operationHorizontalArrow_arity p (operationIdentityArrow s)).trans
+      (_root_.congrArg₂ horizontalArityTwo rfl
+        ((operationIdentity_one_arity s).trans (_root_.congrArg (Pasting.identity (n := 1)) q.arity_source.symm)))
+  have hv : (collection A).arity.app (n := 2) v.cell =
+      horizontalArityTwo (Pasting.identity (Pasting.target ((collection A).arity.app (n := 2) p.cell)))
+        ((collection A).arity.app (n := 2) q.cell) :=
+    (operationHorizontalArrow_arity (operationIdentityArrow r) q).trans
+      (_root_.congrArg₂ horizontalArityTwo
+        ((operationIdentity_one_arity r).trans (_root_.congrArg (Pasting.identity (n := 1)) p.arity_target.symm)) rfl)
+  have hm := (_root_.congrArg (Pasting.target (n := 1)) hu.symm).trans
+    ((u.arity_matching v).trans (_root_.congrArg (Pasting.source (n := 1)) hv))
+  exact (u.vertical_arity_congr v hu hv hm).trans (interchangeArity_left _ _ hm)
+
+theorem operationInterchangeRight_arity {A : Type u}
+    {o r s t : (collection A).operations.Cell 1}
+    (p : Operation2Between o r) (q : Operation2Between s t) :
+    (collection A).arity.app (n := 2) (operationInterchangeRight p q).cell =
+      horizontalArityTwo ((collection A).arity.app (n := 2) p.cell) ((collection A).arity.app (n := 2) q.cell) := by
+  let u := operationHorizontalArrow (operationIdentityArrow o) q
+  let v := operationHorizontalArrow p (operationIdentityArrow t)
+  have hu : (collection A).arity.app (n := 2) u.cell =
+      horizontalArityTwo (Pasting.identity (Pasting.source ((collection A).arity.app (n := 2) p.cell)))
+        ((collection A).arity.app (n := 2) q.cell) :=
+    (operationHorizontalArrow_arity (operationIdentityArrow o) q).trans
+      (_root_.congrArg₂ horizontalArityTwo
+        ((operationIdentity_one_arity o).trans (_root_.congrArg (Pasting.identity (n := 1)) p.arity_source.symm)) rfl)
+  have hv : (collection A).arity.app (n := 2) v.cell =
+      horizontalArityTwo ((collection A).arity.app (n := 2) p.cell)
+        (Pasting.identity (Pasting.target ((collection A).arity.app (n := 2) q.cell))) :=
+    (operationHorizontalArrow_arity p (operationIdentityArrow t)).trans
+      (_root_.congrArg₂ horizontalArityTwo rfl
+        ((operationIdentity_one_arity t).trans (_root_.congrArg (Pasting.identity (n := 1)) q.arity_target.symm)))
+  have hm := (_root_.congrArg (Pasting.target (n := 1)) hu.symm).trans
+    ((u.arity_matching v).trans (_root_.congrArg (Pasting.source (n := 1)) hv))
+  exact (u.vertical_arity_congr v hu hv hm).trans (interchangeArity_right _ _ hm)
+
+/-- The contraction is now applied to the actual sequential whiskering
+composites, whose common full arity is supplied by strict interchange. -/
+noncomputable def operationInterchange {A : Type u}
+    {o r s t : (collection A).operations.Cell 1}
+    (p : Operation2Between o r) (q : Operation2Between s t) :=
+  operationCoherence (operationInterchangeLeft p q).cell (operationInterchangeRight p q).cell
+    (GlobularSet.Parallel.cells
+      ((operationInterchangeLeft p q).source_cell.trans (operationInterchangeRight p q).source_cell.symm)
+      ((operationInterchangeLeft p q).target_cell.trans (operationInterchangeRight p q).target_cell.symm))
+    ((operationInterchangeLeft_arity p q).trans (operationInterchangeRight_arity p q).symm)
+
+theorem operationInterchange_boundary {A : Type u}
+    {o r s t : (collection A).operations.Cell 1}
+    (p : Operation2Between o r) (q : Operation2Between s t) :
+    (collection A).operations.source (operationInterchange p q).cell = (operationInterchangeLeft p q).cell ∧
+      (collection A).operations.target (operationInterchange p q).cell = (operationInterchangeRight p q).cell :=
+  ⟨(operationInterchange p q).source_cell, (operationInterchange p q).target_cell⟩
+
+theorem operationInterchange_arity {A : Type u}
+    {o r s t : (collection A).operations.Cell 1}
+    (p : Operation2Between o r) (q : Operation2Between s t) :
+    (collection A).arity.app (n := 3) (operationInterchange p q).cell =
+      Pasting.identity (n := 2)
+        (horizontalArityTwo ((collection A).arity.app (n := 2) p.cell) ((collection A).arity.app (n := 2) q.cell)) :=
+  (operationCoherence_arity (operationInterchangeLeft p q).cell (operationInterchangeRight p q).cell _ _).trans
+    (_root_.congrArg (Pasting.identity (n := 2)) (operationInterchangeLeft_arity p q))
+
+noncomputable def unitTwoArrow (A : Type u) : Operation2Between (one A 1) (one A 1) :=
+  ⟨one A 2, one_source A 1, one_target A 1⟩
+
+def rewriteCell {A : Type u} {a b : A} {p q : Path a b} (h : RwEq p q) : NativeTower.Cell A 2 :=
+  ⟨a, b, p, q, h⟩
+
+/-- Both original Type-valued rewrite histories are labels of this full
+horizontal pasting diagram. No rewrite totality witness replaces them. -/
+noncomputable def rewritePairDiagram {A : Type u} {a b c : A}
+    {p p' : Path a b} {q q' : Path b c} (h : RwEq p p') (k : RwEq q q') : Pasting 2 (carrier A) :=
+  binaryDiagram (.bottom : Pasting.Cut 2) (rewriteCell h) (rewriteCell k) rfl
+
+theorem shape_two_compose {A : Type u} (p q : Pasting 2 (carrier A)) h :
+    (GlobularCollection.shape (carrier A)).app (n := 2)
+      ((Pasting.cutOperations (carrier A)).compose .bottom p q h) =
+    horizontalArityTwo ((GlobularCollection.shape (carrier A)).app (n := 2) p)
+      ((GlobularCollection.shape (carrier A)).app (n := 2) q) :=
+  (Pasting.mapGlobular_preserves (GlobularSet.terminalMap (carrier A))).compose .bottom p q h _
+
+set_option backward.isDefEq.respectTransparency false in
+theorem rewritePairDiagram_shape {A : Type u} {a b c : A}
+    {p p' : Path a b} {q q' : Path b c} (h : RwEq p p') (k : RwEq q q') :
+    (GlobularCollection.shape (carrier A)).app (n := 2) (rewritePairDiagram h k) =
+      horizontalArityTwo ((collection A).arity.app (n := 2) (one A 2))
+        ((collection A).arity.app (n := 2) (one A 2)) := by
+  unfold rewritePairDiagram binaryDiagram
+  rw [shape_two_compose]
+  exact _root_.congrArg₂ horizontalArityTwo
+    ((Pasting.map_singleton (GlobularSet.terminalMap (carrier A)) _).trans (one_arity A 2).symm)
+    ((Pasting.map_singleton (GlobularSet.terminalMap (carrier A)) _).trans (one_arity A 2).symm)
+
+theorem rewriteInterchange_leftArity {A : Type u} {a b c : A}
+    {p p' : Path a b} {q q' : Path b c} (h : RwEq p p') (k : RwEq q q') :
+    (collection A).arity.app (n := 2) (operationInterchangeLeft (unitTwoArrow A) (unitTwoArrow A)).cell =
+      (GlobularCollection.shape (carrier A)).app (n := 2) (rewritePairDiagram h k) :=
+  (operationInterchangeLeft_arity _ _).trans (rewritePairDiagram_shape h k).symm
+
+theorem rewriteInterchange_rightArity {A : Type u} {a b c : A}
+    {p p' : Path a b} {q q' : Path b c} (h : RwEq p p') (k : RwEq q q') :
+    (collection A).arity.app (n := 2) (operationInterchangeRight (unitTwoArrow A) (unitTwoArrow A)).cell =
+      (GlobularCollection.shape (carrier A)).app (n := 2) (rewritePairDiagram h k) :=
+  (operationInterchangeRight_arity _ _).trans (rewritePairDiagram_shape h k).symm
+
+theorem rewriteInterchange_arity {A : Type u} {a b c : A}
+    {p p' : Path a b} {q q' : Path b c} (h : RwEq p p') (k : RwEq q q') :
+    (collection A).arity.app (n := 3) (operationInterchange (unitTwoArrow A) (unitTwoArrow A)).cell =
+      (GlobularCollection.shape (carrier A)).app (n := 3) (Pasting.identity (rewritePairDiagram h k)) :=
+  (operationInterchange_arity _ _).trans
+    ((_root_.congrArg (Pasting.identity (n := 2)) (rewritePairDiagram_shape h k).symm).trans
+      (map_identityDiagram (GlobularSet.terminalMap (carrier A)) (rewritePairDiagram h k)).symm)
+
+/-- The selected interchange operation acts on the original raw histories,
+with its two sequential composite operations retained as exact boundaries. -/
+noncomputable def rewriteInterchange {A : Type u} {a b c : A}
+    {p p' : Path a b} {q q' : Path b c} (h : RwEq p p') (k : RwEq q q') :
+    { z : NativeTower.Cell A 3 //
+      NativeTower.source z = applyOperation (operationInterchangeLeft (unitTwoArrow A) (unitTwoArrow A)).cell
+        (rewritePairDiagram h k) (rewriteInterchange_leftArity h k) ∧
+      NativeTower.target z = applyOperation (operationInterchangeRight (unitTwoArrow A) (unitTwoArrow A)).cell
+        (rewritePairDiagram h k) (rewriteInterchange_rightArity h k) } := by
+  let o := operationInterchange (unitTwoArrow A) (unitTwoArrow A)
+  let d := rewritePairDiagram h k
+  let hs := (_root_.congrArg ((collection A).arity.app (n := 2)) (operationInterchange_boundary _ _).1).trans
+    ((rewriteInterchange_leftArity h k).trans
+      (_root_.congrArg ((GlobularCollection.shape (carrier A)).app (n := 2))
+        (Pasting.source_identity (carrier A) d)).symm)
+  let ht := (_root_.congrArg ((collection A).arity.app (n := 2)) (operationInterchange_boundary _ _).2).trans
+    ((rewriteInterchange_rightArity h k).trans
+      (_root_.congrArg ((GlobularCollection.shape (carrier A)).app (n := 2))
+        (Pasting.target_identity (carrier A) d)).symm)
+  exact ⟨applyOperation o.cell (Pasting.identity d) (rewriteInterchange_arity h k),
+    (applyOperation_source o.cell _ _ hs).trans
+      (applyOperation_congr (operationInterchange_boundary _ _).1 (Pasting.source_identity (carrier A) d) _ _),
+    (applyOperation_target o.cell _ _ ht).trans
+      (applyOperation_congr (operationInterchange_boundary _ _).2 (Pasting.target_identity (carrier A) d) _ _)⟩
+
+theorem rewriteInterchange_invertible {A : Type u} {a b c : A}
+    {p p' : Path a b} {q q' : Path b c} (h : RwEq p p') (k : RwEq q q') :
+    WeaklyInvertible 2 (rewriteInterchange h k).val := all_cells_weaklyInvertible _ _
+
+theorem rewriteUnit_evaluation {A : Type u} {a b : A} {p q : Path a b} (h : RwEq p q) ha :
+    applyOperation (one A 2) (Pasting.singleton (rewriteCell h)) ha = rewriteCell h :=
+  Endomorphism.evaluation_unit_input (carrier A) (n := 2) (rewriteCell h)
+
+theorem binaryOneOperation_arity {A : Type u} {a b c : A} (p : Path a b) (q : Path b c) :
+    (collection A).arity.app (n := 1) (operationBinary (one A 1) (one A 1)) =
+      (GlobularCollection.shape (carrier A)).app (n := 1)
+        ((Pasting.cutOperations (carrier A)).compose .bottom (pathDiagram p) (pathDiagram q) rfl) :=
+  (operationBinary_arity _ _).trans ((_root_.congrArg₂ binaryArity
+    (pathDiagram_shape p).symm (pathDiagram_shape q).symm).trans (shape_one_compose _ _ rfl).symm)
+
+theorem binaryOneOperation_evaluation {A : Type u} {a b c : A}
+    (p : Path a b) (q : Path b c) h :
+    applyOperation (operationBinary (one A 1) (one A 1))
+      ((Pasting.cutOperations (carrier A)).compose .bottom (pathDiagram p) (pathDiagram q) rfl) h =
+      ULift.up (⟨a, c, Path.trans p q⟩ : PathOne A) :=
+  ((PathApplication.singleton p).binary (PathApplication.singleton q)).applyOperation_eq
+    ((PathApplication.binary_operation _ _).trans (_root_.congrArg₂ operationBinary
+      (PathApplication.singleton_operation p) (PathApplication.singleton_operation q)))
+    (PathApplication.binary_inputs _ _ rfl rfl rfl) h
+
+theorem rewritePairDiagram_source {A : Type u} {a b c : A}
+    {p p' : Path a b} {q q' : Path b c} (h : RwEq p p') (k : RwEq q q') :
+    Pasting.source (rewritePairDiagram h k) =
+      (Pasting.cutOperations (carrier A)).compose .bottom (pathDiagram p) (pathDiagram q) rfl :=
+  binaryDiagram_source (.bottom : Pasting.Cut 1) (rewriteCell h) (rewriteCell k) rfl rfl
+
+theorem rewritePairDiagram_target {A : Type u} {a b c : A}
+    {p p' : Path a b} {q q' : Path b c} (h : RwEq p p') (k : RwEq q q') :
+    Pasting.target (rewritePairDiagram h k) =
+      (Pasting.cutOperations (carrier A)).compose .bottom (pathDiagram p') (pathDiagram q') rfl :=
+  binaryDiagram_target (.bottom : Pasting.Cut 1) (rewriteCell h) (rewriteCell k) rfl rfl
+
+theorem Operation2Between.inputSourceArity {A : Type u}
+    {o r : (collection A).operations.Cell 1} (p : Operation2Between o r) (d : Pasting 2 (carrier A))
+    (ha : (collection A).arity.app (n := 2) p.cell = (GlobularCollection.shape (carrier A)).app (n := 2) d) :
+    (collection A).arity.app (n := 1) o =
+      (GlobularCollection.shape (carrier A)).app (n := 1) (Pasting.source d) :=
+  p.arity_source.symm.trans ((_root_.congrArg ((Pasting.globular GlobularSet.terminal).source (n := 1)) ha).trans
+    ((GlobularCollection.shape (carrier A)).source_app (n := 1) d))
+
+theorem Operation2Between.inputTargetArity {A : Type u}
+    {o r : (collection A).operations.Cell 1} (p : Operation2Between o r) (d : Pasting 2 (carrier A))
+    (ha : (collection A).arity.app (n := 2) p.cell = (GlobularCollection.shape (carrier A)).app (n := 2) d) :
+    (collection A).arity.app (n := 1) r =
+      (GlobularCollection.shape (carrier A)).app (n := 1) (Pasting.target d) :=
+  p.arity_target.symm.trans ((_root_.congrArg ((Pasting.globular GlobularSet.terminal).target (n := 1)) ha).trans
+    ((GlobularCollection.shape (carrier A)).target_app (n := 1) d))
+
+noncomputable def Operation2Between.action {A : Type u}
+    {o r : (collection A).operations.Cell 1} (p : Operation2Between o r) (d : Pasting 2 (carrier A))
+    (ha : (collection A).arity.app (n := 2) p.cell = (GlobularCollection.shape (carrier A)).app (n := 2) d) :
+    { c : NativeTower.Cell A 2 //
+      NativeTower.source c = applyOperation o (Pasting.source d) (p.inputSourceArity d ha) ∧
+      NativeTower.target c = applyOperation r (Pasting.target d) (p.inputTargetArity d ha) } := by
+  let hs := (_root_.congrArg ((collection A).arity.app (n := 1)) p.source_cell).trans (p.inputSourceArity d ha)
+  let ht := (_root_.congrArg ((collection A).arity.app (n := 1)) p.target_cell).trans (p.inputTargetArity d ha)
+  exact ⟨applyOperation p.cell d ha,
+    (applyOperation_source p.cell d ha hs).trans (applyOperation_congr p.source_cell rfl _ _),
+    (applyOperation_target p.cell d ha ht).trans (applyOperation_congr p.target_cell rfl _ _)⟩
+
+noncomputable def rewriteInterchangeLeft {A : Type u} {a b c : A}
+    {p p' : Path a b} {q q' : Path b c} (h : RwEq p p') (k : RwEq q q') :
+    { z : NativeTower.Cell A 2 // NativeTower.source z = ULift.up (⟨a, c, Path.trans p q⟩ : PathOne A) ∧
+      NativeTower.target z = ULift.up (⟨a, c, Path.trans p' q'⟩ : PathOne A) } := by
+  let z := (operationInterchangeLeft (unitTwoArrow A) (unitTwoArrow A)).action
+    (rewritePairDiagram h k) (rewriteInterchange_leftArity h k)
+  have hs := (rewritePairDiagram_source h k)
+  have ht := (rewritePairDiagram_target h k)
+  exact ⟨z.val, z.property.1.trans
+    ((applyOperation_congr rfl hs _ (binaryOneOperation_arity p q)).trans (binaryOneOperation_evaluation p q _)),
+    z.property.2.trans ((applyOperation_congr rfl ht _ (binaryOneOperation_arity p' q')).trans
+      (binaryOneOperation_evaluation p' q' _))⟩
+
+noncomputable def rewriteInterchangeRight {A : Type u} {a b c : A}
+    {p p' : Path a b} {q q' : Path b c} (h : RwEq p p') (k : RwEq q q') :
+    { z : NativeTower.Cell A 2 // NativeTower.source z = ULift.up (⟨a, c, Path.trans p q⟩ : PathOne A) ∧
+      NativeTower.target z = ULift.up (⟨a, c, Path.trans p' q'⟩ : PathOne A) } := by
+  let z := (operationInterchangeRight (unitTwoArrow A) (unitTwoArrow A)).action
+    (rewritePairDiagram h k) (rewriteInterchange_rightArity h k)
+  have hs := (rewritePairDiagram_source h k)
+  have ht := (rewritePairDiagram_target h k)
+  exact ⟨z.val, z.property.1.trans
+    ((applyOperation_congr rfl hs _ (binaryOneOperation_arity p q)).trans (binaryOneOperation_evaluation p q _)),
+    z.property.2.trans ((applyOperation_congr rfl ht _ (binaryOneOperation_arity p' q')).trans
+      (binaryOneOperation_evaluation p' q' _))⟩
+
+theorem rewriteInterchange_boundary {A : Type u} {a b c : A}
+    {p p' : Path a b} {q q' : Path b c} (h : RwEq p p') (k : RwEq q q') :
+    NativeTower.source (rewriteInterchange h k).val = (rewriteInterchangeLeft h k).val ∧
+      NativeTower.target (rewriteInterchange h k).val = (rewriteInterchangeRight h k).val :=
+  (rewriteInterchange h k).property
+
 end NativeOperadic
 
 end ComputationalPaths.Path.OmegaFoundations

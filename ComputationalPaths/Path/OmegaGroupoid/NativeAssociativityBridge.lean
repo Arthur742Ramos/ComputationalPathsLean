@@ -467,6 +467,73 @@ theorem certificatePentagonBoundary_targets_distinct {α : Type v} {A : Type u} 
     ((certificatePentagonShortComparison label w x y z).property.2.symm.trans
       (h.trans (certificatePentagonLongComparison label w x y z).property.2))
 
+/-- Compare the first selected interchange route to the exact original
+signed trace, retaining both whiskered histories and their order. -/
+noncomputable def certificateInterchangeLeftComparison {α : Type v} {A : Type u} {a : A}
+    (label : α → Path a a) {x x' y y' : FreeMagma α}
+    (p : AssocRwEq x x') (q : AssocRwEq y y') :
+    { h : NativeTower.Cell A 3 // NativeTower.source h =
+        (NativeOperadic.rewriteInterchangeLeft (evalTrace label p) (evalTrace label q)).val ∧
+      NativeTower.target h = trace label (.trans (p.congrLeft y) (q.congrRight x')) } :=
+  ⟨NativeTower.fillPositive _ _
+      (NativeOperadic.rewriteInterchangeLeft (evalTrace label p) (evalTrace label q)).property.1
+      (NativeOperadic.rewriteInterchangeLeft (evalTrace label p) (evalTrace label q)).property.2,
+    NativeTower.fillPositive_boundary _ _ _ _⟩
+
+noncomputable def certificateInterchangeRightComparison {α : Type v} {A : Type u} {a : A}
+    (label : α → Path a a) {x x' y y' : FreeMagma α}
+    (p : AssocRwEq x x') (q : AssocRwEq y y') :
+    { h : NativeTower.Cell A 3 // NativeTower.source h =
+        (NativeOperadic.rewriteInterchangeRight (evalTrace label p) (evalTrace label q)).val ∧
+      NativeTower.target h = trace label (.trans (q.congrRight x) (p.congrLeft y')) } :=
+  ⟨NativeTower.fillPositive _ _
+      (NativeOperadic.rewriteInterchangeRight (evalTrace label p) (evalTrace label q)).property.1
+      (NativeOperadic.rewriteInterchangeRight (evalTrace label p) (evalTrace label q)).property.2,
+    NativeTower.fillPositive_boundary _ _ _ _⟩
+
+/-- The image of the unchanged independent interchange certificate is the
+central 3-cell; selected composition pastes its explicit boundary bridges. -/
+noncomputable def certificateInterchangeWithComparedBoundaries {α : Type v} {A : Type u} {a : A}
+    (label : α → Path a a) {x x' y y' : FreeMagma α}
+    (p : AssocRwEq x x') (q : AssocRwEq y y') :
+    { h : NativeTower.Cell A 3 // NativeTower.source h =
+        (NativeOperadic.rewriteInterchangeLeft (evalTrace label p) (evalTrace label q)).val ∧
+      NativeTower.target h =
+        (NativeOperadic.rewriteInterchangeRight (evalTrace label p) (evalTrace label q)).val } := by
+  let l := certificateInterchangeLeftComparison label p q
+  let m := certificate label (AssocHigher.interchange p q)
+  let r := certificateInterchangeRightComparison label p q
+  let hm := m.property.2.trans ((NativeTower.source_reverse (n := 2) r.val).trans r.property.2).symm
+  let t := NativeOperadic.compose (A := A) (n := 2) m.val (NativeTower.reverse (n := 2) r.val) hm
+  have ht := NativeOperadic.compose_boundary (A := A) (n := 2) m.val (NativeTower.reverse (n := 2) r.val) hm
+  let hl := l.property.2.trans (ht.1.trans m.property.1).symm
+  exact ⟨NativeOperadic.compose (A := A) (n := 2) l.val t hl,
+    (NativeOperadic.compose_boundary (A := A) (n := 2) l.val t hl).1.trans l.property.1,
+    (NativeOperadic.compose_boundary (A := A) (n := 2) l.val t hl).2.trans
+      (ht.2.trans ((NativeTower.target_reverse (n := 2) r.val).trans r.property.1))⟩
+
+/-- The selected interchange operation on the original raw labels compares
+to the actual independent certificate, relative to its named boundary
+bridges. As for the pentagon, this is a coskeletal 4-cell, not trace equality. -/
+noncomputable def certificateInterchangeComparison {α : Type v} {A : Type u} {a : A}
+    (label : α → Path a a) {x x' y y' : FreeMagma α}
+    (p : AssocRwEq x x') (q : AssocRwEq y y') :
+    { h : NativeTower.Cell A 4 // NativeTower.source h =
+        (NativeOperadic.rewriteInterchange (evalTrace label p) (evalTrace label q)).val ∧
+      NativeTower.target h = (certificateInterchangeWithComparedBoundaries label p q).val } :=
+  ⟨NativeTower.fillPositive _ _
+      ((NativeOperadic.rewriteInterchange_boundary (evalTrace label p) (evalTrace label q)).1.trans
+        (certificateInterchangeWithComparedBoundaries label p q).property.1.symm)
+      ((NativeOperadic.rewriteInterchange_boundary (evalTrace label p) (evalTrace label q)).2.trans
+        (certificateInterchangeWithComparedBoundaries label p q).property.2.symm),
+    NativeTower.fillPositive_boundary _ _ _ _⟩
+
+theorem certificateInterchangeComparison_invertible {α : Type v} {A : Type u} {a : A}
+    (label : α → Path a a) {x x' y y' : FreeMagma α}
+    (p : AssocRwEq x x') (q : AssocRwEq y y') :
+    NativeOperadic.WeaklyInvertible 3 (certificateInterchangeComparison label p q).val :=
+  NativeOperadic.all_cells_weaklyInvertible _ _
+
 end NativeAssociativity
 
 end ComputationalPaths.Path.OmegaFoundations
