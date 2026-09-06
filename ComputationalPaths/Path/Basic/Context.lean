@@ -63,7 +63,7 @@ variable {A : Type u} {B : Type v}
     {a b : A} (p : Path a b) :
     map (comp g f) p =
       map g (map f p) := by
-  simp [map, comp]
+  exact Path.congrArg_comp g.fill f.fill p
 
 /-- Substitution through a unary context on the "left" rewrite.
 This packages the composition described in Definition 3.5 of the paper. -/
@@ -294,7 +294,8 @@ end DepContext
     {A : Type u} {B : Type v} {C : A → B → Type w}
     (f : (a : A) → (b : B) → C a b) (a : A) (b : B) :
     mapLeftDep f (Path.refl a) b = Path.refl (f a b) := by
-  simp [mapLeftDep]
+  simp [mapLeftDep, id]
+  rfl
 
 /-- Dependent congruence for binary functions: right hole. -/
 @[simp] noncomputable def mapRightDep
@@ -310,7 +311,8 @@ end DepContext
     {A : Type u} {B : Type v} {C : A → B → Type w}
     (f : (a : A) → (b : B) → C a b) (a : A) (b : B) :
     mapRightDep f a (Path.refl b) = Path.refl (f a b) := by
-  simp [mapRightDep]
+  simp [mapRightDep, id]
+  rfl
 
 /-- Dependent congruence for binary functions on both holes. -/
 @[simp] noncomputable def map2Dep
@@ -332,7 +334,8 @@ end DepContext
     {A : Type u} {B : Type v} {C : A → B → Type w}
     (f : (a : A) → (b : B) → C a b) (a : A) (b : B) :
     map2Dep f (Path.refl a) (Path.refl b) = Path.refl (f a b) := by
-  simp [map2Dep]
+  simp [map2Dep, id]
+  rfl
 
 /-- A binary context whose codomain may depend on the left hole. -/
 structure DepBiContext (A : Type u) (B : Type v)

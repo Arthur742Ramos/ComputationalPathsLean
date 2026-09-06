@@ -82,12 +82,12 @@ variable {β : Type u}
 private noncomputable def trans_assoc_left_eq (p q r : GlobularCell β)
     (h₁ : Path p.tgt q.src) (h₂ : Path q.tgt r.src) :
     Path (trans p q h₁).tgt r.src := by
-  simpa [trans] using h₂
+  exact h₂
 
 private noncomputable def trans_assoc_right_eq (p q r : GlobularCell β)
     (h₁ : Path p.tgt q.src) (h₂ : Path q.tgt r.src) :
     Path p.tgt (trans q r h₂).src := by
-  simpa [trans] using h₁
+  exact h₁
 
 @[simp] theorem trans_assoc (p q r : GlobularCell β)
     (h₁ : Path p.tgt q.src) (h₂ : Path q.tgt r.src) :
@@ -186,15 +186,13 @@ private noncomputable def globular_trans_assoc_left_eq {n : Nat}
     (p q r : GlobularLevel A (n + 1))
     (h₁ : Path p.tgt q.src) (h₂ : Path q.tgt r.src) :
     Path (trans (A := A) p q h₁).tgt r.src := by
-  simpa [trans] using
-    (GlobularCell.trans_assoc_left_eq (β := GlobularLevel A n) p q r h₁ h₂)
+  exact h₂
 
 private noncomputable def globular_trans_assoc_right_eq {n : Nat}
     (p q r : GlobularLevel A (n + 1))
     (h₁ : Path p.tgt q.src) (h₂ : Path q.tgt r.src) :
     Path p.tgt (trans (A := A) q r h₂).src := by
-  simpa [trans] using
-    (GlobularCell.trans_assoc_right_eq (β := GlobularLevel A n) p q r h₁ h₂)
+  exact h₁
 
 @[simp] theorem trans_assoc {n : Nat}
     (p q r : GlobularLevel A (n + 1))
@@ -203,8 +201,7 @@ private noncomputable def globular_trans_assoc_right_eq {n : Nat}
         (globular_trans_assoc_left_eq p q r h₁ h₂) =
       trans (A := A) p (trans (A := A) q r h₂)
         (globular_trans_assoc_right_eq p q r h₁ h₂) := by
-  simpa [trans, globular_trans_assoc_left_eq, globular_trans_assoc_right_eq] using
-    (GlobularCell.trans_assoc (β := GlobularLevel A n) p q r h₁ h₂)
+  exact GlobularCell.trans_assoc (β := GlobularLevel A n) p q r h₁ h₂
 
 section Functoriality
 
@@ -240,7 +237,8 @@ computational path. -/
     map (n := n + 1) f (symm c) =
       symm (map (n := n + 1) f c) := by
   cases c
-  simp [symm, map]
+  simp only [symm, map, GlobularCell.symm, Path.congrArg_symm]
+  rfl
 
 @[simp] theorem map_trans {n : Nat} (f : A → B)
     (p q : GlobularLevel A (n + 1)) (h : Path p.tgt q.src) :

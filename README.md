@@ -41,6 +41,22 @@ scripts/check-palomar-associativity.sh
 The pinned Comparator/NanoDa replay runs in the Palomar Readiness workflow.
 Submissions use the current [Palomar submission form](https://submit.palomar-registry.org/).
 
+### Higher-coherence extension
+
+`AssocHigher.allParallel` connects all parallel signed associativity traces
+using explicit pentagon, interchange, naturality and structural higher cells.
+`evalHigherRwEq` interprets these witnesses in the existing computational-path
+tower. See [the higher-coherence scope and verification note](ASSOCIATIVITY_HIGHER_COHERENCE.md)
+for the proof architecture, comparison with existing work, and limitations.
+This extension is separate from the original eight-declaration Comparator
+boundary; it has not been externally submitted or independently replayed by
+that Comparator.
+
+```bash
+lake build ComputationalPaths.Path.OmegaGroupoid.AssocHigherBridge
+lake env lean scripts/AssocHigherAudit.lean
+```
+
 ## Project scope
 
 Representative results and modules include:

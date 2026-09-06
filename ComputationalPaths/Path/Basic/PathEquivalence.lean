@@ -291,7 +291,7 @@ theorem pathEquivOfEquiv_symm (f : A → B) (g : B → A)
     {a b : A} (p : Path a b) :
     (pathEquivOfEquiv f g hfg hgf).mapPath (Path.symm p) =
       Path.symm ((pathEquivOfEquiv f g hfg hgf).mapPath p) := by
-  simp [pathEquivOfEquiv]
+  exact Path.congrArg_symm f p
 
 end Path
 

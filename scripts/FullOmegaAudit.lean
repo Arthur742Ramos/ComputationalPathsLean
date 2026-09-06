@@ -1,0 +1,1252 @@
+import ComputationalPaths.Path.OmegaGroupoid.GlobularPasting
+import ComputationalPaths.Path.OmegaGroupoid.NativeGlobularTower
+import ComputationalPaths.Path.OmegaGroupoid.GlobularEndomorphism
+import ComputationalPaths.Path.OmegaGroupoid.NativeOperadicOperations
+import ComputationalPaths.Path.OmegaGroupoid.NativeAssociativityBridge
+import ComputationalPaths.Path.OmegaGroupoid.NativeUniversalInvertibility
+import ComputationalPaths.Path.OmegaGroupoid.NativeWeakOmegaGroupoid
+
+#print axioms ComputationalPaths.Path.OmegaFoundations.NormalizedContractibleOperad.arityMonadHom
+#print axioms ComputationalPaths.Path.OmegaFoundations.NormalizedContractibleOperad.arity_globular_pullback
+#print axioms ComputationalPaths.Path.OmegaFoundations.NormalizedContractibleOperad.objectsEquiv
+#print axioms ComputationalPaths.Path.OmegaFoundations.NormalizedContractibleOperad.objectsEquiv_natural
+#print axioms ComputationalPaths.Path.OmegaFoundations.NormalizedContractibleOperad.terminalContraction
+#print axioms ComputationalPaths.Path.OmegaFoundations.NativeWeakOmega.category
+#print axioms ComputationalPaths.Path.OmegaFoundations.NativeWeakOmega.fullWeakOmegaGroupoid
+#print axioms ComputationalPaths.Path.OmegaFoundations.NativeWeakOmega.identity_objects
+#print axioms ComputationalPaths.Path.OmegaFoundations.NativeWeakOmega.leftUnitor_operadic_boundary
+#print axioms ComputationalPaths.Path.OmegaFoundations.NativeWeakOmega.rightUnitor_operadic_boundary
+#print axioms ComputationalPaths.Path.OmegaFoundations.NativeWeakOmega.cancelRight_operadic_boundary
+#print axioms ComputationalPaths.Path.OmegaFoundations.NativeWeakOmega.cancelLeft_operadic_boundary
+#print axioms ComputationalPaths.Path.OmegaFoundations.NativeWeakOmega.Semantics.pathComponentsEquiv
+#print axioms ComputationalPaths.Path.OmegaFoundations.NativeWeakOmega.Semantics.loopClassesUnique
+#print axioms ComputationalPaths.Path.OmegaFoundations.NativeWeakOmega.Semantics.higher_cells_determined_by_boundary
+#print axioms ComputationalPaths.Path.OmegaFoundations.NativeWeakOmega.Semantics.raw_rewrites_still_distinct
+#print axioms ComputationalPaths.Path.OmegaFoundations.NativeTower.leftUnitor_paths
+#print axioms ComputationalPaths.Path.OmegaFoundations.NativeTower.rightUnitor_paths
+#print axioms ComputationalPaths.Path.OmegaFoundations.NativeTower.cancelRight_paths
+#print axioms ComputationalPaths.Path.OmegaFoundations.NativeTower.cancelLeft_paths
+
+#print axioms ComputationalPaths.Path.OmegaFoundations.NativeUniversal.BoundaryOperations.weaklyInvertible_unfold
+#print axioms ComputationalPaths.Path.OmegaFoundations.NativeUniversal.BoundaryOperations.all_cells_weaklyInvertible
+#print axioms ComputationalPaths.Path.OmegaFoundations.NativeUniversal.selected_invertibility_iff
+#print axioms ComputationalPaths.Path.OmegaFoundations.NativeUniversal.OperadicSystem.identity_boundary
+#print axioms ComputationalPaths.Path.OmegaFoundations.NativeUniversal.OperadicSystem.compose_boundary
+#print axioms ComputationalPaths.Path.OmegaFoundations.NativeUniversal.OperadicSystem.all_cells_weaklyInvertible
+#print axioms ComputationalPaths.Path.OmegaFoundations.NativeUniversal.every_operadic_system_invertible
+
+#print axioms ComputationalPaths.Path.OmegaFoundations.NativeOperadic.operationEvaluation_singleton
+#print axioms ComputationalPaths.Path.OmegaFoundations.NativeOperadic.operationEvaluation_arity
+#print axioms ComputationalPaths.Path.OmegaFoundations.NativeOperadic.operationIdentity_boundary
+#print axioms ComputationalPaths.Path.OmegaFoundations.NativeOperadic.operationCompose_boundary
+#print axioms ComputationalPaths.Path.OmegaFoundations.NativeOperadic.operationComposeAt_arity
+#print axioms ComputationalPaths.Path.OmegaFoundations.NativeOperadic.operationComposeAt_source
+#print axioms ComputationalPaths.Path.OmegaFoundations.NativeOperadic.operationComposeAt_target
+#print axioms ComputationalPaths.Path.OmegaFoundations.NativeOperadic.operationBinary_assoc_arity
+#print axioms ComputationalPaths.Path.OmegaFoundations.NativeOperadic.operationAssociator_boundary
+#print axioms ComputationalPaths.Path.OmegaFoundations.NativeOperadic.operationPentagon_parallel
+#print axioms ComputationalPaths.Path.OmegaFoundations.NativeOperadic.operationPentagonShort_identityArity
+#print axioms ComputationalPaths.Path.OmegaFoundations.NativeOperadic.operationPentagonLong_identityArity
+#print axioms ComputationalPaths.Path.OmegaFoundations.NativeOperadic.operationPentagon_boundary
+#print axioms ComputationalPaths.Path.OmegaFoundations.NativeOperadic.operationPentagon_arity
+#print axioms ComputationalPaths.Path.OmegaFoundations.NativeOperadic.appliedOperationPentagon
+#print axioms ComputationalPaths.Path.OmegaFoundations.NativeOperadic.appliedOperationPentagon_invertible
+#print axioms ComputationalPaths.Path.OmegaFoundations.NativeOperadic.fourPathPentagonDiagram_arity
+#print axioms ComputationalPaths.Path.OmegaFoundations.NativeOperadic.nestedBinary_operation
+#print axioms ComputationalPaths.Path.OmegaFoundations.NativeOperadic.fourLeftApplication_inputs
+#print axioms ComputationalPaths.Path.OmegaFoundations.NativeOperadic.fourRightApplication_inputs
+#print axioms ComputationalPaths.Path.OmegaFoundations.NativeOperadic.fourLeftOperation_evaluation
+#print axioms ComputationalPaths.Path.OmegaFoundations.NativeOperadic.fourRightOperation_evaluation
+#print axioms ComputationalPaths.Path.OmegaFoundations.NativeOperadic.fourPathPentagon_boundary
+#print axioms ComputationalPaths.Path.OmegaFoundations.NativeAssociativity.selectedPentagonComparison_invertible
+#print axioms ComputationalPaths.Path.OmegaFoundations.NativeAssociativity.certificatePentagonComparison
+#print axioms ComputationalPaths.Path.OmegaFoundations.NativeAssociativity.certificatePentagonComparison_invertible
+#print axioms ComputationalPaths.Path.OmegaFoundations.NativeAssociativity.certificatePentagonBoundary_trace_counts
+#print axioms ComputationalPaths.Path.OmegaFoundations.NativeAssociativity.certificatePentagonBoundary_targets_distinct
+#print axioms ComputationalPaths.Path.OmegaFoundations.NativeOperadic.operationInterchangeLeft_arity
+#print axioms ComputationalPaths.Path.OmegaFoundations.NativeOperadic.operationInterchangeRight_arity
+#print axioms ComputationalPaths.Path.OmegaFoundations.NativeOperadic.operationInterchange_boundary
+#print axioms ComputationalPaths.Path.OmegaFoundations.NativeOperadic.operationInterchange_arity
+#print axioms ComputationalPaths.Path.OmegaFoundations.NativeOperadic.rewriteUnit_evaluation
+#print axioms ComputationalPaths.Path.OmegaFoundations.NativeOperadic.rewriteInterchange_arity
+#print axioms ComputationalPaths.Path.OmegaFoundations.NativeOperadic.rewriteInterchange_boundary
+#print axioms ComputationalPaths.Path.OmegaFoundations.NativeOperadic.rewriteInterchange_invertible
+#print axioms ComputationalPaths.Path.OmegaFoundations.NativeAssociativity.certificateInterchangeComparison
+#print axioms ComputationalPaths.Path.OmegaFoundations.NativeAssociativity.certificateInterchangeComparison_invertible
+
+open ComputationalPaths
+open ComputationalPaths.Path
+open ComputationalPaths.Path.OmegaFoundations
+
+/-! Full construction audit, including the definition-level native package,
+its semantic limitations, and the preserved independent certificate. -/
+
+#print axioms NativeOperadic.compose_paths
+#print axioms NativeAssociativity.operadicAssociator_derivation
+#print axioms NativeAssociativity.certificate
+#print axioms NativeAssociativity.certificate_pentagon
+#print axioms NativeAssociativity.certificate_interchange
+#print axioms NativeAssociativity.pentagon_traces_distinct
+#print axioms NativeAssociativity.three_parallel_images
+#print axioms NativeAssociativity.twoCompositionComparison_invertible
+#print axioms NativeAssociativity.compositionComparison_invertible
+
+example {α A : Type} {a : A} (label : α → Path a a)
+    {x y : FreeMagma α}
+    {p q : PalomarAssociativity.AssocRwEq x y} (h : PalomarAssociativity.AssocHigher p q) :
+    NativeTower.source (NativeAssociativity.certificate label h).val = NativeAssociativity.trace label p ∧
+      NativeTower.target (NativeAssociativity.certificate label h).val = NativeAssociativity.trace label q :=
+  (NativeAssociativity.certificate label h).property
+
+example {α A : Type} {a : A} (label : α → Path a a)
+    (w x y z : FreeMagma α) :
+    NativeAssociativity.trace label (PalomarAssociativity.pentagonShort w x y z).toRwEq ≠
+      NativeAssociativity.trace label (PalomarAssociativity.pentagonLong w x y z).toRwEq :=
+  NativeAssociativity.pentagon_traces_distinct label w x y z
+
+#print axioms NativeOperadic.operation
+#print axioms NativeOperadic.input_boundary
+#print axioms NativeOperadic.compose
+#print axioms NativeOperadic.compose_boundary
+#print axioms NativeOperadic.identity_boundary
+#print axioms NativeOperadic.compareCompose_three_paths_target
+#print axioms NativeOperadic.weaklyInvertible_unfold
+#print axioms NativeOperadic.all_cells_weaklyInvertible
+#print axioms NativeOperadic.shape_boundary
+#print axioms NativeOperadic.instruction_contraction
+#print axioms NativeOperadic.instructions_arity
+#print axioms NativeOperadic.instructions_unit
+#print axioms NativeOperadic.standardEvaluation_unit
+
+example {A : Type u} {a b : A} {p q : Path a b} (h : RwEq p q) :
+    (NativeOperadic.standardEvaluation A).app (n := 2)
+      (Pasting.singleton (G := NativeTower.globular A) (n := 2)
+        (⟨a, b, p, q, h⟩ : NativeTower.Cell A 2)) =
+      (⟨a, b, p, q, h⟩ : NativeTower.Cell A 2) :=
+  NativeOperadic.standardEvaluation_singleton _
+
+example (A : Type u) (n : Nat) (p : NativeTower.Cell A (n + 1)) :
+    NativeOperadic.WeaklyInvertible n p := NativeOperadic.all_cells_weaklyInvertible n p
+
+example (A : Type u) (n : Nat) (p q : NativeTower.Cell A (n + 1))
+    (h : NativeTower.target p = NativeTower.source q) :
+    NativeOperadic.WeaklyInvertible (n + 1) (NativeOperadic.compareCompose p q h) :=
+  NativeOperadic.all_cells_weaklyInvertible _ _
+
+example {A : Type u} {a b c d : A} (p : Path a b) (q : Path b c) (r : Path c d) :
+    NativeOperadic.WeaklyInvertible 1 (NativeTower.associator p q r) :=
+  NativeOperadic.all_cells_weaklyInvertible _ _
+
+#print axioms Endomorphism.operations
+#print axioms Endomorphism.evaluation
+#print axioms Endomorphism.nativeChain_pair
+#print axioms Endomorphism.nativeContraction
+#print axioms Endomorphism.existsUnique_abstraction
+#print axioms Endomorphism.evaluation_injective
+#print axioms Endomorphism.unit
+#print axioms Endomorphism.multiplication
+#print axioms Endomorphism.evaluation_unit_input
+#print axioms Endomorphism.evaluation_multiplication_nested
+#print axioms Endomorphism.one_mul
+#print axioms Endomorphism.mul_one
+#print axioms Endomorphism.associateInv_comparison
+#print axioms Endomorphism.mul_assoc_inv
+#print axioms Endomorphism.operad
+#print axioms Endomorphism.algebra
+
+noncomputable example (A : Type u) :
+    CategoryTheory.MonObj (Endomorphism.collection (NativeTower.globular A)) := inferInstance
+
+noncomputable example (A : Type u) :
+    CategoryTheory.Monad.Algebra
+      (GlobularCollection.operadMonad (Endomorphism.collection (NativeTower.globular A))) :=
+  Endomorphism.algebra (NativeTower.globular A)
+
+example (A : Type u) {a b : A} (p : Path a b) :
+    (Endomorphism.evaluation (NativeTower.globular A)).app (n := 1)
+      (((Endomorphism.unit (NativeTower.globular A)).application (NativeTower.globular A)).app (n := 1)
+        ((GlobularCollection.identityApplicationIn (NativeTower.globular A)).app (n := 1)
+          (ULift.up (⟨a, b, p⟩ : PathOne A)))) =
+      (ULift.up (⟨a, b, p⟩ : PathOne A) : NativeTower.Cell A 1) :=
+  Endomorphism.evaluation_unit_input (NativeTower.globular A) _
+
+example (A : Type u) {n : Nat}
+    (p : GlobularSet.LiftingProblem (Endomorphism.arity (NativeTower.globular A)) n) :
+    (Endomorphism.arity (NativeTower.globular A)).app
+      ((Endomorphism.nativeContraction A).lift p).cell = p.arity :=
+  ((Endomorphism.nativeContraction A).lift p).arity_cell
+
+example (A : Type u) {n : Nat}
+    (p : ((Endomorphism.collection (NativeTower.globular A)).application
+      (NativeTower.globular A)).Cell (n + 1)) :
+    NativeTower.source ((Endomorphism.evaluation (NativeTower.globular A)).app p) =
+      (Endomorphism.evaluation (NativeTower.globular A)).app
+        (((Endomorphism.collection (NativeTower.globular A)).application
+          (NativeTower.globular A)).source p) :=
+  (Endomorphism.evaluation (NativeTower.globular A)).source_app p
+
+#print axioms NativeTower.InterpretationStage.extend
+#print axioms NativeTower.TwoSkeletonInterpretation.extend
+#print axioms NativeTower.map_ext_twoSkeleton
+#print axioms NativeTower.TwoSkeletonInterpretation.existsUnique_extension
+
+example (A : Type u) :
+    (NativeTower.TwoSkeletonInterpretation.extend
+      (⟨⟨id, id, fun _ => rfl, fun _ => rfl⟩, id, fun _ => rfl, fun _ => rfl⟩ :
+        NativeTower.TwoSkeletonInterpretation (NativeTower.globular A) A)) =
+      GlobularSet.Map.id (NativeTower.globular A) := by
+  apply NativeTower.map_ext_twoSkeleton <;> intro x <;> rfl
+
+#print axioms Pasting.preserves_recovered
+#print axioms Pasting.preserves_ext
+#print axioms Pasting.existsUnique_preserving_extension
+#print axioms Pasting.evaluate_multiplication
+#print axioms Pasting.preserves_evaluation
+#print axioms Pasting.cutOperationsAlgebra
+#print axioms Pasting.CutModel.algebraHom_preserves
+#print axioms Pasting.CutModel.algebraHomEquiv
+#print axioms Pasting.CutModel.freeForgetAdjunction
+#print axioms Pasting.CutModel.freeForget_monad
+#print axioms Pasting.Cut.finEquiv
+#print axioms Pasting.CutModel.unit_identityIter
+#print axioms Pasting.CutBoundary.source_eq_sourceIter
+#print axioms Pasting.CutBoundary.target_eq_targetIter
+#print axioms Pasting.CutModel.sourceIter_compose
+#print axioms Pasting.CutModel.targetIter_compose
+#print axioms Pasting.CutModel.identity_compose
+#print axioms Pasting.StrictPresentation.toCutModel
+#print axioms Pasting.StrictPresentation.roundTrip
+#print axioms Pasting.CutModel.strictPresentation_roundTrip
+#print axioms Pasting.StrictPresentation.extend_compose
+#print axioms Pasting.StrictModel.equivalence
+#print axioms Pasting.StrictModel.freeForgetAdjunction
+#print axioms Pasting.StrictModel.freeForget_monad
+#print axioms NativeOperadic.composeAt_source
+#print axioms NativeOperadic.composeAt_target
+#print axioms NativeAssociativity.horizontalComparison
+#print axioms NativeAssociativity.whiskerRightComparison
+#print axioms NativeAssociativity.whiskerLeftComparison
+#print axioms NativeOperadic.coherenceCell_boundary
+#print axioms NativeOperadic.sameArityCoherence
+#print axioms NativeOperadic.substitutionCoherence
+#print axioms NativeOperadic.oneSubstitutionCoherence
+#print axioms NativeOperadic.nestedBinary_evaluation
+#print axioms NativeOperadic.nestedBinary_inputs
+#print axioms NativeOperadic.bracketed_inputs_equal
+#print axioms NativeOperadic.selectedAssociator
+#print axioms NativeAssociativity.selectedAssociatorComparison
+
+example {A : Type} {a b c d : A} (p : Path a b) (q : Path b c) (r : Path c d) :
+    NativeTower.source (NativeOperadic.selectedAssociator p q r).val =
+      ULift.up (⟨a, d, Path.trans (Path.trans p q) r⟩ : PathOne A) ∧
+    NativeTower.target (NativeOperadic.selectedAssociator p q r).val =
+      ULift.up (⟨a, d, Path.trans p (Path.trans q r)⟩ : PathOne A) :=
+  (NativeOperadic.selectedAssociator p q r).property
+example {A : Type} {a b c d : A} (p : Path a b) (q : Path b c) (r : Path c d) :
+    NativeOperadic.WeaklyInvertible 2 (NativeAssociativity.selectedAssociatorComparison p q r).val ∧
+      (NativeTower.target (NativeAssociativity.selectedAssociatorComparison p q r).val).2.2.2.2 =
+        RwEq.step (Step.trans_assoc p q r) := by
+  refine ⟨NativeAssociativity.selectedAssociatorComparison_invertible p q r, ?_⟩
+  rfl
+
+noncomputable example {A : Type} {n : Nat}
+    (o r : (NativeOperadic.collection A).operations.Cell n)
+    (hp : (NativeOperadic.collection A).operations.Parallel n o r)
+    (d : Pasting n (NativeOperadic.carrier A)) ho hr :
+    { c : NativeTower.Cell A (n + 1) //
+      NativeTower.source c = NativeOperadic.applyOperation o d ho ∧
+      NativeTower.target c = NativeOperadic.applyOperation r d hr } :=
+  NativeOperadic.sameArityCoherence o r hp d ho hr
+
+example {A : Type}
+    (x : ((NativeOperadic.collection A).application
+      ((NativeOperadic.collection A).application (NativeOperadic.carrier A))).Cell 1) :
+    NativeTower.source (NativeOperadic.oneSubstitutionCoherence x).val =
+      (Endomorphism.evaluation (NativeOperadic.carrier A)).app
+        (((NativeOperadic.collection A).map (Endomorphism.evaluation (NativeOperadic.carrier A))).app x) ∧
+    NativeTower.target (NativeOperadic.oneSubstitutionCoherence x).val =
+      (NativeOperadic.standardEvaluation A).app (NativeOperadic.substitutedInput x).val.2 :=
+  (NativeOperadic.oneSubstitutionCoherence x).property
+
+example {A : Type} {a b c : A} {p p' : Path a b} {q q' : Path b c}
+    (d : OmegaGroupoid.Derivation₂ p p') (e : OmegaGroupoid.Derivation₂ q q') :
+    NativeTower.target (NativeAssociativity.horizontalComparison d e).val =
+      NativeAssociativity.two (OmegaGroupoid.hcomp d e) :=
+  (NativeAssociativity.horizontalComparison d e).property.2
+example {A : Type} {a b c : A} {p p' : Path a b}
+    (d : OmegaGroupoid.Derivation₂ p p') (q : Path b c) :
+    NativeTower.source (NativeAssociativity.whiskerRightComparison d q).val =
+      NativeAssociativity.operadicWhiskerRight d q ∧
+    NativeOperadic.WeaklyInvertible 2 (NativeAssociativity.whiskerRightComparison d q).val :=
+  ⟨(NativeAssociativity.whiskerRightComparison d q).property.1,
+    NativeAssociativity.whiskerRightComparison_invertible d q⟩
+example {A : Type} {a b c : A} (p : Path a b) {q q' : Path b c}
+    (e : OmegaGroupoid.Derivation₂ q q') :
+    NativeTower.source (NativeAssociativity.whiskerLeftComparison p e).val =
+      NativeAssociativity.operadicWhiskerLeft p e ∧
+    NativeOperadic.WeaklyInvertible 2 (NativeAssociativity.whiskerLeftComparison p e).val :=
+  ⟨(NativeAssociativity.whiskerLeftComparison p e).property.1,
+    NativeAssociativity.whiskerLeftComparison_invertible p e⟩
+
+noncomputable example : CategoryTheory.Equivalence Pasting.CutModel Pasting.StrictModel :=
+  Pasting.StrictModel.equivalence
+noncomputable example :
+    CategoryTheory.Adjunction Pasting.StrictModel.freeFunctor Pasting.StrictModel.forget :=
+  Pasting.StrictModel.freeForgetAdjunction
+example : Pasting.StrictModel.freeForgetAdjunction.toMonad = Pasting.pastingMonad :=
+  Pasting.StrictModel.freeForget_monad
+example (C : Pasting.CutModel) :
+    (Pasting.StrictModel.unitIso C).hom.map = GlobularSet.Map.id C.carrier := rfl
+example (S : Pasting.StrictModel) :
+    (Pasting.StrictModel.counitIso S).hom.map = GlobularSet.Map.id S.carrier := rfl
+
+example (G : GlobularSet) (S : Pasting.StrictPresentation G) :
+    S.toCutModel.strictPresentation = S := S.roundTrip
+example (C : Pasting.CutModel) : C.strictPresentation.toCutModel = C :=
+  C.strictPresentation_roundTrip
+example (G : GlobularSet) (S : Pasting.StrictPresentation G) :
+    S.operations.UnitCompatible ∧ S.operations.UnitIdempotent :=
+  ⟨S.unitCompatible, S.unitIdempotent⟩
+
+example (C : Pasting.CutModel) {n : Nat} (c : Pasting.Cut n) (k : Nat)
+    (p q : C.carrier.Cell (n + k))
+    (h : Pasting.CutBoundary.target (c.upIter k) C.carrier p =
+      Pasting.CutBoundary.source (c.upIter k) C.carrier q) :
+    C.carrier.sourceIter k (C.operations.compose (c.upIter k) p q h) =
+      C.operations.compose c (C.carrier.sourceIter k p) (C.carrier.sourceIter k q)
+        (Pasting.CutBoundary.sourceIter_matching C.carrier c k p q h) :=
+  C.sourceIter_compose c k p q h _
+
+example (C : Pasting.CutModel) {n : Nat} (c : Pasting.Cut n) (k : Nat)
+    (p q : C.carrier.Cell (n + k))
+    (h : Pasting.CutBoundary.target (c.upIter k) C.carrier p =
+      Pasting.CutBoundary.source (c.upIter k) C.carrier q) :
+    C.carrier.targetIter k (C.operations.compose (c.upIter k) p q h) =
+      C.operations.compose c (C.carrier.targetIter k p) (C.carrier.targetIter k q)
+        (Pasting.CutBoundary.targetIter_matching C.carrier c k p q h) :=
+  C.targetIter_compose c k p q h _
+
+example (C : Pasting.CutModel) {n : Nat} (c : Pasting.Cut n)
+    (p q : C.carrier.Cell n)
+    (h : Pasting.CutBoundary.target c C.carrier p = Pasting.CutBoundary.source c C.carrier q) :
+    C.identity (C.operations.compose c p q h) =
+      C.operations.compose c.up (C.identity p) (C.identity q) (C.identity_matching c p q h) :=
+  C.identity_compose c p q h _
+
+example (n : Nat) : Pasting.Cut n ≃ Fin n := Pasting.Cut.finEquiv n
+example (C : Pasting.CutModel) {n : Nat} (p : C.carrier.Cell n) :
+    C.carrier.source (C.identity p) = p ∧ C.carrier.target (C.identity p) = p :=
+  ⟨C.source_identity p, C.target_identity p⟩
+example (C : Pasting.CutModel) {n : Nat} (k : Nat)
+    (c : Pasting.Cut (n + k + 1)) (h : c.height = n)
+    (p : C.carrier.Cell c.height) (q : C.carrier.Cell n) (hp : HEq p q) :
+    C.operations.unit c p = C.identityIter (k + 1) q :=
+  C.unit_identityIter k c h p q hp
+
+noncomputable example :
+    CategoryTheory.Adjunction Pasting.CutModel.freeFunctor Pasting.CutModel.forget :=
+  Pasting.CutModel.freeForgetAdjunction
+example : Pasting.CutModel.freeForgetAdjunction.toMonad = Pasting.pastingMonad :=
+  Pasting.CutModel.freeForget_monad
+example (G : GlobularSet) :
+    Pasting.CutModel.freeForgetAdjunction.toMonad.μ.app G = Pasting.flattenGlobular G :=
+  Pasting.CutModel.freeForget_multiplication G
+
+example : Pasting.CutModel.algebraFunctor.Full := inferInstance
+example : Pasting.CutModel.algebraFunctor.Faithful := inferInstance
+noncomputable example (C D : Pasting.CutModel) :
+    Pasting.CutModel.Hom C D ≃
+      CategoryTheory.Monad.Algebra.Hom C.algebra D.algebra :=
+  Pasting.CutModel.algebraHomEquiv C D
+#print axioms Pasting.atom_map
+#print axioms Pasting.singleton_of_atom
+#print axioms Pasting.singleton_cartesian
+#print axioms Pasting.singleton_globular_pullback
+#print axioms GlobularSet.pullback
+#print axioms GlobularSet.pullback_universal
+#print axioms Pasting.pullbackComparison
+#print axioms Pasting.pullbackComparison_singleton
+#print axioms GlobularSet.pullbackHomForward
+#print axioms GlobularSet.pullbackHomBackward
+#print axioms GlobularSet.pullbackHom_backward_forward
+#print axioms GlobularSet.pullbackHom_forward_backward
+#print axioms Chain.zipAlong
+#print axioms Chain.zipAlong_left
+#print axioms Chain.zipAlong_right
+#print axioms Pasting.pullback_pasting_exists
+#print axioms Pasting.pullbackComparison_surjective
+#print axioms Chain.mapAlong_joint_injective
+#print axioms Pasting.pullback_pasting_ext
+#print axioms Pasting.pullbackComparisonIso
+#print axioms Pasting.pasting_pullback_universal
+#print axioms Chain.split_mapAlong
+#print axioms Chain.split_mapAlong_unique
+#print axioms Chain.lift_bind_mapAlong
+#print axioms Chain.bind_mapAlong_joint_injective
+#print axioms Chain.bind_cartesian
+#print axioms Pasting.recursive_fold_pack
+#print axioms Pasting.recursive_fold_unpack
+#print axioms Pasting.flattenHom_natural
+#print axioms Pasting.flattenHom_segments_natural
+#print axioms Pasting.flatten_horizontal_segments
+#print axioms Pasting.homPastingInclusion_injective
+#print axioms Pasting.homPastingInclusion_natural
+#print axioms Pasting.flattenHom_factor
+#print axioms Pasting.homFlattenCartesianAt_zero
+#print axioms Pasting.horizontal_unit_cartesian
+#print axioms Pasting.horizontal_cut_cartesian
+#print axioms Chain.map_retract_of_mapAlong
+#print axioms Pasting.cutUnit_retract_of_map
+#print axioms Pasting.cutUnit_cartesian
+#print axioms Pasting.cutPairChain_left
+#print axioms Pasting.cutPairChain_right
+#print axioms Pasting.cutPairChain_roundtrip
+#print axioms Pasting.cutCompose_lift_pairs
+#print axioms Chain.lift_mapAlong_square
+#print axioms Pasting.cutPairMap_compose
+#print axioms Pasting.cutCompositionCartesian_bottom
+#print axioms Pasting.packCutPairChain_map
+#print axioms Pasting.cutComposition_lift_exists
+#print axioms Pasting.cutComposition_lift_unique
+#print axioms Pasting.cutComposition_cartesian
+#print axioms Pasting.mapGlobular_cartesian
+#print axioms Pasting.CutOperations.Cartesian.unit_lift_hom
+#print axioms Pasting.CutOperations.Cartesian.compose_lift_hom
+#print axioms Pasting.CutOperations.Cartesian.hom
+#print axioms Pasting.CutOperations.Cartesian.horizontal_factor_lift
+#print axioms Pasting.CutOperations.Cartesian.horizontal_unit_lift
+#print axioms Pasting.CutOperations.Cartesian.fold_lift
+#print axioms Pasting.CutOperations.Cartesian.fold_joint_injective
+#print axioms Pasting.CutOperations.Cartesian.fold_unique_lift
+#print axioms Pasting.evaluate_pack_id
+#print axioms Pasting.evaluate_lift
+#print axioms Pasting.evaluate_map_id
+#print axioms Pasting.evaluate_joint_injective
+#print axioms Pasting.evaluate_unique_lift
+#print axioms Pasting.flatten_cartesian
+#print axioms Pasting.flatten_globular_pullback
+#print axioms Pasting.homFlattenCartesianAt
+#print axioms GlobularSet.terminalMap_unique
+#print axioms GlobularCollection.functor
+#print axioms GlobularCollection.arityTransformation
+#print axioms GlobularCollection.arity_cartesian
+#print axioms GlobularCollection.arity_globular_pullback
+#print axioms GlobularCollection.application_pullback_universal
+#print axioms GlobularCollection.applicationTerminalIso
+#print axioms GlobularCollection.atTerminal_arity
+#print axioms GlobularCollection.identityApplication_lift
+#print axioms GlobularCollection.identityApplicationIso
+#print axioms GlobularCollection.identityApplicationOut_natural
+#print axioms GlobularCollection.substitution_match
+#print axioms GlobularCollection.substitutionComparison
+#print axioms GlobularCollection.substitutionComparison_operation
+#print axioms GlobularCollection.substitutionComparison_inputs
+#print axioms GlobularCollection.substitutionComparison_natural
+#print axioms GlobularCollection.substitutionComparison_unique_lift
+#print axioms GlobularCollection.substitutionComparisonInverse
+#print axioms GlobularCollection.substitutionComparisonIso
+#print axioms GlobularCollection.substitutionFunctorIso
+#print axioms GlobularCollection.Hom.transformation
+#print axioms GlobularCollection.Hom.application_id
+#print axioms GlobularCollection.Hom.application_comp
+#print axioms GlobularCollection.Hom.application_inputs
+#print axioms GlobularCollection.Hom.application_cartesian
+#print axioms GlobularCollection.Hom.substitute_id
+#print axioms GlobularCollection.Hom.substitute_comp
+#print axioms GlobularCollection.Hom.substitute_comparison
+#print axioms GlobularCollection.leftUnitIso
+#print axioms GlobularCollection.rightUnitIso
+#print axioms GlobularCollection.Hom.leftUnit_natural
+#print axioms GlobularCollection.Hom.rightUnit_natural
+#print axioms GlobularCollection.Hom.application_faithful
+#print axioms GlobularCollection.Hom.associateInv
+#print axioms GlobularCollection.associatorIso
+#print axioms GlobularCollection.Hom.associateInv_natural
+#print axioms GlobularCollection.Hom.triangle_inv
+#print axioms GlobularCollection.Hom.pentagon_inv
+#print axioms GlobularCollection.associate_natural
+#print axioms GlobularCollection.triangle
+#print axioms GlobularCollection.pentagon
+#print axioms GlobularCollection.monoidalCategory
+#print axioms GlobularCollection.operadUnitTransformation
+#print axioms GlobularCollection.operadMulTransformation
+#print axioms GlobularCollection.operadUnit_arity
+#print axioms GlobularCollection.operadMul_arity
+#print axioms GlobularCollection.operad_left_unit
+#print axioms GlobularCollection.operad_right_unit
+#print axioms GlobularCollection.operad_assoc_operations
+#print axioms GlobularCollection.operad_assoc
+#print axioms GlobularCollection.operadMonad
+#print axioms GlobularCollection.operadArityMonadHom
+#print axioms GlobularSet.square_globular_pullback
+#print axioms GlobularCollection.operadUnit_cartesian
+#print axioms GlobularCollection.operadMul_cartesian
+#print axioms GlobularCollection.operadUnit_globular_pullback
+#print axioms GlobularCollection.operadMul_globular_pullback
+#print axioms QuotientPathInduction.rweqAny
+#print axioms NativeTower.fillPositive
+#print axioms NativeTower.fillPositiveBoundary
+#print axioms NativeTower.fillPositive_paths
+
+noncomputable example {A : Type u} {n : Nat} (b : (NativeTower.globular A).Boundary (n + 1)) :
+    (NativeTower.globular A).CellOver b := NativeTower.fillPositiveBoundary b
+
+example (C : GlobularCollection.{u}) [CategoryTheory.MonObj C] {G H X : GlobularSet.{u}}
+    (f : GlobularSet.Map G H) (p : GlobularSet.Map X (C.application G))
+    (q : GlobularSet.Map X (C.application (C.application H)))
+    (h : GlobularSet.Map.comp (C.map f) p = GlobularSet.Map.comp (C.operadMul H) q) :
+    ∃! r : GlobularSet.Map X (C.application (C.application G)),
+      GlobularSet.Map.comp (C.operadMul G) r = p ∧
+      GlobularSet.Map.comp (C.map (C.map f)) r = q := C.operadMul_globular_pullback f p q h
+
+noncomputable example (C : GlobularCollection.{u}) [CategoryTheory.MonObj C] :
+    CategoryTheory.Monad GlobularSet.{u} := C.operadMonad
+
+noncomputable example (C : GlobularCollection.{u}) [CategoryTheory.MonObj C] :
+    CategoryTheory.MonadHom C.operadMonad Pasting.pastingMonad := C.operadArityMonadHom
+
+example (C : GlobularCollection.{u}) [CategoryTheory.MonObj C] (G : GlobularSet.{u}) :
+    GlobularSet.Map.comp (C.operadMul G) (C.map (C.operadMul G)) =
+      GlobularSet.Map.comp (C.operadMul G) (C.operadMul (C.application G)) := C.operad_assoc G
+
+example (C : GlobularCollection.{u}) [CategoryTheory.MonObj C] (G : GlobularSet.{u}) :
+    GlobularSet.Map.comp (C.operadMul G) (C.operadUnit (C.application G)) =
+      GlobularSet.Map.id (C.application G) := C.operad_left_unit G
+
+example (C : GlobularCollection.{u}) [CategoryTheory.MonObj C] (G : GlobularSet.{u}) :
+    GlobularSet.Map.comp (C.operadMul G) (C.map (C.operadUnit G)) =
+      GlobularSet.Map.id (C.application G) := C.operad_right_unit G
+
+example (C : GlobularCollection.{u}) [CategoryTheory.MonObj C] (G : GlobularSet.{u}) :
+    GlobularSet.Map.comp (C.inputs G) (C.operadMul G) =
+      GlobularSet.Map.comp (Pasting.flattenGlobular G)
+        (GlobularSet.Map.comp (Pasting.mapGlobular (C.inputs G)) (C.inputs (C.application G))) :=
+  C.operadMul_arity G
+
+noncomputable example : CategoryTheory.MonoidalCategory GlobularCollection.{u} := inferInstance
+
+example (C D : GlobularCollection.{u}) :
+    CategoryTheory.MonoidalCategoryStruct.tensorObj C D = C.substitute D := rfl
+
+example (A B C D : GlobularCollection.{u}) :
+    GlobularCollection.Hom.comp (GlobularCollection.Hom.associateInv (A.substitute B) C D)
+      (GlobularCollection.Hom.associateInv A B (C.substitute D)) =
+    GlobularCollection.Hom.comp
+      (GlobularCollection.Hom.substitute (GlobularCollection.Hom.associateInv A B C) (GlobularCollection.Hom.id D))
+      (GlobularCollection.Hom.comp (GlobularCollection.Hom.associateInv A (B.substitute C) D)
+        (GlobularCollection.Hom.substitute (GlobularCollection.Hom.id A) (GlobularCollection.Hom.associateInv B C D))) :=
+  GlobularCollection.Hom.pentagon_inv A B C D
+
+example (C D : GlobularCollection.{u}) :
+    GlobularCollection.Hom.comp
+      (GlobularCollection.Hom.substitute (GlobularCollection.Hom.rightUnit C) (GlobularCollection.Hom.id D))
+      (GlobularCollection.Hom.associateInv C GlobularCollection.identity D) =
+    GlobularCollection.Hom.substitute (GlobularCollection.Hom.id C) (GlobularCollection.Hom.leftUnit D) :=
+  GlobularCollection.Hom.triangle_inv C D
+
+noncomputable example (C D E : GlobularCollection.{u}) :
+    CategoryTheory.Iso ((C.substitute D).substitute E) (C.substitute (D.substitute E)) :=
+  C.associatorIso D E
+
+example {C D : GlobularCollection.{u}} {f g : GlobularCollection.Hom C D}
+    (h : f.application GlobularSet.terminal = g.application GlobularSet.terminal) : f = g :=
+  GlobularCollection.Hom.application_faithful h
+
+noncomputable example (C : GlobularCollection.{u}) :
+    CategoryTheory.Iso (GlobularCollection.identity.substitute C) C := C.leftUnitIso
+
+example (C : GlobularCollection.{u}) :
+    CategoryTheory.Iso (C.substitute GlobularCollection.identity) C := C.rightUnitIso
+
+example {C D E F J K : GlobularCollection.{u}}
+    (f : GlobularCollection.Hom C E) (g : GlobularCollection.Hom D F)
+    (h : GlobularCollection.Hom E J) (k : GlobularCollection.Hom F K) :
+    GlobularCollection.Hom.substitute (GlobularCollection.Hom.comp h f) (GlobularCollection.Hom.comp k g) =
+      GlobularCollection.Hom.comp (GlobularCollection.Hom.substitute h k) (GlobularCollection.Hom.substitute f g) :=
+  GlobularCollection.Hom.substitute_comp f g h k
+
+example {C D : GlobularCollection.{u}} (f : GlobularCollection.Hom C D)
+    {G H : GlobularSet.{u}} (g : GlobularSet.Map G H) {n : Nat}
+    (p : (D.application G).Cell n) (q : (C.application H).Cell n)
+    (h : (D.map g).app p = (f.application H).app q) :
+    ∃! r : (C.application G).Cell n, (f.application G).app r = p ∧ (C.map g).app r = q :=
+  f.application_cartesian g p q h
+
+example (C D : GlobularCollection.{u}) (G : GlobularSet.{u}) {n : Nat}
+    (p : ((C.substitute D).application G).Cell n) :
+    ∃! r : (C.application (D.application G)).Cell n,
+      (C.substitutionComparison D G).app r = p := C.substitutionComparison_unique_lift D G p
+
+noncomputable example (C D : GlobularCollection.{u}) :
+    CategoryTheory.Iso (CategoryTheory.Functor.comp D.functor C.functor) (C.substitute D).functor :=
+  C.substitutionFunctorIso D
+
+example (C D : GlobularCollection.{u}) {G H : GlobularSet.{u}} (f : GlobularSet.Map G H) :
+    GlobularSet.Map.comp (C.substitutionComparison D H) (C.map (D.map f)) =
+      GlobularSet.Map.comp ((C.substitute D).map f) (C.substitutionComparison D G) :=
+  C.substitutionComparison_natural D f
+
+noncomputable example (G : GlobularSet.{u}) :
+    CategoryTheory.Iso (GlobularCollection.identity.application G) G :=
+  GlobularCollection.identityApplicationIso G
+
+example {G H : GlobularSet.{u}} (f : GlobularSet.Map G H) :
+    GlobularSet.Map.comp (GlobularCollection.identityApplicationOut H)
+      (GlobularCollection.identity.map f) =
+    GlobularSet.Map.comp f (GlobularCollection.identityApplicationOut G) :=
+  GlobularCollection.identityApplicationOut_natural f
+
+example (C : GlobularCollection.{u}) {G H X : GlobularSet.{u}}
+    (f : GlobularSet.Map G H) (p : GlobularSet.Map X (Pasting.globular G))
+    (q : GlobularSet.Map X (C.application H))
+    (h : GlobularSet.Map.comp (Pasting.mapGlobular f) p = GlobularSet.Map.comp (C.inputs H) q) :
+    ∃! d : GlobularSet.Map X (C.application G),
+      GlobularSet.Map.comp (C.inputs G) d = p ∧ GlobularSet.Map.comp (C.map f) d = q :=
+  C.arity_globular_pullback f p q h
+
+example (C : GlobularCollection.{u}) {G H K X : GlobularSet.{u}}
+    (f : GlobularSet.Map G K) (g : GlobularSet.Map H K)
+    (p : GlobularSet.Map X (C.application G)) (q : GlobularSet.Map X (C.application H))
+    (h : GlobularSet.Map.comp (C.map f) p = GlobularSet.Map.comp (C.map g) q) :
+    ∃! d : GlobularSet.Map X (C.application (GlobularSet.pullback f g)),
+      GlobularSet.Map.comp (C.map (GlobularSet.pullbackFst f g)) d = p ∧
+      GlobularSet.Map.comp (C.map (GlobularSet.pullbackSnd f g)) d = q :=
+  C.application_pullback_universal f g p q h
+
+example (C : GlobularCollection.{u}) :
+    CategoryTheory.Iso (C.application GlobularSet.terminal) C.operations := C.applicationTerminalIso
+
+example {G H : GlobularSet.{u}} (f : GlobularSet.Map G H) {n : Nat}
+    (p : Pasting n G) (q : Pasting n (Pasting.globular H))
+    (h : Pasting.map f p = (Pasting.flattenGlobular H).app (n := n) q) :
+    ∃! r : Pasting n (Pasting.globular G),
+      (Pasting.flattenGlobular G).app (n := n) r = p ∧
+      Pasting.map (Pasting.mapGlobular f) r = q := Pasting.flatten_cartesian f p q h
+
+example {G H X : GlobularSet.{u}} (f : GlobularSet.Map G H)
+    (p : GlobularSet.Map X (Pasting.globular G))
+    (q : GlobularSet.Map X (Pasting.globular (Pasting.globular H)))
+    (h : GlobularSet.Map.comp (Pasting.mapGlobular f) p =
+      GlobularSet.Map.comp (Pasting.flattenGlobular H) q) :
+    ∃! d : GlobularSet.Map X (Pasting.globular (Pasting.globular G)),
+      GlobularSet.Map.comp (Pasting.flattenGlobular G) d = p ∧
+      GlobularSet.Map.comp (Pasting.mapGlobular (Pasting.mapGlobular f)) d = q :=
+  Pasting.flatten_globular_pullback f p q h
+
+example {G H : GlobularSet.{u}} (f : GlobularSet.Map G H) (n : Nat) :
+    Pasting.HomFlattenCartesianAt f n := Pasting.homFlattenCartesianAt f n
+
+example {G H : GlobularSet.{u}} {C : Pasting.CutOperations G} {D : Pasting.CutOperations H}
+    {f : GlobularSet.Map G H} (K : Pasting.CutOperations.Cartesian C D f)
+    (L : C.Compatible) (M : D.Compatible) {n : Nat} {a b : G.Cell 0}
+    (p : (G.hom a b).Cell n)
+    (q : Chain (fun x y => (H.hom x y).Cell n) (f.app a) (f.app b))
+    (h : f.app p.val = ((D.horizontal M).fold q).val) :
+    ∃! s : Chain (fun x y => (G.hom x y).Cell n) a b,
+      (C.horizontal L).fold s = p ∧
+      s.mapAlong f.app (fun {x y} e => (f.hom x y).app e) = q :=
+  K.fold_unique_lift L M p q h
+
+example {G H : GlobularSet.{u}} {C : Pasting.CutOperations G} {D : Pasting.CutOperations H}
+    {f : GlobularSet.Map G H} (K : Pasting.CutOperations.Cartesian C D f)
+    {n : Nat} (a b : G.Cell 0) (p : (G.hom a b).Cell n) (c : H.Cell 0)
+    (q : (H.hom (f.app a) c).Cell n) (r : (H.hom c (f.app b)).Cell n)
+    (h : f.app p.val = (D.horizontalMul q r).val) :
+    ∃! s : Σ y : G.Cell 0, (G.hom a y).Cell n × (G.hom y b).Cell n,
+      f.app s.1 = c ∧ C.horizontalMul s.2.1 s.2.2 = p ∧
+      f.app s.2.1.val = q.val ∧ f.app s.2.2.val = r.val :=
+  K.horizontal_factor_lift a b p c q r h
+
+example {G H : GlobularSet.{u}} (f : GlobularSet.Map G H) (a b : G.Cell 0) :
+    Pasting.CutOperations.Cartesian ((Pasting.cutOperations G).hom a b)
+      ((Pasting.cutOperations H).hom (f.app a) (f.app b)) ((Pasting.mapGlobular f).hom a b) :=
+  (Pasting.mapGlobular_cartesian f).hom a b
+
+example {G H : GlobularSet.{u}} (f : GlobularSet.Map G H) {n : Nat} (c : Pasting.Cut n) :
+    Pasting.CutCompositionCartesian c f := Pasting.cutComposition_cartesian c f
+
+example {G H : GlobularSet.{u}} (f : GlobularSet.Map G H) {n : Nat} (c : Pasting.Cut n)
+    (p : Pasting n G) (q : Pasting.CutPair c H) (h : Pasting.map f p = Pasting.cutPairCompose c q) :
+    ∃! r : Pasting.CutPair c G,
+      Pasting.cutPairCompose c r = p ∧ Pasting.cutPairMap c f r = q :=
+  Pasting.cutComposition_cartesian c f p q h
+
+example {G H : GlobularSet.{u}} (f : GlobularSet.Map G H) (n : Nat) :
+    Pasting.CutCompositionCartesian (.bottom : Pasting.Cut (n + 1)) f :=
+  Pasting.cutCompositionCartesian_bottom f n
+
+example {G : GlobularSet.{u}} {n : Nat} (c : Pasting.Cut n) {a b : G.Cell 0}
+    (p q : Pasting.Horizontal n G a b)
+    (h : p.map (fun e => Pasting.cutTarget c e) = q.map (fun e => Pasting.cutSource c e)) :
+    Pasting.cutCompose (.lift c) (Pasting.pack p) (Pasting.pack q) (_root_.congrArg Pasting.pack h) =
+      Pasting.pack ((Pasting.cutPairChain c p q h).map
+        (fun r => Pasting.cutCompose c r.val.1 r.val.2 r.property)) :=
+  Pasting.cutCompose_lift_pairs c p q h
+
+example {G H : GlobularSet.{u}} (f : GlobularSet.Map G H) {n : Nat} (c : Pasting.Cut n)
+    (p : Pasting n G) (q : Pasting c.height H) (h : Pasting.map f p = Pasting.cutUnit c q) :
+    ∃! r : Pasting c.height G, Pasting.cutUnit c r = p ∧ Pasting.map f r = q :=
+  Pasting.cutUnit_cartesian c f p q h
+
+example {G H : GlobularSet.{u}} (f : GlobularSet.Map G H) {n : Nat}
+    (p : Pasting (n + 1) G) (c : H.Cell 0)
+    (h : Pasting.map f p = Pasting.cutUnit (.bottom : Pasting.Cut (n + 1)) c) :
+    ∃! a : G.Cell 0, Pasting.cutUnit (.bottom : Pasting.Cut (n + 1)) a = p ∧ f.app a = c :=
+  Pasting.horizontal_unit_cartesian f p c h
+
+example {G H : GlobularSet.{u}} (f : GlobularSet.Map G H) {n : Nat} {a b : G.Cell 0}
+    (p : Pasting.Horizontal n G a b) (c : H.Cell 0)
+    (q : Pasting.Horizontal n H (f.app a) c) (r : Pasting.Horizontal n H c (f.app b))
+    (h : Pasting.map f (Pasting.pack p) = Pasting.pack (q.append r)) :
+    ∃! s : Σ y : G.Cell 0, Pasting.Horizontal n G a y × Pasting.Horizontal n G y b,
+      f.app s.1 = c ∧ s.2.1.append s.2.2 = p ∧
+      Pasting.map f (Pasting.pack s.2.1) = Pasting.pack q ∧
+      Pasting.map f (Pasting.pack s.2.2) = Pasting.pack r :=
+  Pasting.horizontal_cut_cartesian f p c q r h
+
+example (G : GlobularSet.{u}) (a b : G.Cell 0) :
+    GlobularSet.Map.comp ((Pasting.flattenGlobular G).hom a b)
+      (Pasting.homPastingInclusion (Pasting.globular G) a b) = Pasting.flattenHom G a b :=
+  Pasting.flattenHom_factor G a b
+
+example {G H : GlobularSet.{u}} (f : GlobularSet.Map G H) :
+    Pasting.HomFlattenCartesianAt f 0 := Pasting.homFlattenCartesianAt_zero f
+
+example {G : GlobularSet.{u}} {n : Nat} {a b : G.Cell 0}
+    (p : Chain (fun x y => Pasting n ((Pasting.globular G).hom x y)) a b) :
+    (Pasting.flattenGlobular G).app (n := n + 1) (Pasting.pack p) =
+      Pasting.pack ((p.map (fun {x y} e =>
+        Pasting.unpackFibre ((Pasting.flattenHom G x y).app e))).bind (fun e => e)) :=
+  Pasting.flatten_horizontal_segments p
+
+example {O P : Type u} {E : O → O → Type u} {F : P → P → Type u}
+    (f : O → P) (e : {x y : O} → E x y → F (f x) (f y))
+    {x z : O} (p : Chain E x z) (q : Chain (fun a b => Chain F a b) (f x) (f z))
+    (h : p.mapAlong f e = q.bind (fun r => r)) :
+    ∃! r : Chain (fun x y => Chain E x y) x z,
+      r.bind (fun s => s) = p ∧ r.mapAlong f (fun s => s.mapAlong f e) = q :=
+  Chain.bind_cartesian f e p q h
+
+noncomputable example {G H K : GlobularSet.{u}}
+    (f : GlobularSet.Map G K) (g : GlobularSet.Map H K) :
+    CategoryTheory.Iso (Pasting.globular (GlobularSet.pullback f g))
+      (GlobularSet.pullback (Pasting.mapGlobular f) (Pasting.mapGlobular g)) :=
+  Pasting.pullbackComparisonIso f g
+
+example {G H K X : GlobularSet.{u}} (f : GlobularSet.Map G K) (g : GlobularSet.Map H K)
+    (p : GlobularSet.Map X (Pasting.globular G)) (q : GlobularSet.Map X (Pasting.globular H))
+    (h : GlobularSet.Map.comp (Pasting.mapGlobular f) p =
+      GlobularSet.Map.comp (Pasting.mapGlobular g) q) :
+    ∃! d : GlobularSet.Map X (Pasting.globular (GlobularSet.pullback f g)),
+      GlobularSet.Map.comp (Pasting.mapGlobular (GlobularSet.pullbackFst f g)) d = p ∧
+      GlobularSet.Map.comp (Pasting.mapGlobular (GlobularSet.pullbackSnd f g)) d = q :=
+  Pasting.pasting_pullback_universal f g p q h
+
+example {G H K : GlobularSet.{u}} (f : GlobularSet.Map G K) (g : GlobularSet.Map H K)
+    (n : Nat) : Function.Surjective ((Pasting.pullbackComparison f g).app (n := n)) :=
+  Pasting.pullbackComparison_surjective f g n
+
+example {G H K : GlobularSet.{u}} (f : GlobularSet.Map G K) (g : GlobularSet.Map H K)
+    (a b : (GlobularSet.pullback f g).Cell 0) :
+    GlobularSet.Map.comp (GlobularSet.pullbackHomBackward f g a b)
+      (GlobularSet.pullbackHomForward f g a b) =
+      GlobularSet.Map.id ((GlobularSet.pullback f g).hom a b) :=
+  GlobularSet.pullbackHom_backward_forward f g a b
+
+example {G H K X : GlobularSet.{u}} (f : GlobularSet.Map G K) (g : GlobularSet.Map H K)
+    (p : GlobularSet.Map X G) (q : GlobularSet.Map X H)
+    (h : GlobularSet.Map.comp f p = GlobularSet.Map.comp g q) :
+    ∃! d : GlobularSet.Map X (GlobularSet.pullback f g),
+      GlobularSet.Map.comp (GlobularSet.pullbackFst f g) d = p ∧
+      GlobularSet.Map.comp (GlobularSet.pullbackSnd f g) d = q :=
+  GlobularSet.pullback_universal f g p q h
+
+example {G H K : GlobularSet.{u}} (f : GlobularSet.Map G K) (g : GlobularSet.Map H K)
+    {n : Nat} (p : (GlobularSet.pullback f g).Cell n) :
+    ((Pasting.pullbackComparison f g).app (Pasting.singleton p)).val =
+      (Pasting.singleton p.val.1, Pasting.singleton p.val.2) :=
+  Pasting.pullbackComparison_singleton f g p
+
+example {G H X : GlobularSet.{u}} (f : GlobularSet.Map G H)
+    (p : GlobularSet.Map X (Pasting.globular G)) (q : GlobularSet.Map X H)
+    (h : GlobularSet.Map.comp (Pasting.mapGlobular f) p =
+      GlobularSet.Map.comp (Pasting.singletonGlobular H) q) :
+    ∃! d : GlobularSet.Map X G,
+      GlobularSet.Map.comp (Pasting.singletonGlobular G) d = p ∧
+      GlobularSet.Map.comp f d = q := Pasting.singleton_globular_pullback f p q h
+
+noncomputable example (G : GlobularSet) :
+    CategoryTheory.Monad.Algebra Pasting.pastingMonad :=
+  Pasting.cutOperationsAlgebra (Pasting.cutOperations G)
+    (Pasting.cutOperations_compatible G) (Pasting.cutOperations_leftUnital G)
+    (Pasting.cutOperations_rightUnital G) (Pasting.cutOperations_associative G)
+    (Pasting.cutOperations_interchange G) (Pasting.cutOperations_unitIdempotent G)
+    (Pasting.cutOperations_unitCompatible G)
+
+example {G H : GlobularSet} (C : Pasting.CutOperations H)
+    (L : C.Compatible) (U : C.LeftUnital) (R : C.RightUnital) (A : C.Associative)
+    (I : C.Interchange) (J : C.UnitIdempotent) (V : C.UnitCompatible)
+    (f : GlobularSet.Map G H) :
+    ∃! g : GlobularSet.Map (Pasting.globular G) H,
+      Pasting.CutOperations.Preserves (Pasting.cutOperations G) C g ∧
+      GlobularSet.Map.comp g (Pasting.singletonGlobular G) = f :=
+  Pasting.existsUnique_preserving_extension C L U R A I J V f
+
+example (G : GlobularSet) (n k : Nat) (c : G.Cell (n + (k + 2))) :
+    G.sourceIter (k + 1) (G.source c) = G.sourceIter (k + 1) (G.target c) :=
+  G.sourceIter_globular k c
+
+example (G : GlobularSet) {n : Nat} (p q : G.Cell (n + 1))
+    (h : G.target p = G.source q) :
+    GlobularSet.Parallel G n (G.source p) (G.target q) :=
+  (G.compositeBoundary p q h).parallel
+
+example (G : GlobularSet) : GlobularSet.Contraction (GlobularSet.Map.id G) :=
+  GlobularSet.Contraction.identity G
+
+noncomputable example {A : Type} {a b c d : A}
+    (p : Path a b) (q : Path b c) (r : Path c d) :
+    RwEq (Path.trans (Path.trans p q) r) (Path.trans p (Path.trans q r)) :=
+  (associatorCell p q r).2.2.2.2
+
+#print axioms GlobularSet.sourceIter_globular
+#print axioms GlobularSet.targetIter_globular
+#print axioms GlobularSet.compositeBoundary
+#print axioms GlobularSet.Contraction.comp
+#print axioms associatorCell
+
+example (G : GlobularSet) (n : Nat) (c : Pasting n G) :
+    Pasting.source (Pasting.identity c) = c := Pasting.source_identity G c
+
+example (G : GlobularSet) (c : Pasting 7 G) :
+    Pasting.target (Pasting.identity c) = c := Pasting.target_identity G c
+
+#print axioms GlobularSet.hom
+#print axioms GlobularSet.Map.hom
+#print axioms Pasting.globular
+#print axioms Pasting.identities
+
+example {G H K : GlobularSet} (f : GlobularSet.Map G H) (g : GlobularSet.Map H K)
+    (n : Nat) (c : Pasting n G) :
+    Pasting.map g (Pasting.map f c) = Pasting.map (GlobularSet.Map.comp g f) c :=
+  Pasting.map_comp f g c
+
+#print axioms Pasting.pastingFunctor
+
+example {O : Type} {E F D : O → O → Type}
+    (f : {a b : O} → E a b → Chain F a b)
+    (g : {a b : O} → F a b → Chain D a b) {a b : O} (p : Chain E a b) :
+    (p.bind f).bind g = p.bind (fun e => (f e).bind g) := Chain.bind_assoc f g p
+
+#print axioms Chain.bind_assoc
+#print axioms evalPathChain_bind
+
+example (G : GlobularSet) (n : Nat) (c d : G.Cell n)
+    (h : Pasting.singleton c = Pasting.singleton d) : c = d :=
+  Pasting.singleton_injective G h
+
+example (G : GlobularSet) (c : G.Cell 8) :
+    Pasting.source (Pasting.singleton c) = Pasting.singleton (G.source c) :=
+  Pasting.source_singleton G c
+
+example {G H : GlobularSet} (f : GlobularSet.Map G H) (n : Nat) (c : G.Cell n) :
+    Pasting.map f (Pasting.singleton c) = Pasting.singleton (f.app c) :=
+  Pasting.map_singleton f c
+
+#print axioms Pasting.singleton_injective
+#print axioms Pasting.singletonGlobular
+#print axioms Pasting.singleton_natural
+
+example {G : GlobularSet} (n : Nat) {a b c d : G.Cell 0}
+    (p : Pasting.Horizontal n G a b) (q : Pasting.Horizontal n G b c)
+    (r : Pasting.Horizontal n G c d) :
+    Pasting.horizontal (Pasting.horizontal p q) r =
+      Pasting.horizontal p (Pasting.horizontal q r) := Pasting.horizontal_assoc p q r
+
+example {G : GlobularSet} {a b c : G.Cell 0}
+    (p : Pasting.Horizontal 8 G a b) (q : Pasting.Horizontal 8 G b c) :
+    (Pasting.globular G).sourceZero (n := 9) (Pasting.pack (Pasting.horizontal p q)) = a :=
+  Pasting.sourceZero_pack _
+
+#print axioms Pasting.horizontal_assoc
+#print axioms Pasting.source_horizontal
+#print axioms Pasting.target_horizontal
+#print axioms Pasting.identity_horizontal
+#print axioms Pasting.map_horizontal
+#print axioms Pasting.sourceZero_pack
+
+example {G : GlobularSet} (n : Nat) (p q : Pasting (n + 1) G)
+    (h : Pasting.target p = Pasting.source q) :
+    Pasting.source (Pasting.vertical p q h) = Pasting.source p :=
+  Pasting.source_vertical p q h
+
+example {G : GlobularSet} (p q : Pasting 9 G)
+    (h : Pasting.target p = Pasting.source q) :
+    Pasting.target (Pasting.vertical p q h) = Pasting.target q :=
+  Pasting.target_vertical p q h
+
+#print axioms Chain.zipOver
+#print axioms Chain.map_zipOver_left
+#print axioms Chain.map_zipOver_right
+#print axioms Chain.zipOver_append
+#print axioms Pasting.vertical
+#print axioms Pasting.verticalCell
+
+example {G : GlobularSet} (n : Nat) (p : Pasting (n + 1) G) :
+    Pasting.vertical (Pasting.identity (Pasting.source p)) p
+      (Pasting.target_identity G (Pasting.source p)) = p := Pasting.vertical_left_unit p
+
+example {G : GlobularSet} (p q r : Pasting 9 G)
+    (h : Pasting.target p = Pasting.source q) (k : Pasting.target q = Pasting.source r) :
+    Pasting.vertical (Pasting.vertical p q h) r ((Pasting.target_vertical p q h).trans k) =
+      Pasting.vertical p (Pasting.vertical q r k) (h.trans (Pasting.source_vertical q r k).symm) :=
+  Pasting.vertical_assoc p q r h k
+
+#print axioms Chain.zipOver_map_left
+#print axioms Chain.zipOver_map_right
+#print axioms Chain.zipOver_assoc
+#print axioms Pasting.vertical_left_unit
+#print axioms Pasting.vertical_right_unit
+#print axioms Pasting.vertical_assoc
+#print axioms Pasting.pack_verticalFibre
+#print axioms Pasting.vertical_horizontal_interchange
+
+example {G : GlobularSet} (k n : Nat) (p q : Pasting (n + k + 1) G)
+    (h : Pasting.targetAt k n p = Pasting.sourceAt k n q) :
+    Pasting.sourceAt k n (Pasting.composeAt k n p q h) = Pasting.sourceAt k n p :=
+  Pasting.sourceAt_composeAt k n p q h
+
+example {G : GlobularSet} (p q r : Pasting 9 G)
+    (h : Pasting.targetAt 4 4 p = Pasting.sourceAt 4 4 q)
+    (j : Pasting.targetAt 4 4 q = Pasting.sourceAt 4 4 r) :
+    Pasting.composeAt 4 4 (Pasting.composeAt 4 4 p q h) r
+      ((Pasting.targetAt_composeAt 4 4 p q h).trans j) =
+    Pasting.composeAt 4 4 p (Pasting.composeAt 4 4 q r j)
+      (h.trans (Pasting.sourceAt_composeAt 4 4 q r j).symm) :=
+  Pasting.composeAt_assoc 4 4 p q r h j
+
+#print axioms Pasting.sourceAt_adjacent
+#print axioms Pasting.targetAt_adjacent
+#print axioms Pasting.composeAt
+#print axioms Pasting.sourceAt_composeAt
+#print axioms Pasting.targetAt_composeAt
+#print axioms Pasting.sourceAt_identityAt
+#print axioms Pasting.targetAt_identityAt
+#print axioms Pasting.composeAt_left_unit
+#print axioms Pasting.composeAt_right_unit
+#print axioms Pasting.composeAt_assoc
+
+example {G : GlobularSet} (k n : Nat) (p : Pasting (n + k + 1) G) :
+    Pasting.sourceAt k n p = (Pasting.globular G).sourceIter (n := k) (n + 1)
+      (Pasting.reindex (by omega) p) := Pasting.sourceAt_eq_sourceIter k n p
+
+example {G : GlobularSet} (p : Pasting 9 G) :
+    Pasting.targetAt 4 4 p = (Pasting.globular G).targetIter (n := 4) 5 p :=
+  Pasting.targetAt_eq_targetIter 4 4 p
+
+#print axioms Pasting.sourceAt_step
+#print axioms Pasting.targetAt_step
+#print axioms Pasting.sourceAt_globular
+#print axioms Pasting.targetAt_globular
+#print axioms Pasting.sourceAt_lower
+#print axioms Pasting.targetAt_lower
+#print axioms Pasting.sourceAt_eq_sourceIter
+#print axioms Pasting.targetAt_eq_targetIter
+
+example {G H : GlobularSet} (f : GlobularSet.Map G H) (k n : Nat)
+    (p q : Pasting (n + k + 1) G) (h : Pasting.targetAt k n p = Pasting.sourceAt k n q) :
+    Pasting.map f (Pasting.composeAt k n p q h) =
+      Pasting.composeAt k n (Pasting.map f p) (Pasting.map f q)
+        ((Pasting.targetAt_map k n f p).trans
+          ((_root_.congrArg (Pasting.map f) h).trans (Pasting.sourceAt_map k n f q).symm)) :=
+  Pasting.map_composeAt_natural k n f p q h
+
+#print axioms Chain.map_zipOver
+#print axioms Chain.mapAlong_zipOver
+#print axioms Pasting.sourceAt_map
+#print axioms Pasting.targetAt_map
+#print axioms Pasting.map_identityAt
+#print axioms Pasting.map_composeAt_natural
+
+example {G : GlobularSet} (k n : Nat) (p q : Pasting ((n + 1) + k + 1) G)
+    (h : Pasting.targetAt k (n + 1) p = Pasting.sourceAt k (n + 1) q) :
+    Pasting.dropSource k n (Pasting.composeAt k (n + 1) p q h) =
+      Pasting.composeAt k n (Pasting.dropSource k n p) (Pasting.dropSource k n q)
+        ((Pasting.targetAt_dropSource k n p).trans (h.trans (Pasting.sourceAt_dropSource k n q).symm)) :=
+  Pasting.dropSource_composeAt_boundary k n p q h
+
+example {G : GlobularSet} (p : Pasting 9 G) : Pasting.dropTarget 4 3 p = Pasting.target p :=
+  Pasting.dropTarget_eq 4 3 p
+
+#print axioms Pasting.dropSource_eq
+#print axioms Pasting.dropTarget_eq
+#print axioms Pasting.sourceAt_dropSource
+#print axioms Pasting.targetAt_dropSource
+#print axioms Pasting.sourceAt_dropTarget
+#print axioms Pasting.targetAt_dropTarget
+#print axioms Pasting.dropSource_composeAt_boundary
+#print axioms Pasting.dropTarget_composeAt_boundary
+#print axioms Pasting.dropSource_identityAt
+#print axioms Pasting.dropTarget_identityAt
+
+example {G : GlobularSet} (k : Nat) (p q : Pasting (0 + k + 1) G)
+    (h : Pasting.targetAt k 0 p = Pasting.sourceAt k 0 q)
+    (h' : Pasting.target p = Pasting.source q) :
+    Pasting.composeAt k 0 p q h = Pasting.vertical p q h' :=
+  Pasting.composeAt_adjacent k p q h h'
+
+example {G : GlobularSet} (p : Pasting 7 G) : HEq (Pasting.identityAt 7 0 p) (Pasting.identity p) :=
+  Pasting.identityAt_adjacent 7 p
+
+#print axioms Chain.zipOver_congr
+#print axioms Pasting.composeAt_horizontal
+#print axioms Pasting.composeAt_adjacent_eq
+#print axioms Pasting.identityAt_adjacent
+#print axioms Pasting.identityAt_step
+#print axioms Pasting.pack_composeAtFibre
+#print axioms Pasting.composeAt_horizontal_interchange
+
+example : Pasting.Cut.Below (Pasting.Cut.at 2 6) (Pasting.Cut.at 5 3) :=
+  (Pasting.Cut.below_iff_height _ _).mpr (by decide)
+
+example {G : GlobularSet} {n : Nat} (c d : Pasting.Cut n) (hc : Pasting.Cut.Below c d)
+    (p q r s : Pasting n G)
+    (hpq : Pasting.cutTarget c p = Pasting.cutSource c q)
+    (hrs : Pasting.cutTarget c r = Pasting.cutSource c s)
+    (hpr : Pasting.cutTarget d p = Pasting.cutSource d r)
+    (hqs : Pasting.cutTarget d q = Pasting.cutSource d s)
+    (hrow : Pasting.cutTarget d (Pasting.cutCompose c p q hpq) =
+      Pasting.cutSource d (Pasting.cutCompose c r s hrs))
+    (hcol : Pasting.cutTarget c (Pasting.cutCompose d p r hpr) =
+      Pasting.cutSource c (Pasting.cutCompose d q s hqs)) :
+    Pasting.cutCompose d (Pasting.cutCompose c p q hpq) (Pasting.cutCompose c r s hrs) hrow =
+      Pasting.cutCompose c (Pasting.cutCompose d p r hpr) (Pasting.cutCompose d q s hqs) hcol :=
+  Pasting.cutCompose_interchange hc p q r s hpq hrs hpr hqs hrow hcol
+
+#print axioms Chain.zipOver_interchange
+#print axioms Pasting.Cut.below_iff_height
+#print axioms Pasting.cutSource_at
+#print axioms Pasting.cutTarget_at
+#print axioms Pasting.cutCompose_at_eq
+#print axioms Pasting.cutCompose_interchange
+
+example {G : GlobularSet} {n : Nat} (c d : Pasting.Cut n) (hc : Pasting.Cut.Below c d)
+    (p q r s : Pasting n G)
+    (hpq : Pasting.cutTarget c p = Pasting.cutSource c q)
+    (hrs : Pasting.cutTarget c r = Pasting.cutSource c s)
+    (hpr : Pasting.cutTarget d p = Pasting.cutSource d r)
+    (hqs : Pasting.cutTarget d q = Pasting.cutSource d s) :
+    Pasting.cutCompose d (Pasting.cutCompose c p q hpq) (Pasting.cutCompose c r s hrs)
+      (Pasting.cutGrid_composable hc p q r s hpq hrs hpr hqs).1 =
+    Pasting.cutCompose c (Pasting.cutCompose d p r hpr) (Pasting.cutCompose d q s hqs)
+      (Pasting.cutGrid_composable hc p q r s hpq hrs hpr hqs).2 :=
+  Pasting.cutCompose_interchange_grid hc p q r s hpq hrs hpr hqs
+
+#print axioms Chain.zipOver_grid
+#print axioms Pasting.cutGrid_composable
+#print axioms Pasting.cutCompose_interchange_grid
+
+example (A : Type) : RealizesPathSkeleton (NativeTower.globular A) A := NativeTower.realizes A
+
+example {A : Type} (p : NativeTower.Cell A 9) :
+    NativeTower.source (NativeTower.identity p) = p := NativeTower.source_identity p
+
+example {A : Type} {n : Nat} (p q : NativeTower.Cell A (n + 3))
+    (hs : NativeTower.source p = NativeTower.source q)
+    (ht : NativeTower.target p = NativeTower.target q) : p = q := NativeTower.higher_ext p q hs ht
+
+#print axioms NativeTower.globular
+#print axioms NativeTower.realizes
+#print axioms NativeTower.identities
+#print axioms NativeTower.higher_ext
+#print axioms NativeTower.associator_derivation
+#print axioms NativeTower.distinct_rewrite_cells
+
+example {A : Type} {n : Nat} (p : NativeTower.Cell A (n + 1)) :
+    NativeTower.source (NativeTower.cancelRight p).val =
+      NativeTower.compose p (NativeTower.reverse p) (NativeTower.source_reverse p).symm :=
+  (NativeTower.cancelRight p).property.1
+
+example {A : Type} (p : NativeTower.Cell A 9) :
+    NativeTower.target (NativeTower.cancelLeft p).val = NativeTower.identity (NativeTower.target p) :=
+  (NativeTower.cancelLeft p).property.2
+
+#print axioms NativeTower.source_reverse
+#print axioms NativeTower.target_reverse
+#print axioms NativeTower.compose_boundary
+#print axioms NativeTower.compose_paths
+#print axioms NativeTower.compose_rewrites
+#print axioms NativeTower.cancelRight
+#print axioms NativeTower.cancelLeft
+#print axioms NativeTower.cancelRight_paths
+#print axioms NativeTower.cancelLeft_paths
+
+example {A : Type} (n : Nat) (p : NativeTower.Cell A (n + 1)) :
+    NativeTower.WeaklyInvertible (n + 1) (NativeTower.cancelRight p).val :=
+  NativeTower.all_cells_weaklyInvertible _ _
+
+#print axioms NativeTower.invertibilityStep_mono
+#print axioms NativeTower.weaklyInvertible_coinduction
+#print axioms NativeTower.weaklyInvertible_unfold
+#print axioms NativeTower.all_cells_weaklyInvertible
+
+example {A : Type} {n : Nat} (p q r : NativeTower.Cell A (n + 1))
+    (hpq : NativeTower.target p = NativeTower.source q)
+    (hqr : NativeTower.target q = NativeTower.source r) :
+    NativeTower.WeaklyInvertible (n + 1) (NativeTower.composeAssociator p q r hpq hqr).val :=
+  NativeTower.all_cells_weaklyInvertible _ _
+
+example {A : Type} {n : Nat} (p : NativeTower.Cell A (n + 1)) :
+    NativeTower.WeaklyInvertible (n + 1) (NativeTower.leftUnitor p).val ∧
+    NativeTower.WeaklyInvertible (n + 1) (NativeTower.rightUnitor p).val :=
+  ⟨NativeTower.all_cells_weaklyInvertible _ _, NativeTower.all_cells_weaklyInvertible _ _⟩
+
+#print axioms NativeTower.composeAssociator
+#print axioms NativeTower.leftUnitor
+#print axioms NativeTower.rightUnitor
+#print axioms NativeTower.composeAssociator_paths
+#print axioms NativeTower.leftUnitor_paths
+#print axioms NativeTower.rightUnitor_paths
+
+#print axioms Pasting.evaluateGlobular
+#print axioms Pasting.evaluate_singleton
+#print axioms Pasting.pack_unpackFibre
+#print axioms Pasting.unpack_packFibre
+#print axioms Pasting.horizontalComposition
+#print axioms Pasting.horizontalComposition_right_unit
+#print axioms Pasting.horizontalComposition_fold
+
+#print axioms GlobularSet.homInclusion
+#print axioms GlobularSet.sourceZeroMap
+#print axioms GlobularSet.targetZeroMap
+#print axioms Pasting.CutBoundary.source_map
+#print axioms Pasting.CutBoundary.target_map
+#print axioms Pasting.CutBoundary.source_hom
+#print axioms Pasting.CutBoundary.target_hom
+#print axioms Pasting.CutOperations.hom
+#print axioms Pasting.CutOperations.hom_compose_val
+#print axioms Pasting.CutOperations.hom_unit_val
+#print axioms Pasting.CutOperations.inContext
+
+#print axioms Pasting.canonical_source_eq_cutSource
+#print axioms Pasting.canonical_target_eq_cutTarget
+#print axioms Pasting.cutSource_cutCompose
+#print axioms Pasting.cutTarget_cutCompose
+#print axioms Pasting.cutSource_cutUnit
+#print axioms Pasting.cutTarget_cutUnit
+#print axioms Pasting.cutCompose_left_unit
+#print axioms Pasting.cutCompose_right_unit
+#print axioms Pasting.cutOperations
+
+#print axioms Pasting.source_cutCompose
+#print axioms Pasting.target_cutCompose
+#print axioms Pasting.source_cutUnit_reindex
+#print axioms Pasting.target_cutUnit_reindex
+#print axioms Pasting.cutOperations_compatible
+#print axioms Pasting.CutOperations.Compatible.hom
+#print axioms Pasting.CutOperations.RightUnital.hom
+#print axioms Pasting.recursiveComposition
+#print axioms Pasting.flattenGlobular
+#print axioms Pasting.flatten_singleton
+
+#print axioms Pasting.CutOperations.Preserves.hom
+#print axioms Pasting.map_cutCompose
+#print axioms Pasting.map_cutUnit
+#print axioms Pasting.mapGlobular_preserves
+#print axioms Pasting.evaluate_precompose
+#print axioms Pasting.evaluate_postcompose
+#print axioms Pasting.flatten_natural
+#print axioms Pasting.flattenNatTrans
+
+#print axioms Pasting.homPastingInclusion
+#print axioms Pasting.homPastingInclusion_preserves
+#print axioms Pasting.singleton_hom_factor
+#print axioms Pasting.recursive_fold_single
+#print axioms Pasting.evaluate_singletonLabels
+#print axioms Pasting.flatten_map_singleton
+#print axioms Pasting.singletonNatTrans
+#print axioms Pasting.flatten_unit_left
+#print axioms Pasting.flatten_unit_right
+
+#print axioms Pasting.cutCompose_assoc
+#print axioms Pasting.cutOperations_associative
+#print axioms Pasting.cutOperations_leftUnital
+#print axioms Pasting.cutOperations_interchange
+#print axioms Pasting.CutOperations.Associative.inContext
+#print axioms Pasting.CutOperations.Interchange.inContext
+#print axioms Pasting.CutOperations.fold_append
+#print axioms Pasting.evaluate_horizontal
+#print axioms Pasting.flatten_horizontal
+#print axioms Pasting.flatten_cutCompose_bottom
+
+#print axioms Pasting.cutCompose_unit_idempotent
+#print axioms Pasting.cutOperations_unitIdempotent
+#print axioms Pasting.CutOperations.UnitIdempotent.inContext
+#print axioms Pasting.CutOperations.horizontal_interchange
+#print axioms Pasting.CutOperations.fold_zipOver
+#print axioms Pasting.map_cut_composable
+#print axioms Pasting.evaluate_cutCompose
+#print axioms Pasting.flatten_cutCompose
+
+#print axioms Pasting.cutUnit_compose
+#print axioms Pasting.cutUnit_unit_reindex
+#print axioms Pasting.cutOperations_unitCompatible
+#print axioms Pasting.CutOperations.UnitCompatible.inContext
+#print axioms Pasting.CutOperations.fold_unit
+#print axioms Pasting.evaluate_cutUnit
+#print axioms Pasting.flatten_cutUnit
+#print axioms Pasting.flatten_preserves
+#print axioms Pasting.flatten_assoc
+#print axioms Pasting.pastingMonad
+
+example (G : GlobularSet) {n : Nat} (p : Pasting n (Pasting.globular (Pasting.globular G))) :
+    (Pasting.flattenGlobular G).app (n := n)
+        ((Pasting.flattenGlobular (Pasting.globular G)).app (n := n) p) =
+      (Pasting.flattenGlobular G).app (n := n) (Pasting.map (Pasting.flattenGlobular G) p) :=
+  Pasting.flatten_assoc G p
+
+noncomputable example : CategoryTheory.Monad GlobularSet := Pasting.pastingMonad
+
+example {G : GlobularSet} {n : Nat} (c : Pasting.Cut n)
+    (p q : Pasting n (Pasting.globular G)) (h : Pasting.cutTarget c p = Pasting.cutSource c q)
+    (h' : Pasting.cutTarget c ((Pasting.flattenGlobular G).app (n := n) p) =
+      Pasting.cutSource c ((Pasting.flattenGlobular G).app (n := n) q)) :
+    (Pasting.flattenGlobular G).app (n := n) (Pasting.cutCompose c p q h) =
+      Pasting.cutCompose c ((Pasting.flattenGlobular G).app (n := n) p)
+        ((Pasting.flattenGlobular G).app (n := n) q) h' := Pasting.flatten_cutCompose c p q h h'
+
+example {G : GlobularSet} {n : Nat} (p : Pasting n G) :
+    (Pasting.flattenGlobular G).app (n := n) (Pasting.map (Pasting.singletonGlobular G) p) = p :=
+  Pasting.flatten_map_singleton p
+
+example {G H : GlobularSet} (f : GlobularSet.Map G H) {n : Nat} (p : Pasting n (Pasting.globular G)) :
+    Pasting.map f ((Pasting.flattenGlobular G).app (n := n) p) =
+      (Pasting.flattenGlobular H).app (n := n) (Pasting.map (Pasting.mapGlobular f) p) :=
+  Pasting.flatten_natural f p
+
+example (G : GlobularSet) {n : Nat} (p : Pasting (n + 1) (Pasting.globular G)) :
+    Pasting.source ((Pasting.flattenGlobular G).app (n := n + 1) p) =
+      (Pasting.flattenGlobular G).app (n := n) (Pasting.source p) :=
+  (Pasting.flattenGlobular G).source_app (n := n) p
+
+example (G : GlobularSet) {n : Nat} (p : Pasting n G) :
+    (Pasting.flattenGlobular G).app (Pasting.singleton (G := Pasting.globular G) p) = p :=
+  Pasting.flatten_singleton p
+
+example {G H : GlobularSet} (h : Pasting.HomContext (Pasting.globular G) H)
+    {n : Nat} (c : Pasting.Cut n) (p q : H.Cell n)
+    (hpq : Pasting.CutBoundary.target c H p = Pasting.CutBoundary.source c H q) :
+    Pasting.CutBoundary.source c H (((Pasting.cutOperations G).inContext h).compose c p q hpq) =
+      Pasting.CutBoundary.source c H p :=
+  ((Pasting.cutOperations G).inContext h).source_compose c p q hpq
+
+example {G H : GlobularSet} (C : Pasting.CutOperations G)
+    (h : Pasting.HomContext G H) {n : Nat} (c : Pasting.Cut n)
+    (p q : H.Cell n) (hpq : Pasting.CutBoundary.target c H p = Pasting.CutBoundary.source c H q) :
+    Pasting.CutBoundary.source c H ((C.inContext h).compose c p q hpq) =
+      Pasting.CutBoundary.source c H p := (C.inContext h).source_compose c p q hpq
+
+example (G : GlobularSet) {n : Nat} {a b : G.Cell 0}
+    (p : Chain (fun x y => Pasting.Horizontal n G x y) a b) :
+    (Pasting.horizontalComposition G).fold (p.map (fun e => Pasting.packFibre e)) =
+      Pasting.packFibre (p.bind (fun e => e)) := Pasting.horizontalComposition_fold p

@@ -47,6 +47,7 @@ because raw traces remain observable.  The dichotomy is recorded as
 -/
 
 import ComputationalPaths.Path.TypeTheory.MetadataRepair
+import ComputationalPaths.Path.Rewrite.TraceCollapse
 
 namespace ComputationalPaths
 namespace Path
@@ -57,65 +58,8 @@ open MetadataRepair
 
 universe u v w
 
-/-! ## The trace-free path and the collapsing rule -/
-
-/-- The computational path that records an ambient equality with no rewrite
-trace at all. -/
-noncomputable def emptyTrace {A : Type u} {a b : A} (h : a = b) : Path a b :=
-  Path.mk [] h
-
-@[simp] theorem emptyTrace_steps {A : Type u} {a b : A} (h : a = b) :
-    (emptyTrace h).steps = [] := rfl
-
-/-- Ambient equality proofs are irrelevant, so the trace-free path depends only
-on its endpoints. -/
-theorem emptyTrace_eq {A : Type u} {a b : A} (h h' : a = b) :
-    emptyTrace h = emptyTrace h' := rfl
-
-@[simp] theorem emptyTrace_refl {A : Type u} (a : A) :
-    emptyTrace (rfl : a = a) = Path.refl a := rfl
-
-/-- `Path.lamCongr` records the empty trace: packaging a family of pointwise
-paths into a path between functions discards every recorded step.  This is the
-structural fact behind the collapse. -/
-@[simp] theorem lamCongr_steps {A : Type u} {α : Type u} {f g : α → A}
-    (p : ∀ x : α, Path (f x) (g x)) :
-    (Path.lamCongr (f := f) (g := g) p).steps = [] := rfl
-
-/-- **The collapsing rule.**  Instantiating the primitive application rule
-`Step.fun_app_beta` at the unit domain makes the trace-free path a one-step
-predecessor of an arbitrary path with the same endpoints.
-
-Reading the rule from left to right, `congrArg (· ⋆) (lamCongr (fun _ => p))` is
-literally `Path.mk [] p.proof`, because `lamCongr` erases the trace and
-`congrArg` maps the erased trace pointwise.  Its reduct is `p`, whose trace is
-arbitrary. -/
-noncomputable def stepEmptyTrace {A : Type u} {a b : A} (p : Path a b) :
-    Step (emptyTrace p.proof) p :=
-  Step.fun_app_beta (A := A) (α := PUnit.{u + 1})
-    (f := fun _ => a) (g := fun _ => b) (fun _ => p) PUnit.unit
-
-/-- The rewrite-equivalence form of the collapsing rule. -/
-noncomputable def rweqEmptyTrace {A : Type u} {a b : A} (p : Path a b) :
-    RwEq (emptyTrace p.proof) p :=
-  rweq_of_step (stepEmptyTrace p)
-
-/-! ## `RwEq` is total on every fiber -/
-
-/-- **Totality of rewrite equivalence.**  Any two computational paths with the
-same endpoints are related by an explicit two-stage rewrite derivation: reduce
-the trace-free path to the first, and to the second.
-
-This is a genuine derivation, not a reflexivity stub: the two paths may carry
-arbitrarily different traces, and the certificate passes through a third path
-which is in general distinct from both. -/
-noncomputable def rweqAny {A : Type u} {a b : A} (p q : Path a b) : RwEq p q :=
-  rweq_trans (rweq_symm (rweqEmptyTrace p)) (rweqEmptyTrace q)
-
-/-- Proof-valued form of totality. -/
-theorem rweq_total {A : Type u} {a b : A} (p q : Path a b) :
-    Nonempty (RwEq p q) :=
-  ⟨rweqAny p q⟩
+/-! The primitive trace-collapse declarations are imported from
+`Rewrite.TraceCollapse`, preserving their original public names. -/
 
 /-- The `rwEqSetoid` of any fiber is total, so `PathRwQuot` is an instance of the
 maximal (indiscrete) setoid repair classified by

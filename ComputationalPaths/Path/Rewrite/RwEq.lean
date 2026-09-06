@@ -297,7 +297,7 @@ noncomputable def rweq_congrArg_const {B : Type u} (b : B)
       -- We show that any list of reflexive steps in the codomain rewrites to `refl`.
       -- The key base rewrite is `ofEq rfl ▷ refl`, which is `transport_refl_beta`.
       have hOfEq : RwEq (Path.stepChain (rfl : b = b)) (Path.refl b) := by
-        simpa using
+        exact
           (RwEq.step <|
             Step.transport_refl_beta (A := PUnit) (B := fun _ : PUnit => B)
               (a := PUnit.unit) (x := b))
