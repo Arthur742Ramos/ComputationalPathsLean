@@ -18,6 +18,18 @@ completion gate for the full weak omega-groupoid theorem. -/
 #print axioms NativeOperadic.compareCompose_three_paths_target
 #print axioms NativeOperadic.weaklyInvertible_unfold
 #print axioms NativeOperadic.all_cells_weaklyInvertible
+#print axioms NativeOperadic.shape_boundary
+#print axioms NativeOperadic.instruction_contraction
+#print axioms NativeOperadic.instructions_arity
+#print axioms NativeOperadic.instructions_unit
+#print axioms NativeOperadic.standardEvaluation_unit
+
+example {A : Type u} {a b : A} {p q : Path a b} (h : RwEq p q) :
+    (NativeOperadic.standardEvaluation A).app (n := 2)
+      (Pasting.singleton (G := NativeTower.globular A) (n := 2)
+        (⟨a, b, p, q, h⟩ : NativeTower.Cell A 2)) =
+      (⟨a, b, p, q, h⟩ : NativeTower.Cell A 2) :=
+  NativeOperadic.standardEvaluation_singleton _
 
 example (A : Type u) (n : Nat) (p : NativeTower.Cell A (n + 1)) :
     NativeOperadic.WeaklyInvertible n p := NativeOperadic.all_cells_weaklyInvertible n p

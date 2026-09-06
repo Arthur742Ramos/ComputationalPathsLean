@@ -687,12 +687,23 @@ native higher fillers to replace an operadic equality.
 Together with `nativeContraction`, these give a normalized contractible
 endomorphism operad over the implemented pasting monad acting on the native
 tower. The audit instantiates both structures on that tower.
-`NativeOperadicOperations.lean` now selects operations by lifting arities
-with unit-operation boundaries through the actual contraction, then labels
-and evaluates them using the actual algebra. Adjacent binary inputs are
-vertical composites of singleton diagrams; identity inputs are identity
-diagrams over singletons. `input_boundary` and the exact unit action prove
-the required cell boundaries in all dimensions.
+`NativeOperadicOperations.lean` now constructs the recursive standard
+pasting-instruction convention of Fujii--Hoshino--Maehara, Definition 2.5.1.
+`shape_boundary` proves that a shape has equal source and target.
+`instruction_singleton` selects the operadic unit on singleton arities;
+`instruction_contraction` lifts every other arity using the recursively
+selected boundary instruction. `instructions` is a globular section of the
+arity map, and `instructions_unit` proves compatibility with singleton units
+as an equality of globular maps.
+`standardEvaluation` pairs complete labelled diagrams with these instructions
+and applies the actual algebra. It preserves singleton cells literally in
+every dimension, including raw `RwEq` witnesses checked by the audit.
+The adjacent binary inputs are vertical composites of singleton diagrams;
+identity inputs are identity diagrams over singletons. Both operations now
+use this full standard evaluation, and their boundary and invertibility
+proofs have been rechecked with these definitions. The earlier specialized
+unit-boundary `input` helper remains available but is not substituted for the
+standard instruction recursion.
 `NativeOperadic.WeaklyInvertible` uses these operations in the greatest
 postfixed-point definition; `weaklyInvertible_unfold` and
 `all_cells_weaklyInvertible` verify its fixed-point equation and all-cell
@@ -704,11 +715,10 @@ comparison cells, not equality of raw `RwEq` witnesses. Their invertibility,
 and that of the retained primitive native associator, is checked by the audit.
 
 This is not yet the full weak omega-groupoid theorem: the standard free
-strict-category monad comparison, a complete identification with the chosen
-standard pasting-instruction convention, and the independent
-associativity/pentagon and interchange certificate comparisons still require
-verification. The adjacent contraction lifts alone do not prove that final
-instruction-convention comparison.
+strict-category monad comparison and the independent associativity/pentagon
+and interchange certificate comparisons still require verification. The
+standard instruction recursion is now verified over the implemented monad;
+that does not by itself discharge the monad comparison.
 
 Completion requires the mathematical target above to be instantiated, all
 proof dependencies audited, the relevant modules built, and preservation of
