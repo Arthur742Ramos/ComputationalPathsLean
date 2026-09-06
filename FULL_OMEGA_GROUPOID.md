@@ -170,6 +170,14 @@ Its dimension-zero case is proved by the identity evaluator. No positive-
 dimensional instance of this predicate is currently claimed; this boundary
 check does not complete cartesianness of multiplication.
 
+The bottom-cut primitives now have verified unique lifts in every positive
+dimension. `horizontal_unit_cartesian` reflects the actual empty-chain
+`cutUnit .bottom`, and `horizontal_cut_cartesian` reconstructs the original
+intermediate vertex and both horizontal factors from a specified factorization
+after relabelling. These proofs allow non-injective relabellings and preserve
+empty factors. Higher-cut lifting and the resulting positive-dimensional
+hom-evaluation lifting theorem remain open.
+
 `evaluate` now evaluates labelled diagrams by dimension recursion into a
 target equipped with horizontal operations in all its iterated hom contexts
 (`RecursiveComposition`). The evaluator is implemented, not a field assumed

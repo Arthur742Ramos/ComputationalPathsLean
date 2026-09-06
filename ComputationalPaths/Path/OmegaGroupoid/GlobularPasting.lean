@@ -593,6 +593,15 @@ theorem packed_eq_heq {Q : Type u} {D : Q → Q → Type u}
   have hh := eq_of_heq hpq
   injection hh with hbd hpq
 
+theorem packed_eq_of_heq {Q : Type u} {D : Q → Q → Type u}
+    {a b c d : Q} (p : Chain D a b) (q : Chain D c d)
+    (ha : a = c) (hb : b = d) (h : HEq p q) :
+    (⟨a, b, p⟩ : Σ x y, Chain D x y) = ⟨c, d, q⟩ := by
+  cases ha
+  cases hb
+  cases h
+  rfl
+
 theorem cons_heq_components {Q : Type u} {D : Q → Q → Type u}
     {x y z x' y' z' : Q} (a : D x y) (p : Chain D y z)
     (b : D x' y') (q : Chain D y' z') (hx : x = x') (hz : z = z')
@@ -2976,6 +2985,55 @@ theorem cutOperations_leftUnital (G : GlobularSet.{u}) : (cutOperations G).LeftU
 theorem cutOperations_associative (G : GlobularSet.{u}) : (cutOperations G).Associative := by
   intro n c p q r hpq hqr hl hr
   exact cutCompose_assoc c p q r _ _
+
+/-- Empty horizontal units also have unique lifts under relabelling, in
+every positive dimension. A nonempty chain cannot map to such a unit. -/
+theorem horizontal_unit_cartesian {G H : GlobularSet.{u}} (f : GlobularSet.Map G H)
+    {n : Nat} (p : Pasting (n + 1) G) (c : H.Cell 0)
+    (h : map f p = cutUnit (.bottom : Cut (n + 1)) c) :
+    ∃! a : G.Cell 0, cutUnit (.bottom : Cut (n + 1)) a = p ∧ f.app a = c := by
+  rcases p with ⟨a, b, p⟩
+  have ha : f.app a = c := _root_.congrArg Sigma.fst h
+  have hb : f.app b = c := _root_.congrArg (fun z => z.2.1) h
+  cases p with
+  | nil =>
+    refine ⟨a, ⟨rfl, ha⟩, ?_⟩
+    intro d hd
+    exact _root_.congrArg Sigma.fst hd.1
+  | @cons _ y _ e p =>
+    have hc := Chain.packed_eq_heq _ _ h
+    exact False.elim (Chain.nil_not_heq_cons (D := fun x y => Pasting n (H.hom x y)) (map (f.hom a y) e)
+      (p.mapAlong (F := fun x y => Pasting n (H.hom x y)) f.app
+        (fun {x y} e => map (f.hom x y) e)) ha.symm hb.symm (HEq.symm hc))
+
+/-- Unique lifting of an actual horizontal cut factorization in every
+positive dimension. The original intermediate vertex and both factors are
+recovered even when the globular relabelling identifies labels. -/
+theorem horizontal_cut_cartesian {G H : GlobularSet.{u}} (f : GlobularSet.Map G H)
+    {n : Nat} {a b : G.Cell 0} (p : Horizontal n G a b) (c : H.Cell 0)
+    (q : Horizontal n H (f.app a) c) (r : Horizontal n H c (f.app b))
+    (h : map f (pack p) = pack (q.append r)) :
+    ∃! s : Σ y : G.Cell 0, Horizontal n G a y × Horizontal n G y b,
+      f.app s.1 = c ∧ s.2.1.append s.2.2 = p ∧
+      map f (pack s.2.1) = pack q ∧ map f (pack s.2.2) = pack r := by
+  have hm : HEq (p.mapAlong (F := fun x y => Pasting n (H.hom x y)) f.app
+      (fun {x y} e => map (f.hom x y) e)) (q.append r) := Chain.packed_eq_heq _ _ h
+  obtain ⟨y, p₁, p₂, hy, hp, h₁, h₂⟩ := Chain.split_mapAlong f.app
+    (fun {x y} e => map (f.hom x y) e) q r p rfl rfl hm
+  have hp₁ : map f (pack p₁) = pack q := Chain.packed_eq_of_heq _ _ rfl hy h₁
+  have hp₂ : map f (pack p₂) = pack r := Chain.packed_eq_of_heq _ _ hy rfl h₂
+  refine ⟨⟨y, p₁, p₂⟩, ⟨hy, hp, hp₁, hp₂⟩, ?_⟩
+  rintro ⟨z, q₁, q₂⟩ ⟨hz, hq, hq₁, hq₂⟩
+  have hprefix : HEq (q₁.mapAlong (F := fun x y => Pasting n (H.hom x y)) f.app
+      (fun {x y} e => map (f.hom x y) e))
+      (p₁.mapAlong (F := fun x y => Pasting n (H.hom x y)) f.app
+        (fun {x y} e => map (f.hom x y) e)) :=
+    HEq.trans (Chain.packed_eq_heq _ _ hq₁) (HEq.symm h₁)
+  obtain ⟨hzy, he, hf⟩ := Chain.split_mapAlong_unique (F := fun x y => Pasting n (H.hom x y)) f.app
+    (fun {x y} e => map (f.hom x y) e) q₁ q₂ p₁ p₂ (hz.trans hy.symm) hprefix (hq.trans hp.symm)
+  cases hzy
+  exact _root_.congrArg (fun z => (⟨y, z⟩ : Σ y : G.Cell 0, Horizontal n G a y × Horizontal n G y b))
+    (Prod.ext (eq_of_heq he) (eq_of_heq hf))
 
 theorem map_cutCompose {n : Nat} (c : Cut n) {G H : GlobularSet.{u}} (f : GlobularSet.Map G H)
     (p q : Pasting n G) (h : cutTarget c p = cutSource c q)

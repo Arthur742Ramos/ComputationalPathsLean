@@ -49,6 +49,24 @@ completion gate for the full weak omega-groupoid theorem. -/
 #print axioms Pasting.homPastingInclusion_natural
 #print axioms Pasting.flattenHom_factor
 #print axioms Pasting.homFlattenCartesianAt_zero
+#print axioms Pasting.horizontal_unit_cartesian
+#print axioms Pasting.horizontal_cut_cartesian
+
+example {G H : GlobularSet.{u}} (f : GlobularSet.Map G H) {n : Nat}
+    (p : Pasting (n + 1) G) (c : H.Cell 0)
+    (h : Pasting.map f p = Pasting.cutUnit (.bottom : Pasting.Cut (n + 1)) c) :
+    ∃! a : G.Cell 0, Pasting.cutUnit (.bottom : Pasting.Cut (n + 1)) a = p ∧ f.app a = c :=
+  Pasting.horizontal_unit_cartesian f p c h
+
+example {G H : GlobularSet.{u}} (f : GlobularSet.Map G H) {n : Nat} {a b : G.Cell 0}
+    (p : Pasting.Horizontal n G a b) (c : H.Cell 0)
+    (q : Pasting.Horizontal n H (f.app a) c) (r : Pasting.Horizontal n H c (f.app b))
+    (h : Pasting.map f (Pasting.pack p) = Pasting.pack (q.append r)) :
+    ∃! s : Σ y : G.Cell 0, Pasting.Horizontal n G a y × Pasting.Horizontal n G y b,
+      f.app s.1 = c ∧ s.2.1.append s.2.2 = p ∧
+      Pasting.map f (Pasting.pack s.2.1) = Pasting.pack q ∧
+      Pasting.map f (Pasting.pack s.2.2) = Pasting.pack r :=
+  Pasting.horizontal_cut_cartesian f p c q r h
 
 example (G : GlobularSet.{u}) (a b : G.Cell 0) :
     GlobularSet.Map.comp ((Pasting.flattenGlobular G).hom a b)
