@@ -235,7 +235,17 @@ laws, and both raw relabelling equations are retained.
 `Cartesian.horizontal_unit_lift` handles an empty fold by proving the
 original endpoints coincide and identifying the actual original unit.
 These supply the binary and empty cases for a fold-lifting induction;
-the arbitrary-chain and recursive-evaluation lifting proofs remain open.
+the recursive-evaluation lifting proof remains open.
+
+Arbitrary finite horizontal chains now have unique lifts:
+`Cartesian.fold_lift` proves existence with explicit endpoint equations,
+`Cartesian.fold_joint_injective` recovers a chain from its fold and relabelled
+image, and `Cartesian.fold_unique_lift` combines these into the fixed-endpoint
+pullback property. All three quantify over arbitrary dimension and require
+the proved primitive `Cartesian` interface and compatible cut operations;
+they do not require an injective object map. This closes the horizontal-chain
+step only. Lifting recursively labelled pastings, cartesianness of monad
+multiplication, and the operad/action comparison remain completion gates.
 
 `evaluate` now evaluates labelled diagrams by dimension recursion into a
 target equipped with horizontal operations in all its iterated hom contexts

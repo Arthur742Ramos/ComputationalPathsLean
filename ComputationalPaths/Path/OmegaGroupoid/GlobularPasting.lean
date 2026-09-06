@@ -4218,6 +4218,37 @@ theorem target_fold {H : GlobularSet.{u}} (C : HorizontalComposition H)
 
 end HorizontalComposition
 
+/-- Primitive cartesian lifting extends to arbitrary finite horizontal chains.
+The endpoints are retained even when the object map is not injective. -/
+theorem CutOperations.Cartesian.fold_lift {G H : GlobularSet.{u}}
+    {C : CutOperations G} {D : CutOperations H} {f : GlobularSet.Map G H}
+    (K : CutOperations.Cartesian C D f) (L : C.Compatible) (M : D.Compatible)
+    {n : Nat} {x y : H.Cell 0} (q : Chain (fun x y => (H.hom x y).Cell n) x y)
+    (a b : G.Cell 0) (p : (G.hom a b).Cell n)
+    (ha : f.app a = x) (hb : f.app b = y)
+    (h : f.app p.val = ((D.horizontal M).fold q).val) :
+    ∃ s : Chain (fun x y => (G.hom x y).Cell n) a b,
+      (C.horizontal L).fold s = p ∧
+      HEq (s.mapAlong (F := fun x y => (H.hom x y).Cell n)
+        f.app (fun {x y} e => (f.hom x y).app e)) q := by
+  induction q generalizing a b with
+  | nil x =>
+    obtain ⟨hab, hp, hx⟩ := K.horizontal_unit_lift a b p x h
+    cases hab
+    refine ⟨.nil a, Subtype.ext hp, ?_⟩
+    cases ha
+    rfl
+  | @cons x z y e q ih =>
+    cases ha
+    cases hb
+    obtain ⟨⟨c, r, t⟩, ⟨hc, hr, he, ht⟩, _⟩ :=
+      K.horizontal_factor_lift a b p z e ((D.horizontal M).fold q) h
+    obtain ⟨s, hs, hf⟩ := ih c b t hc rfl ht
+    refine ⟨.cons r s, (_root_.congrArg ((C.horizontal L).mul r) hs).trans hr, ?_⟩
+    cases hc
+    have he' : (f.hom a c).app r = e := Subtype.ext he
+    exact heq_of_eq (_root_.congrArg₂ Chain.cons he' (eq_of_heq hf))
+
 /-- Concatenation is respected by the evaluator's fold whenever the actual
 target operations satisfy their associativity and left-unit laws. -/
 theorem CutOperations.fold_append {H : GlobularSet.{u}} {C : CutOperations H}
@@ -4297,6 +4328,79 @@ theorem CutOperations.Preserves.fold {G H : GlobularSet.{u}}
   | cons e p ih =>
     exact (P.horizontal_mul e ((C.horizontal L).fold p)).trans
       (_root_.congrArg (D.horizontalMul ((f.hom _ _).app e)) ih)
+
+/-- A fold and its relabelled chain jointly determine the original chain.
+No injectivity assumption on the object map is needed. -/
+theorem CutOperations.Cartesian.fold_joint_injective {G H : GlobularSet.{u}}
+    {C : CutOperations G} {D : CutOperations H} {f : GlobularSet.Map G H}
+    (K : CutOperations.Cartesian C D f) (L : C.Compatible) (M : D.Compatible)
+    {n : Nat} {a b : G.Cell 0} (p q : Chain (fun x y => (G.hom x y).Cell n) a b)
+    (hc : (C.horizontal L).fold p = (C.horizontal L).fold q)
+    (hm : p.mapAlong (F := fun x y => (H.hom x y).Cell n) f.app (fun {x y} e => (f.hom x y).app e) =
+      q.mapAlong f.app (fun {x y} e => (f.hom x y).app e)) : p = q := by
+  have valEq : ∀ {x y z w : H.Cell 0} (r : (H.hom x y).Cell n)
+      (s : (H.hom z w).Cell n), x = z → y = w → HEq r s → r.val = s.val := by
+    intro x y z w r s hx hy he
+    cases hx
+    cases hy
+    exact _root_.congrArg Subtype.val (eq_of_heq he)
+  have foldEq : ∀ {x y z w : H.Cell 0}
+      (r : Chain (fun x y => (H.hom x y).Cell n) x y)
+      (s : Chain (fun x y => (H.hom x y).Cell n) z w),
+      x = z → y = w → HEq r s →
+      ((D.horizontal M).fold r).val = ((D.horizontal M).fold s).val := by
+    intro x y z w r s hx hy he
+    cases hx
+    cases hy
+    exact _root_.congrArg (fun t => ((D.horizontal M).fold t).val) (eq_of_heq he)
+  induction p with
+  | nil a =>
+    cases q with
+    | nil => rfl
+    | cons e q => cases hm
+  | @cons a c b e p ih =>
+    cases q with
+    | nil => cases hm
+    | @cons _ d _ g q =>
+      have hh := Chain.cons_heq_components (D := fun x y => (H.hom x y).Cell n) ((f.hom a c).app e)
+        (p.mapAlong (F := fun x y => (H.hom x y).Cell n) f.app (fun {x y} e => (f.hom x y).app e))
+        ((f.hom a d).app g) (q.mapAlong (F := fun x y => (H.hom x y).Cell n)
+          f.app (fun {x y} e => (f.hom x y).app e))
+        rfl rfl (heq_of_eq hm)
+      have he : f.app e.val = f.app g.val := valEq _ _ rfl hh.1 hh.2.1
+      have ht : f.app ((C.horizontal L).fold p).val = f.app ((C.horizontal L).fold q).val :=
+        (_root_.congrArg Subtype.val (K.toPreserves.fold L M p)).trans
+          ((foldEq _ _ hh.1 rfl hh.2.2).trans
+            (_root_.congrArg Subtype.val (K.toPreserves.fold L M q)).symm)
+      obtain ⟨s, hs, hu⟩ := K.horizontal_factor_lift a b
+        ((C.horizontal L).fold (.cons g q)) (f.app d)
+        ((f.hom a d).app g) ((f.hom d b).app ((C.horizontal L).fold q))
+        (_root_.congrArg Subtype.val (K.toPreserves.horizontal_mul g ((C.horizontal L).fold q)))
+      have h₁ := hu ⟨c, e, (C.horizontal L).fold p⟩ ⟨hh.1, hc, he, ht⟩
+      have h₂ := hu ⟨d, g, (C.horizontal L).fold q⟩ ⟨rfl, rfl, rfl, rfl⟩
+      have hpair := h₁.trans h₂.symm
+      have hcd := _root_.congrArg Sigma.fst hpair
+      cases hcd
+      have hp := eq_of_heq (Sigma.mk.inj hpair).2
+      exact _root_.congrArg₂ Chain.cons (_root_.congrArg Prod.fst hp)
+        (ih q (_root_.congrArg Prod.snd hp) (eq_of_heq hh.2.2))
+
+/-- The horizontal fold square is a pullback, expressed by its unique-lift
+property at every dimension and every fixed pair of source endpoints. -/
+theorem CutOperations.Cartesian.fold_unique_lift {G H : GlobularSet.{u}}
+    {C : CutOperations G} {D : CutOperations H} {f : GlobularSet.Map G H}
+    (K : CutOperations.Cartesian C D f) (L : C.Compatible) (M : D.Compatible)
+    {n : Nat} {a b : G.Cell 0} (p : (G.hom a b).Cell n)
+    (q : Chain (fun x y => (H.hom x y).Cell n) (f.app a) (f.app b))
+    (h : f.app p.val = ((D.horizontal M).fold q).val) :
+    ∃! s : Chain (fun x y => (G.hom x y).Cell n) a b,
+      (C.horizontal L).fold s = p ∧
+      s.mapAlong f.app (fun {x y} e => (f.hom x y).app e) = q := by
+  obtain ⟨s, hs, hf⟩ := K.fold_lift L M q a b p rfl rfl h
+  refine ⟨s, ⟨hs, eq_of_heq hf⟩, ?_⟩
+  intro t ht
+  exact K.fold_joint_injective L M t s (ht.1.trans hs.symm)
+    (ht.2.trans (eq_of_heq hf).symm)
 
 /-- Evaluate every labelled pasting cell by dimension recursion, using the
 target's operations in its actual iterated hom sets. The concrete pasting
