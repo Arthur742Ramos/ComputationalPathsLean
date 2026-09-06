@@ -5593,6 +5593,66 @@ theorem atTerminal_arity (C : GlobularCollection.{u}) :
   intro n p
   rfl
 
+/-- The identity collection selects singleton arities in every dimension. -/
+def identity : GlobularCollection.{u} where
+  operations := GlobularSet.terminal
+  arity := Pasting.singletonGlobular GlobularSet.terminal
+
+def identityApplicationIn (G : GlobularSet.{u}) :
+    GlobularSet.Map G (identity.application G) where
+  app p := ⟨⟨PUnit.unit, Pasting.singleton p⟩,
+    (Pasting.map_singleton (GlobularSet.terminalMap G) p).symm⟩
+  source_app p := Subtype.ext (Prod.ext rfl (Pasting.source_singleton G p))
+  target_app p := Subtype.ext (Prod.ext rfl (Pasting.target_singleton G p))
+
+theorem identityApplication_lift (G : GlobularSet.{u}) :
+    ∃! d : GlobularSet.Map (identity.application G) G,
+      GlobularSet.Map.comp (Pasting.singletonGlobular G) d = identity.inputs G ∧
+      GlobularSet.Map.comp (GlobularSet.terminalMap G) d = identity.operation G := by
+  apply Pasting.singleton_globular_pullback (GlobularSet.terminalMap G)
+  apply GlobularSet.Map.ext
+  intro n p
+  exact p.property.symm
+
+noncomputable def identityApplicationOut (G : GlobularSet.{u}) :
+    GlobularSet.Map (identity.application G) G := (identityApplication_lift G).choose
+
+theorem identityApplicationOut_inputs (G : GlobularSet.{u}) :
+    GlobularSet.Map.comp (Pasting.singletonGlobular G) (identityApplicationOut G) = identity.inputs G :=
+  (identityApplication_lift G).choose_spec.1.1
+
+noncomputable def identityApplicationIso (G : GlobularSet.{u}) :
+    CategoryTheory.Iso (identity.application G) G where
+  hom := identityApplicationOut G
+  inv := identityApplicationIn G
+  hom_inv_id := by
+    apply GlobularSet.Map.ext
+    intro n p
+    apply Subtype.ext
+    refine Prod.ext ?_ ?_
+    · exact @Subsingleton.elim PUnit _ _ _
+    · exact _root_.congrArg (fun k : GlobularSet.Map (identity.application G) (Pasting.globular G) => k.app p)
+        (identityApplicationOut_inputs G)
+  inv_hom_id := by
+    apply GlobularSet.Map.ext
+    intro n p
+    apply Pasting.singleton_injective G
+    exact _root_.congrArg (fun k : GlobularSet.Map (identity.application G) (Pasting.globular G) =>
+      k.app ((identityApplicationIn G).app p)) (identityApplicationOut_inputs G)
+
+theorem identityApplicationOut_natural {G H : GlobularSet.{u}} (f : GlobularSet.Map G H) :
+    GlobularSet.Map.comp (identityApplicationOut H) (identity.map f) =
+      GlobularSet.Map.comp f (identityApplicationOut G) := by
+  apply GlobularSet.Map.ext
+  intro n p
+  apply Pasting.singleton_injective H
+  exact (_root_.congrArg (fun k : GlobularSet.Map (identity.application H) (Pasting.globular H) =>
+      k.app ((identity.map f).app p)) (identityApplicationOut_inputs H)).trans
+    ((_root_.congrArg (fun q => Pasting.map f q)
+      (_root_.congrArg (fun k : GlobularSet.Map (identity.application G) (Pasting.globular G) => k.app p)
+        (identityApplicationOut_inputs G)).symm).trans
+      (Pasting.map_singleton f ((identityApplicationOut G).app p)))
+
 end GlobularCollection
 
 /-- Interpretation of composable path-labelled chains keeps the endpoints

@@ -281,6 +281,14 @@ operad: substitution, its monad laws, contraction, and the native algebra
 action still need to be constructed. No equivalence of entire categories of
 collections is asserted by the object-level terminal isomorphism alone.
 
+`GlobularCollection.identity` selects singleton arities in all dimensions.
+`identityApplication_lift` uses the proved singleton globular pullback to
+recover an original cell from an identity-labelled operation.
+`identityApplicationIso` proves both inverse equations as globular maps, and
+`identityApplicationOut_natural` proves compatibility with every relabelling.
+Thus the proposed substitution unit acts as the identity on globular sets;
+this does not yet establish either substitution unitor or associativity law.
+
 `evaluate` now evaluates labelled diagrams by dimension recursion into a
 target equipped with horizontal operations in all its iterated hom contexts
 (`RecursiveComposition`). The evaluator is implemented, not a field assumed
