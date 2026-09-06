@@ -154,6 +154,139 @@ noncomputable def identities (A : Type u) : GlobularSet.Identities (globular A) 
   source_identity := source_identity
   target_identity := target_identity
 
+/-- Reversal retains the native path/derivation constructors in dimensions
+one and two. Higher reversal uses the explicitly chosen extension. -/
+noncomputable def reverse {A : Type u} : {n : Nat} → Cell A (n + 1) → Cell A (n + 1)
+  | 0, p => ULift.up ⟨p.down.2.1, p.down.1, Path.symm p.down.2.2⟩
+  | 1, p => ⟨p.1, p.2.1, p.2.2.2.1, p.2.2.1, RwEq.symm p.2.2.2.2⟩
+  | _ + 2, p => higherCell (target p) (source p) (source_source p).symm (target_source p).symm
+
+theorem source_reverse {A : Type u} {n : Nat} (p : Cell A (n + 1)) : source (reverse p) = target p := by
+  cases n with
+  | zero => rfl
+  | succ n =>
+    cases n with
+    | zero => rfl
+    | succ n => exact source_higherCell _ _ _ _
+
+theorem target_reverse {A : Type u} {n : Nat} (p : Cell A (n + 1)) : target (reverse p) = source p := by
+  cases n with
+  | zero => rfl
+  | succ n =>
+    cases n with
+    | zero => rfl
+    | succ n => exact target_higherCell _ _ _ _
+
+/-- Adjacent composition keeps `Path.trans` and `RwEq.trans` literally.
+Only dimensions above the raw two-skeleton use adjoined higher cells. -/
+noncomputable def compose {A : Type u} {n : Nat} (p q : Cell A (n + 1))
+    (h : target p = source q) : Cell A (n + 1) := by
+  cases n with
+  | zero =>
+    rcases p with ⟨a, b, p⟩
+    rcases q with ⟨c, d, q⟩
+    have hc : b = c := _root_.congrArg ULift.down h
+    cases hc
+    exact ULift.up ⟨a, d, Path.trans p q⟩
+  | succ n =>
+    cases n with
+    | zero =>
+      rcases p with ⟨a, b, p, p', hp⟩
+      rcases q with ⟨c, d, q, q', hq⟩
+      have he : (⟨a, b, p'⟩ : PathOne A) = ⟨c, d, q⟩ := _root_.congrArg ULift.down h
+      have ha : a = c := _root_.congrArg Sigma.fst he
+      cases ha
+      have hb : b = d := _root_.congrArg (fun z => z.2.1) he
+      cases hb
+      have hpq : p' = q := eq_of_heq (Sigma.mk.inj (eq_of_heq (Sigma.mk.inj he).2)).2
+      cases hpq
+      exact ⟨a, b, p, q', RwEq.trans hp hq⟩
+    | succ n =>
+      exact higherCell (source p) (target q)
+        ((source_source p).trans ((_root_.congrArg source h).trans (source_source q)))
+        ((target_source p).trans ((_root_.congrArg target h).trans (target_source q)))
+
+theorem compose_boundary {A : Type u} {n : Nat} (p q : Cell A (n + 1))
+    (h : target p = source q) : source (compose p q h) = source p ∧ target (compose p q h) = target q := by
+  cases n with
+  | zero =>
+    rcases p with ⟨a, b, p⟩
+    rcases q with ⟨c, d, q⟩
+    have hc : b = c := _root_.congrArg ULift.down h
+    cases hc
+    exact ⟨rfl, rfl⟩
+  | succ n =>
+    cases n with
+    | zero =>
+      rcases p with ⟨a, b, p, p', hp⟩
+      rcases q with ⟨c, d, q, q', hq⟩
+      have he : (⟨a, b, p'⟩ : PathOne A) = ⟨c, d, q⟩ := _root_.congrArg ULift.down h
+      have ha : a = c := _root_.congrArg Sigma.fst he
+      cases ha
+      have hb : b = d := _root_.congrArg (fun z => z.2.1) he
+      cases hb
+      have hpq : p' = q := eq_of_heq (Sigma.mk.inj (eq_of_heq (Sigma.mk.inj he).2)).2
+      cases hpq
+      exact ⟨rfl, rfl⟩
+    | succ n => exact ⟨source_higherCell _ _ _ _, target_higherCell _ _ _ _⟩
+
+theorem source_compose {A : Type u} {n : Nat} (p q : Cell A (n + 1))
+    (h : target p = source q) : source (compose p q h) = source p := (compose_boundary p q h).1
+
+theorem target_compose {A : Type u} {n : Nat} (p q : Cell A (n + 1))
+    (h : target p = source q) : target (compose p q h) = target q := (compose_boundary p q h).2
+
+theorem compose_paths {A : Type u} {a b c : A} (p : Path a b) (q : Path b c) :
+    compose (A := A) (n := 0) (ULift.up (⟨a, b, p⟩ : PathOne A)) (ULift.up (⟨b, c, q⟩ : PathOne A)) rfl =
+      ULift.up (⟨a, c, Path.trans p q⟩ : PathOne A) := rfl
+
+theorem compose_rewrites {A : Type u} {a b : A} {p q r : Path a b} (h : RwEq p q) (k : RwEq q r) :
+    compose (A := A) (n := 1) (⟨a, b, p, q, h⟩ : Cell A 2) (⟨a, b, q, r, k⟩ : Cell A 2) rfl =
+      (⟨a, b, p, r, RwEq.trans h k⟩ : Cell A 2) := rfl
+
+/-- Cancellation at every positive dimension. At dimension one the witness
+is a native primitive rewrite; higher witnesses belong to the declared
+coskeletal extension. This is not yet a coinductive invertibility theorem. -/
+noncomputable def cancelRight {A : Type u} {n : Nat} (p : Cell A (n + 1)) :
+    { c : Cell A (n + 2) // source c = compose p (reverse p) (source_reverse p).symm ∧
+      target c = identity (source p) } := by
+  cases n with
+  | zero =>
+    rcases p with ⟨a, b, p⟩
+    exact ⟨⟨a, a, Path.trans p (Path.symm p), Path.refl a, RwEq.step (Step.trans_symm p)⟩, rfl, rfl⟩
+  | succ n =>
+    let l := compose p (reverse p) (source_reverse p).symm
+    let r := identity (source p)
+    have hs : source l = source r :=
+      (source_compose p (reverse p) _).trans (source_identity (source p)).symm
+    have ht : target l = target r :=
+      (target_compose p (reverse p) _).trans ((target_reverse p).trans (target_identity (source p)).symm)
+    exact ⟨higherCell l r hs ht, source_higherCell _ _ _ _, target_higherCell _ _ _ _⟩
+
+noncomputable def cancelLeft {A : Type u} {n : Nat} (p : Cell A (n + 1)) :
+    { c : Cell A (n + 2) // source c = compose (reverse p) p (target_reverse p) ∧
+      target c = identity (target p) } := by
+  cases n with
+  | zero =>
+    rcases p with ⟨a, b, p⟩
+    exact ⟨⟨b, b, Path.trans (Path.symm p) p, Path.refl b, RwEq.step (Step.symm_trans p)⟩, rfl, rfl⟩
+  | succ n =>
+    let l := compose (reverse p) p (target_reverse p)
+    let r := identity (target p)
+    have hs : source l = source r :=
+      (source_compose (reverse p) p _).trans ((source_reverse p).trans (source_identity (target p)).symm)
+    have ht : target l = target r :=
+      (target_compose (reverse p) p _).trans (target_identity (target p)).symm
+    exact ⟨higherCell l r hs ht, source_higherCell _ _ _ _, target_higherCell _ _ _ _⟩
+
+theorem cancelRight_paths {A : Type u} {a b : A} (p : Path a b) :
+    (cancelRight (A := A) (n := 0) (ULift.up (⟨a, b, p⟩ : PathOne A))).val.2.2.2.2 =
+      RwEq.step (Step.trans_symm p) := rfl
+
+theorem cancelLeft_paths {A : Type u} {a b : A} (p : Path a b) :
+    (cancelLeft (A := A) (n := 0) (ULift.up (⟨a, b, p⟩ : PathOne A))).val.2.2.2.2 =
+      RwEq.step (Step.symm_trans p) := rfl
+
 /-- The existing primitive associator lands in the exact native second level. -/
 noncomputable def associator {A : Type u} {a b c d : A}
     (p : Path a b) (q : Path b c) (r : Path c d) : Cell A 2 := associatorCell p q r

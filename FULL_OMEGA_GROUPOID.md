@@ -204,6 +204,17 @@ and does not replace the independent, presentation-sensitive associativity
 certificate. The action must still be constructed and its algebra laws verified
 before this candidate can support the requested theorem.
 
+The candidate now has adjacent composition and reversal at every positive
+dimension, with verified source/target laws. `compose_paths` and
+`compose_rewrites` retain `Path.trans` and `RwEq.trans` exactly; reversal uses
+the native `Path.symm` and `RwEq.symm` constructors. `cancelRight` and
+`cancelLeft` supply cancellation cells in every positive dimension. Their
+one-cell witnesses are exactly `Step.trans_symm` and `Step.symm_trans`, as
+checked by the corresponding `_paths` theorems. Higher cancellation uses the
+explicit coskeletal extension. These uniform cancellation witnesses have not
+yet been packaged as the required coinductive weak-invertibility proof, nor
+identified with operations of a proved operadic action.
+
 The current rewrite theory has a totality theorem for `RwEq` on parallel
 paths. A structural weak omega-groupoid theorem does not automatically give a
 model of arbitrary homotopy types or nontrivial fundamental groups. Establish

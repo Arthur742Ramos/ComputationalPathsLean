@@ -277,3 +277,22 @@ example {A : Type} {n : Nat} (p q : NativeTower.Cell A (n + 3))
 #print axioms NativeTower.higher_ext
 #print axioms NativeTower.associator_derivation
 #print axioms NativeTower.distinct_rewrite_cells
+
+example {A : Type} {n : Nat} (p : NativeTower.Cell A (n + 1)) :
+    NativeTower.source (NativeTower.cancelRight p).val =
+      NativeTower.compose p (NativeTower.reverse p) (NativeTower.source_reverse p).symm :=
+  (NativeTower.cancelRight p).property.1
+
+example {A : Type} (p : NativeTower.Cell A 9) :
+    NativeTower.target (NativeTower.cancelLeft p).val = NativeTower.identity (NativeTower.target p) :=
+  (NativeTower.cancelLeft p).property.2
+
+#print axioms NativeTower.source_reverse
+#print axioms NativeTower.target_reverse
+#print axioms NativeTower.compose_boundary
+#print axioms NativeTower.compose_paths
+#print axioms NativeTower.compose_rewrites
+#print axioms NativeTower.cancelRight
+#print axioms NativeTower.cancelLeft
+#print axioms NativeTower.cancelRight_paths
+#print axioms NativeTower.cancelLeft_paths
