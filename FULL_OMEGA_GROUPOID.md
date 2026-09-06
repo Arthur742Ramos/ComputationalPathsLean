@@ -296,8 +296,15 @@ equation for nested labelled applications, so `substitutionComparison` is a
 globular map into the substituted collection's application. Its two
 projection equations retain the nested operations and flatten only their
 input diagrams; `substitutionComparison_natural` proves compatibility with
-relabelling. The comparison's inverse, substitution unitors and associativity,
-and the eventual operad multiplication remain unproved.
+relabelling. `substitutionComparison_unique_lift` now recovers the complete
+nested labelled operation uniquely: multiplication cartesianness recovers its
+nested inputs, and pasting pullback preservation recovers its inner-operation
+labels. `substitutionComparisonInverse` respects both globular boundaries by
+uniqueness, and `substitutionComparisonIso` proves both inverse equations.
+`substitutionFunctorIso` packages the existing naturality law into an actual
+natural isomorphism between composed application functors and application of
+the substituted collection. Substitution unitors, associativity, and the
+eventual operad multiplication remain unproved.
 
 `evaluate` now evaluates labelled diagrams by dimension recursion into a
 target equipped with horizontal operations in all its iterated hom contexts

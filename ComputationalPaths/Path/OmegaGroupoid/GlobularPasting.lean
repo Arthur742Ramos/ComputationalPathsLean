@@ -5736,6 +5736,78 @@ theorem substitutionComparison_natural (C D : GlobularCollection.{u})
           (Pasting.map_comp (D.inputs G) (Pasting.mapGlobular f) p.val.2).symm))).trans
         (Pasting.flatten_natural f (Pasting.map (D.inputs G) p.val.2)).symm
 
+/-- The substitution comparison has a unique inverse on every cell.
+Multiplication cartesianness recovers the nested input diagram, and pasting
+pullback preservation then recovers its inner-operation labels. -/
+theorem substitutionComparison_unique_lift (C D : GlobularCollection.{u}) (G : GlobularSet.{u})
+    {n : Nat} (p : ((C.substitute D).application G).Cell n) :
+    ∃! r : (C.application (D.application G)).Cell n,
+      (C.substitutionComparison D G).app r = p := by
+  obtain ⟨t, ⟨ht, hs⟩, hu⟩ := Pasting.flatten_cartesian (GlobularSet.terminalMap G)
+    p.val.2 (Pasting.map D.arity p.val.1.val.2) p.property.symm
+  obtain ⟨w, hw, hw'⟩ := Pasting.pullback_pasting_exists D.arity (shape G)
+    p.val.1.val.2 t hs.symm
+  let r : (C.application (D.application G)).Cell n := ⟨⟨p.val.1.val.1, w⟩,
+    p.val.1.property.trans ((_root_.congrArg (shape D.operations).app hw.symm).trans
+      (shape_map (D.operation G) w))⟩
+  refine ⟨r, ?_, ?_⟩
+  · apply Subtype.ext
+    exact Prod.ext (Subtype.ext (Prod.ext rfl hw))
+      ((_root_.congrArg (Pasting.flattenGlobular G).app hw').trans ht)
+  · intro s he
+    have ho : s.val.1 = p.val.1.val.1 :=
+      _root_.congrArg (fun z : ((C.substitute D).application G).Cell n => z.val.1.val.1) he
+    have hm : Pasting.map (D.operation G) s.val.2 = p.val.1.val.2 :=
+      _root_.congrArg (fun z : ((C.substitute D).application G).Cell n => z.val.1.val.2) he
+    have hf : (Pasting.flattenGlobular G).app (Pasting.map (D.inputs G) s.val.2) = p.val.2 :=
+      _root_.congrArg (fun z : ((C.substitute D).application G).Cell n => z.val.2) he
+    have hshape : Pasting.map (shape G) (Pasting.map (D.inputs G) s.val.2) =
+        Pasting.map D.arity p.val.1.val.2 :=
+      (Pasting.map_comp (D.inputs G) (shape G) s.val.2).trans
+        ((_root_.congrArg (fun k => Pasting.map k s.val.2)
+          (GlobularSet.pullback_condition D.arity (shape G)).symm).trans
+          ((Pasting.map_comp (D.operation G) D.arity s.val.2).symm.trans
+            (_root_.congrArg (Pasting.map D.arity) hm)))
+    have hi := hu (Pasting.map (D.inputs G) s.val.2) ⟨hf, hshape⟩
+    exact Subtype.ext (Prod.ext ho (Pasting.pullback_pasting_ext D.arity (shape G)
+      s.val.2 w (hm.trans hw.symm) (hi.trans hw'.symm)))
+
+/-- The verified cellwise inverse respects both adjacent globular maps by
+uniqueness; it does not add or quotient any nested operation data. -/
+noncomputable def substitutionComparisonInverse (C D : GlobularCollection.{u}) (G : GlobularSet.{u}) :
+    GlobularSet.Map ((C.substitute D).application G) (C.application (D.application G)) where
+  app p := (C.substitutionComparison_unique_lift D G p).choose
+  source_app p := (C.substitutionComparison_unique_lift D G
+    (((C.substitute D).application G).source p)).choose_spec.2 _
+      (((C.substitutionComparison D G).source_app _).symm.trans
+        (_root_.congrArg ((C.substitute D).application G).source
+          (C.substitutionComparison_unique_lift D G p).choose_spec.1))
+  target_app p := (C.substitutionComparison_unique_lift D G
+    (((C.substitute D).application G).target p)).choose_spec.2 _
+      (((C.substitutionComparison D G).target_app _).symm.trans
+        (_root_.congrArg ((C.substitute D).application G).target
+          (C.substitutionComparison_unique_lift D G p).choose_spec.1))
+
+noncomputable def substitutionComparisonIso (C D : GlobularCollection.{u}) (G : GlobularSet.{u}) :
+    CategoryTheory.Iso (C.application (D.application G)) ((C.substitute D).application G) where
+  hom := C.substitutionComparison D G
+  inv := C.substitutionComparisonInverse D G
+  hom_inv_id := by
+    apply GlobularSet.Map.ext
+    intro n p
+    exact ((C.substitutionComparison_unique_lift D G ((C.substitutionComparison D G).app p)).choose_spec.2 p rfl).symm
+  inv_hom_id := by
+    apply GlobularSet.Map.ext
+    intro n p
+    exact (C.substitutionComparison_unique_lift D G p).choose_spec.1
+
+/-- Substitution of collections implements composition of their actual
+application functors, naturally in the input globular set. -/
+noncomputable def substitutionFunctorIso (C D : GlobularCollection.{u}) :
+    CategoryTheory.Iso (CategoryTheory.Functor.comp D.functor C.functor) (C.substitute D).functor :=
+  CategoryTheory.NatIso.ofComponents (fun G => C.substitutionComparisonIso D G)
+    (fun f => C.substitutionComparison_natural D f)
+
 end GlobularCollection
 
 /-- Interpretation of composable path-labelled chains keeps the endpoints
