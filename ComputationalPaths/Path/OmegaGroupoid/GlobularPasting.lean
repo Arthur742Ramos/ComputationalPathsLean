@@ -3998,6 +3998,21 @@ theorem unpack_packFibre {G : GlobularSet.{u}} {n : Nat} {a b : G.Cell 0}
   have h := _root_.congrArg Subtype.val (pack_unpackFibre (packFibre p))
   exact eq_of_heq (Sigma.mk.inj (eq_of_heq (Sigma.mk.inj h).2)).2
 
+/-- Relabelling an actual hom cell relabels its unpacked horizontal chain,
+including all intermediate vertices. -/
+theorem unpackFibre_map_hom {G H : GlobularSet.{u}} (f : GlobularSet.Map G H)
+    {n : Nat} {a b : G.Cell 0} (p : ((globular G).hom a b).Cell n) :
+    unpackFibre (((mapGlobular f).hom a b).app p) =
+      (unpackFibre p).mapAlong f.app (fun {x y} e => map (f.hom x y) e) := by
+  obtain ⟨p, rfl⟩ : ∃ p', packFibre p' = p := ⟨unpackFibre p, pack_unpackFibre p⟩
+  have hm : ((mapGlobular f).hom a b).app (packFibre p) =
+      packFibre (p.mapAlong f.app (fun {x y} e => map (f.hom x y) e)) := Subtype.ext rfl
+  exact (_root_.congrArg unpackFibre hm).trans
+    ((unpack_packFibre _).trans
+      (_root_.congrArg (fun q : Horizontal n G a b =>
+        q.mapAlong (F := fun x y => Pasting n (H.hom x y)) f.app (fun {x y} e => map (f.hom x y) e))
+        (unpack_packFibre p).symm))
+
 theorem source_packFibre {G : GlobularSet.{u}} {n : Nat} {a b : G.Cell 0}
     (p : Horizontal (n + 1) G a b) :
     ((globular G).hom a b).source (packFibre p) = packFibre (p.map (fun e => source e)) :=
@@ -4050,6 +4065,88 @@ theorem horizontalComposition_fold {G : GlobularSet.{u}} {n : Nat} {a b : G.Cell
       (unpackFibre (packFibre (p.bind (fun e => e))))) = _
     rw [unpack_packFibre, unpack_packFibre]
     rfl
+
+/-- The actual recursive evaluator, not just the auxiliary horizontal
+structure, substitutes a chain for each horizontal segment. -/
+theorem recursive_fold_pack {G : GlobularSet.{u}} {n : Nat} {a b : G.Cell 0}
+    (p : Chain (fun x y => Horizontal n G x y) a b) :
+    (recursiveComposition G .root).fold (p.map (fun e => packFibre e)) =
+      packFibre (p.bind (fun e => e)) := by
+  induction p with
+  | nil => rfl
+  | cons e p ih =>
+    change (cutOperations G).horizontalMul (packFibre e)
+      ((recursiveComposition G .root).fold (p.map (fun e => packFibre e))) = _
+    rw [ih]
+    rfl
+
+theorem recursive_fold_unpack {G : GlobularSet.{u}} {n : Nat} {a b : G.Cell 0}
+    (p : Chain (fun x y => ((globular G).hom x y).Cell n) a b) :
+    (recursiveComposition G .root).fold p =
+      packFibre ((p.map (fun e => unpackFibre e)).bind (fun e => e)) := by
+  have hp : (p.map (fun e => unpackFibre e)).map (fun e => packFibre e) = p :=
+    (Chain.map_map _ _ p).trans
+      ((Chain.map_congr _ (fun e => e) (fun e => pack_unpackFibre e) p).trans (Chain.map_id p))
+  exact (_root_.congrArg (fun q => (recursiveComposition G .root).fold q) hp).symm.trans
+    (recursive_fold_pack (G := G) (n := n) (p.map (fun e => unpackFibre e)))
+
+/-- The hom-context evaluator used by the implemented multiplication.
+Its domain is the actual hom of the pasting globular set, not a substituted
+hom-pasting carrier. -/
+noncomputable def flattenHom (G : GlobularSet.{u}) (a b : G.Cell 0) :
+    GlobularSet.Map (globular ((globular G).hom a b)) ((globular G).hom a b) :=
+  evaluateGlobular (recursiveComposition G) ((HomContext.root (H := globular G)).hom a b)
+    (GlobularSet.Map.id ((globular G).hom a b))
+
+theorem flattenHom_natural {G H : GlobularSet.{u}} (f : GlobularSet.Map G H)
+    (a b : G.Cell 0) {n : Nat} (p : Pasting n ((globular G).hom a b)) :
+    ((mapGlobular f).hom a b).app ((flattenHom G a b).app p) =
+      (flattenHom H (f.app a) (f.app b)).app (map ((mapGlobular f).hom a b) p) := by
+  let g := (mapGlobular f).hom a b
+  have hpost := evaluate_postcompose (cutOperations G) (cutOperations H)
+    (cutOperations_compatible G) (cutOperations_compatible H)
+    ((HomContext.root (H := globular G)).hom a b)
+    ((HomContext.root (H := globular H)).hom (f.app a) (f.app b))
+    g ((mapGlobular_preserves f).hom a b) (GlobularSet.Map.id ((globular G).hom a b)) p
+  have hpre := evaluate_precompose (recursiveComposition H)
+    ((HomContext.root (H := globular H)).hom (f.app a) (f.app b))
+    (GlobularSet.Map.id ((globular H).hom (f.app a) (f.app b))) g p
+  have he : GlobularSet.Map.comp g (GlobularSet.Map.id ((globular G).hom a b)) =
+      GlobularSet.Map.comp (GlobularSet.Map.id ((globular H).hom (f.app a) (f.app b))) g := by
+    apply GlobularSet.Map.ext
+    intro m c
+    rfl
+  exact hpost.trans ((_root_.congrArg (fun k => evaluate (recursiveComposition H)
+    ((HomContext.root (H := globular H)).hom (f.app a) (f.app b)) k p) he).trans hpre.symm)
+
+theorem flattenHom_segments_natural {G H : GlobularSet.{u}} (f : GlobularSet.Map G H)
+    (a b : G.Cell 0) {n : Nat} (p : Pasting n ((globular G).hom a b)) :
+    unpackFibre ((flattenHom H (f.app a) (f.app b)).app (map ((mapGlobular f).hom a b) p)) =
+      (unpackFibre ((flattenHom G a b).app p)).mapAlong f.app
+        (fun {x y} e => map (f.hom x y) e) :=
+  (_root_.congrArg unpackFibre (flattenHom_natural f a b p)).symm.trans
+    (unpackFibre_map_hom f ((flattenHom G a b).app p))
+
+/-- Exact segmentation formula for globular multiplication in every
+positive dimension. Each segment is the genuine evaluated hom label. -/
+theorem flatten_horizontal_segments {G : GlobularSet.{u}} {n : Nat} {a b : G.Cell 0}
+    (p : Chain (fun x y => Pasting n ((globular G).hom x y)) a b) :
+    (flattenGlobular G).app (n := n + 1) (pack p) =
+      pack ((p.map (fun {x y} e => unpackFibre ((flattenHom G x y).app e))).bind (fun e => e)) := by
+  have he : p.mapAlong (fun x => x) (fun {x y} e =>
+      evaluate (recursiveComposition G) ((HomContext.root (H := globular G)).hom x y)
+        ((GlobularSet.Map.id (globular G)).hom x y) e) =
+      p.map (fun {x y} e => (flattenHom G x y).app e) := by
+    refine (Chain.mapAlong_identity_vertices _ p).trans ?_
+    apply Chain.map_congr
+    intro x y e
+    rw [GlobularSet.Map.hom_id]
+    rfl
+  exact (_root_.congrArg (fun q => ((recursiveComposition G .root).fold q).val) he).trans
+    ((_root_.congrArg Subtype.val (recursive_fold_unpack (G := G) (n := n)
+    (p.map (fun {x y} e => (flattenHom G x y).app e)))).trans
+      (_root_.congrArg (fun q : Chain (fun x y => Horizontal n G x y) a b => pack (q.bind (fun e => e)))
+        (Chain.map_map (fun {x y} e => (flattenHom G x y).app e) (fun e => unpackFibre e) p)))
 
 /-- Include a pasting diagram in one hom set as a single horizontal edge
 of the original pasting carrier. Its labels are retained literally. -/

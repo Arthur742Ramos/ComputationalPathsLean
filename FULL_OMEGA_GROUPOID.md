@@ -148,8 +148,18 @@ segments without an injectivity assumption. `lift_bind_mapAlong` lifts an
 entire nested-chain segmentation, retaining empty inner chains explicitly.
 `bind_mapAlong_joint_injective` and `bind_cartesian` prove uniqueness of this
 chain-level multiplication lift. These are not yet a proof about the full
-globular `flattenGlobular`: its recursively evaluated hom labels still have
-to be connected to this segmentation theorem in every dimension.
+globular `flattenGlobular` by themselves.
+
+The exact interface to that multiplication is now checked:
+`recursive_fold_pack` and `recursive_fold_unpack` identify the implemented
+root-context evaluator's fold with chain substitution. `flattenHom` names
+its actual hom-context evaluator, and `flatten_horizontal_segments` expresses
+`flattenGlobular` in every positive dimension as concatenation of unpacked,
+evaluated hom labels. `flattenHom_natural`, `unpackFibre_map_hom`, and
+`flattenHom_segments_natural` check relabelling of these exact segments.
+This does not replace the hom of the pasting carrier with a different
+hom-pasting type. Unique lifting for these recursive hom evaluations remains
+to be proved before claiming cartesianness of globular multiplication.
 
 `evaluate` now evaluates labelled diagrams by dimension recursion into a
 target equipped with horizontal operations in all its iterated hom contexts
