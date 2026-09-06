@@ -69,6 +69,18 @@ completion gate for the full weak omega-groupoid theorem. -/
 #print axioms Pasting.CutOperations.Cartesian.unit_lift_hom
 #print axioms Pasting.CutOperations.Cartesian.compose_lift_hom
 #print axioms Pasting.CutOperations.Cartesian.hom
+#print axioms Pasting.CutOperations.Cartesian.horizontal_factor_lift
+#print axioms Pasting.CutOperations.Cartesian.horizontal_unit_lift
+
+example {G H : GlobularSet.{u}} {C : Pasting.CutOperations G} {D : Pasting.CutOperations H}
+    {f : GlobularSet.Map G H} (K : Pasting.CutOperations.Cartesian C D f)
+    {n : Nat} (a b : G.Cell 0) (p : (G.hom a b).Cell n) (c : H.Cell 0)
+    (q : (H.hom (f.app a) c).Cell n) (r : (H.hom c (f.app b)).Cell n)
+    (h : f.app p.val = (D.horizontalMul q r).val) :
+    ∃! s : Σ y : G.Cell 0, (G.hom a y).Cell n × (G.hom y b).Cell n,
+      f.app s.1 = c ∧ C.horizontalMul s.2.1 s.2.2 = p ∧
+      f.app s.2.1.val = q.val ∧ f.app s.2.2.val = r.val :=
+  K.horizontal_factor_lift a b p c q r h
 
 example {G H : GlobularSet.{u}} (f : GlobularSet.Map G H) (a b : G.Cell 0) :
     Pasting.CutOperations.Cartesian ((Pasting.cutOperations G).hom a b)

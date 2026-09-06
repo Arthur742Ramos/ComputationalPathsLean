@@ -3995,6 +3995,59 @@ def CutOperations.horizontalMul {H : GlobularSet.{u}} (C : CutOperations H)
     (C.source_compose (.bottom : Cut (n + 1)) p.val q.val _).trans p.property.1,
     (C.target_compose (.bottom : Cut (n + 1)) p.val q.val _).trans q.property.2⟩
 
+/-- Primitive cartesianness recovers a horizontal intermediate object and
+both fixed-endpoint factors. Relabelling equalities retain their raw cells. -/
+theorem CutOperations.Cartesian.horizontal_factor_lift {G H : GlobularSet.{u}}
+    {C : CutOperations G} {D : CutOperations H} {f : GlobularSet.Map G H}
+    (K : CutOperations.Cartesian C D f) {n : Nat} (a b : G.Cell 0)
+    (p : (G.hom a b).Cell n) (c : H.Cell 0)
+    (q : (H.hom (f.app a) c).Cell n) (r : (H.hom c (f.app b)).Cell n)
+    (h : f.app p.val = (D.horizontalMul q r).val) :
+    ∃! s : Σ y : G.Cell 0, (G.hom a y).Cell n × (G.hom y b).Cell n,
+      f.app s.1 = c ∧ C.horizontalMul s.2.1 s.2.2 = p ∧
+      f.app s.2.1.val = q.val ∧ f.app s.2.2.val = r.val := by
+  let qr : D.Pair (.bottom : Cut (n + 1)) := ⟨(q.val, r.val), q.property.2.trans r.property.1.symm⟩
+  obtain ⟨s, ⟨hs, hf⟩, hu⟩ := K.compose_lift (.bottom : Cut (n + 1)) p.val qr h
+  have h₁ : f.app s.val.1 = q.val := _root_.congrArg (fun z : D.Pair (.bottom : Cut (n + 1)) => z.val.1) hf
+  have h₂ : f.app s.val.2 = r.val := _root_.congrArg (fun z : D.Pair (.bottom : Cut (n + 1)) => z.val.2) hf
+  have ha : G.sourceZero s.val.1 = a :=
+    (C.source_compose .bottom s.val.1 s.val.2 s.property).symm.trans
+      ((_root_.congrArg G.sourceZero hs).trans p.property.1)
+  have hb : G.targetZero s.val.2 = b :=
+    (C.target_compose .bottom s.val.1 s.val.2 s.property).symm.trans
+      ((_root_.congrArg G.targetZero hs).trans p.property.2)
+  let y := G.targetZero s.val.1
+  let s₁ : (G.hom a y).Cell n := ⟨s.val.1, ha, rfl⟩
+  let s₂ : (G.hom y b).Cell n := ⟨s.val.2, s.property.symm, hb⟩
+  have hy : f.app y = c := (f.targetZero s.val.1).symm.trans
+    ((_root_.congrArg H.targetZero h₁).trans q.property.2)
+  refine ⟨⟨y, s₁, s₂⟩, ⟨hy, Subtype.ext hs, h₁, h₂⟩, ?_⟩
+  rintro ⟨z, t₁, t₂⟩ ⟨hz, ht, ht₁, ht₂⟩
+  let t : C.Pair (.bottom : Cut (n + 1)) := ⟨(t₁.val, t₂.val), t₁.property.2.trans t₂.property.1.symm⟩
+  have he : t = s := hu t ⟨_root_.congrArg Subtype.val ht, Subtype.ext (Prod.ext ht₁ ht₂)⟩
+  have he₁ : t₁.val = s.val.1 := _root_.congrArg (fun z : C.Pair (.bottom : Cut (n + 1)) => z.val.1) he
+  have he₂ : t₂.val = s.val.2 := _root_.congrArg (fun z : C.Pair (.bottom : Cut (n + 1)) => z.val.2) he
+  have hzy : z = y := t₁.property.2.symm.trans (_root_.congrArg G.targetZero he₁)
+  cases hzy
+  exact _root_.congrArg (fun z => (⟨y, z⟩ : Σ y : G.Cell 0, (G.hom a y).Cell n × (G.hom y b).Cell n))
+    (Prod.ext (Subtype.ext he₁) (Subtype.ext he₂))
+
+/-- The empty-fold lifting case determines both original endpoints and
+the actual unit cell, rather than assuming they already coincide. -/
+theorem CutOperations.Cartesian.horizontal_unit_lift {G H : GlobularSet.{u}}
+    {C : CutOperations G} {D : CutOperations H} {f : GlobularSet.Map G H}
+    (K : CutOperations.Cartesian C D f) {n : Nat} (a b : G.Cell 0)
+    (p : (G.hom a b).Cell n) (c : H.Cell 0)
+    (h : f.app p.val = (D.horizontalUnit n c).val) :
+    a = b ∧ (C.horizontalUnit n a).val = p.val ∧ f.app a = c := by
+  obtain ⟨r, ⟨hr, hf⟩, hu⟩ := K.unit_lift (.bottom : Cut (n + 1)) p.val c h
+  have ha : r = a := (C.source_unit (.bottom : Cut (n + 1)) r).symm.trans
+    ((_root_.congrArg G.sourceZero hr).trans p.property.1)
+  have hb : r = b := (C.target_unit (.bottom : Cut (n + 1)) r).symm.trans
+    ((_root_.congrArg G.targetZero hr).trans p.property.2)
+  exact ⟨ha.symm.trans hb, (_root_.congrArg (C.unit (.bottom : Cut (n + 1))) ha.symm).trans hr,
+    (_root_.congrArg f.app ha.symm).trans hf⟩
+
 /-- Compatible cut operations give the horizontal operations used by the
 evaluator, on the genuine hom fibres of the same globular set. -/
 def CutOperations.horizontal {H : GlobularSet.{u}} (C : CutOperations H) (L : C.Compatible) :

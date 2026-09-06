@@ -227,6 +227,16 @@ including both existence and uniqueness; it does not postulate endpoint
 fillers. This supplies the hom-stable premise needed for recursive-evaluation
 lifting. The latter and monad multiplication cartesianness remain unproved.
 
+The evaluator's horizontal lifting steps are now explicit.
+`Cartesian.horizontal_factor_lift` recovers a unique original intermediate
+object and both fixed-endpoint factors from a prescribed factorization.
+Their endpoint equations follow from the primitive composite's boundary
+laws, and both raw relabelling equations are retained.
+`Cartesian.horizontal_unit_lift` handles an empty fold by proving the
+original endpoints coincide and identifying the actual original unit.
+These supply the binary and empty cases for a fold-lifting induction;
+the arbitrary-chain and recursive-evaluation lifting proofs remain open.
+
 `evaluate` now evaluates labelled diagrams by dimension recursion into a
 target equipped with horizontal operations in all its iterated hom contexts
 (`RecursiveComposition`). The evaluator is implemented, not a field assumed
