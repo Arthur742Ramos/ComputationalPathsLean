@@ -686,6 +686,67 @@ theorem map_singleton {n : Nat} {G H : GlobularSet.{u}} (f : GlobularSet.Map G H
       Chain.single q⟩ : Pasting (n + 1) H)) (ih (f.hom _ _) d)).trans
         (singleton_of_hom H ((f.hom _ _).app d))
 
+/-- Relabelling cannot hide a composite as an atomic generator. -/
+theorem atom_map {n : Nat} {G H : GlobularSet.{u}} (f : GlobularSet.Map G H)
+    (p : Pasting n G) : atom? (map f p) = (atom? p).map f.app := by
+  induction n generalizing G H with
+  | zero => rfl
+  | succ n ih =>
+    rcases p with ⟨a, b, p⟩
+    cases p with
+    | nil => rfl
+    | cons d q =>
+      cases q with
+      | nil =>
+        change (atom? (map (f.hom _ _) d)).map Subtype.val =
+          ((atom? d).map Subtype.val).map f.app
+        rw [ih]
+        cases atom? d <;> rfl
+      | cons e r => rfl
+
+/-- Successful extraction characterizes a genuine singleton diagram. -/
+theorem singleton_of_atom {n : Nat} {G : GlobularSet.{u}} (p : Pasting n G)
+    (c : G.Cell n) (h : atom? p = some c) : singleton c = p := by
+  induction n generalizing G with
+  | zero => exact Option.some.inj h.symm
+  | succ n ih =>
+    rcases p with ⟨a, b, p⟩
+    cases p with
+    | nil => cases h
+    | cons d q =>
+      cases q with
+      | cons e r => cases h
+      | nil =>
+        change (atom? d).map Subtype.val = some c at h
+        cases hd : atom? d with
+        | none =>
+          rw [hd] at h
+          change none = some c at h
+          cases h
+        | some e =>
+          rw [hd] at h
+          have hc : e.val = c := Option.some.inj h
+          subst c
+          exact (singleton_of_hom G e).symm.trans
+            (_root_.congrArg (fun z => (⟨a, b, Chain.single z⟩ : Pasting (n + 1) G))
+              (ih d e hd))
+
+/-- Pointwise pullback property of the natural unit, with no injectivity
+assumption on the relabelling map. -/
+theorem singleton_cartesian {n : Nat} {G H : GlobularSet.{u}}
+    (f : GlobularSet.Map G H) (p : Pasting n G) (c : H.Cell n)
+    (h : map f p = singleton c) :
+    ∃! d : G.Cell n, singleton d = p ∧ f.app d = c := by
+  have ha : (atom? p).map f.app = some c :=
+    (atom_map f p).symm.trans ((_root_.congrArg atom? h).trans (atom_singleton H c))
+  cases hp : atom? p with
+  | none => simp [hp] at ha
+  | some d =>
+    have hd : f.app d = c := by simpa [hp] using ha
+    refine ⟨d, ⟨singleton_of_atom p d hp, hd⟩, ?_⟩
+    intro e he
+    exact singleton_injective G (he.1.trans (singleton_of_atom p d hp).symm)
+
 theorem source_singleton {n : Nat} (G : GlobularSet.{u}) (c : G.Cell (n + 1)) :
     source (singleton c) = singleton (G.source c) := by
   induction n generalizing G with
@@ -780,6 +841,45 @@ theorem singleton_natural {G H : GlobularSet.{u}} (f : GlobularSet.Map G H) :
   apply GlobularSet.Map.ext
   intro n c
   exact map_singleton f c
+
+/-- The unit naturality square has the universal lifting property in the
+category of globular sets, not just separately on its cell sets. -/
+theorem singleton_globular_pullback {G H X : GlobularSet.{u}}
+    (f : GlobularSet.Map G H) (p : GlobularSet.Map X (globular G))
+    (q : GlobularSet.Map X H)
+    (h : GlobularSet.Map.comp (mapGlobular f) p =
+      GlobularSet.Map.comp (singletonGlobular H) q) :
+    ∃! d : GlobularSet.Map X G,
+      GlobularSet.Map.comp (singletonGlobular G) d = p ∧
+      GlobularSet.Map.comp f d = q := by
+  have liftExists (n : Nat) (x : X.Cell n) := singleton_cartesian f (p.app x) (q.app x)
+    (_root_.congrArg (fun k : GlobularSet.Map X (globular H) => k.app x) h)
+  let d {n : Nat} (x : X.Cell n) : G.Cell n := (liftExists n x).choose
+  have hd {n : Nat} (x : X.Cell n) : singleton (d x) = p.app x ∧ f.app (d x) = q.app x :=
+    (liftExists n x).choose_spec.1
+  let D : GlobularSet.Map X G := {
+    app := d
+    source_app := fun x => singleton_injective G
+      ((source_singleton G (d x)).symm.trans
+        ((_root_.congrArg source (hd x).1).trans
+          ((p.source_app x).trans (hd (X.source x)).1.symm)))
+    target_app := fun x => singleton_injective G
+      ((target_singleton G (d x)).symm.trans
+        ((_root_.congrArg target (hd x).1).trans
+          ((p.target_app x).trans (hd (X.target x)).1.symm))) }
+  refine ⟨D, ⟨?_, ?_⟩, ?_⟩
+  · apply GlobularSet.Map.ext
+    intro n x
+    exact (hd x).1
+  · apply GlobularSet.Map.ext
+    intro n x
+    exact (hd x).2
+  · intro e he
+    apply GlobularSet.Map.ext
+    intro n x
+    exact singleton_injective G
+      ((_root_.congrArg (fun k : GlobularSet.Map X (globular G) => k.app x) he.1).trans
+        (hd x).1.symm)
 
 /-- The lawful endofunctor of recursively labelled pasting diagrams.
 Monad unit/multiplication and the universal property are separate obligations. -/

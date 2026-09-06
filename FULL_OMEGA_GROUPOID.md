@@ -98,6 +98,17 @@ unit without erasing original cells. Flattening is now constructed as
 described below, with the full monad laws; the free strict-category universal
 property remains to be established.
 
+The natural unit is now verified cartesian. `atom_map` proves that relabelling
+commutes with extraction of a generator, and `singleton_of_atom` proves that
+successful extraction characterizes singleton diagrams. Consequently
+`singleton_cartesian` provides the unique cell lift for every unit naturality
+square, without assuming the relabelling map is injective.
+`singleton_globular_pullback` assembles these lifts into a globular map,
+checks both adjacent boundaries, and proves the unique lifting property for
+arbitrary globular cones. This establishes the actual universal property of
+the unit squares. Preservation of pullbacks by the pasting functor and
+cartesianness of multiplication remain separate, unproved obligations.
+
 `evaluate` now evaluates labelled diagrams by dimension recursion into a
 target equipped with horizontal operations in all its iterated hom contexts
 (`RecursiveComposition`). The evaluator is implemented, not a field assumed

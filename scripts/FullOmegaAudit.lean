@@ -14,6 +14,18 @@ completion gate for the full weak omega-groupoid theorem. -/
 #print axioms Pasting.evaluate_multiplication
 #print axioms Pasting.preserves_evaluation
 #print axioms Pasting.cutOperationsAlgebra
+#print axioms Pasting.atom_map
+#print axioms Pasting.singleton_of_atom
+#print axioms Pasting.singleton_cartesian
+#print axioms Pasting.singleton_globular_pullback
+
+example {G H X : GlobularSet.{u}} (f : GlobularSet.Map G H)
+    (p : GlobularSet.Map X (Pasting.globular G)) (q : GlobularSet.Map X H)
+    (h : GlobularSet.Map.comp (Pasting.mapGlobular f) p =
+      GlobularSet.Map.comp (Pasting.singletonGlobular H) q) :
+    ∃! d : GlobularSet.Map X G,
+      GlobularSet.Map.comp (Pasting.singletonGlobular G) d = p ∧
+      GlobularSet.Map.comp f d = q := Pasting.singleton_globular_pullback f p q h
 
 noncomputable example (G : GlobularSet) :
     CategoryTheory.Monad.Algebra Pasting.pastingMonad :=
