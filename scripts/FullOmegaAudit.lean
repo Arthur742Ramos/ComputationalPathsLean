@@ -137,6 +137,18 @@ example (A : Type u) :
 #print axioms Pasting.CutModel.algebraHomEquiv
 #print axioms Pasting.CutModel.freeForgetAdjunction
 #print axioms Pasting.CutModel.freeForget_monad
+#print axioms Pasting.Cut.finEquiv
+#print axioms Pasting.CutModel.unit_identityIter
+
+example (n : Nat) : Pasting.Cut n ≃ Fin n := Pasting.Cut.finEquiv n
+example (C : Pasting.CutModel) {n : Nat} (p : C.carrier.Cell n) :
+    C.carrier.source (C.identity p) = p ∧ C.carrier.target (C.identity p) = p :=
+  ⟨C.source_identity p, C.target_identity p⟩
+example (C : Pasting.CutModel) {n : Nat} (k : Nat)
+    (c : Pasting.Cut (n + k + 1)) (h : c.height = n)
+    (p : C.carrier.Cell c.height) (q : C.carrier.Cell n) (hp : HEq p q) :
+    C.operations.unit c p = C.identityIter (k + 1) q :=
+  C.unit_identityIter k c h p q hp
 
 noncomputable example :
     CategoryTheory.Adjunction Pasting.CutModel.freeFunctor Pasting.CutModel.forget :=

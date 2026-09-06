@@ -767,3 +767,21 @@ identifies its induced multiplication with the existing recursive flattening.
 explicit cut-law presentation; the remaining standard-definition gate is
 identifying that presentation with strict omega-categories, not merely
 producing an adjunction or checking another multiplication law.
+
+The comparison with [Raftogianis, Definition 4.4, pp. 30-31](https://arxiv.org/pdf/1711.07958)
+now verifies the indexing and identity conventions. `Cut.finEquiv` identifies
+the structural cuts with precisely `k < n`; `raise_iff_height` identifies
+raising an axis with retaining its numerical index. `CutModel.identity`
+extracts the single adjacent identity, with both adjacent boundary equations.
+`unit_identityIter` proves by dimension induction that every stored cut
+identity is repeated adjacent identity, not extra independently chosen data.
+The remaining presentation comparison still must account for every boundary,
+composition and exchange law in both directions.
+
+Source-convention audit: the printed Definition 4.4(d) puts the target identity
+on the left and source identity on the right, although its preceding
+composability convention is target of the first cell equals source of the
+second. For a non-endomorphism these displayed unit composites are not
+generally defined. We retain the type-correct convention: source identity
+on the left, target identity on the right. The discrepancy was checked on
+the rendered source pages, not inferred solely from extracted text.

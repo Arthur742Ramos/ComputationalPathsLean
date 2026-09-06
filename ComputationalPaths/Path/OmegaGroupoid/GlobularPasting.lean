@@ -3698,6 +3698,90 @@ theorem Cut.height_lt {n : Nat} (c : Cut n) : c.height < n := by
   | bottom => exact Nat.zero_lt_succ _
   | lift c ih => exact Nat.succ_lt_succ ih
 
+/-- Every ordinary index `k < n` determines one composition axis. -/
+def Cut.ofFin : {n : Nat} → Fin n → Cut n
+  | 0, k => Fin.elim0 k
+  | _ + 1, ⟨0, _⟩ => .bottom
+  | _ + 1, ⟨k + 1, h⟩ => .lift (ofFin ⟨k, Nat.lt_of_succ_lt_succ h⟩)
+
+theorem Cut.height_ofFin {n : Nat} (k : Fin n) : (ofFin k).height = k.val := by
+  induction n with
+  | zero => exact Fin.elim0 k
+  | succ n ih =>
+    rcases k with ⟨k, h⟩
+    cases k with
+    | zero => rfl
+    | succ k => exact _root_.congrArg Nat.succ (ih ⟨k, Nat.lt_of_succ_lt_succ h⟩)
+
+theorem Cut.height_injective {n : Nat} : Function.Injective (@height n) := by
+  intro c
+  induction c with
+  | bottom =>
+    intro d h
+    cases d with
+    | bottom => rfl
+    | lift d => exact False.elim (Nat.noConfusion h)
+  | lift c ih =>
+    intro d h
+    cases d with
+    | bottom => exact False.elim (Nat.noConfusion h)
+    | lift d => exact _root_.congrArg Cut.lift (ih (Nat.succ.inj h))
+
+/-- The structural axes are exactly the standard indices, without missing
+or duplicate lower-dimensional compositions. -/
+def Cut.finEquiv (n : Nat) : Cut n ≃ Fin n where
+  toFun c := ⟨c.height, c.height_lt⟩
+  invFun := ofFin
+  left_inv c := height_injective (height_ofFin ⟨c.height, c.height_lt⟩)
+  right_inv k := Fin.ext (height_ofFin k)
+
+/-- Preserve an axis while increasing the dimension of its cells. -/
+def Cut.up : {n : Nat} → Cut n → Cut (n + 1)
+  | _, .bottom => .bottom
+  | _, .lift c => .lift c.up
+
+theorem Cut.raise_up {n : Nat} (c : Cut n) : Raise c c.up := by
+  induction c with
+  | bottom => exact .bottom
+  | lift c ih => exact .lift ih
+
+theorem Cut.height_up {n : Nat} (c : Cut n) : c.up.height = c.height :=
+  c.raise_up.height_eq.symm
+
+def Cut.top : (n : Nat) → Cut (n + 1)
+  | 0 => .bottom
+  | n + 1 => .lift (top n)
+
+theorem Cut.height_top (n : Nat) : (top n).height = n := by
+  induction n with
+  | zero => rfl
+  | succ n ih => exact _root_.congrArg Nat.succ ih
+
+theorem Cut.raise_iff_height {n : Nat} (c : Cut n) (d : Cut (n + 1)) :
+    Raise c d ↔ c.height = d.height := by
+  refine ⟨Raise.height_eq, fun h => ?_⟩
+  have hd : c.up = d := height_injective (c.height_up.trans h)
+  exact hd ▸ c.raise_up
+
+theorem CutBoundary.source_top (G : GlobularSet.{u}) {n : Nat}
+    (p : G.Cell (n + 1)) : HEq (source (Cut.top n) G p) (G.source p) := by
+  induction n generalizing G with
+  | zero => rfl
+  | succ n ih => exact ih G.shift p
+
+theorem CutBoundary.target_top (G : GlobularSet.{u}) {n : Nat}
+    (p : G.Cell (n + 1)) : HEq (target (Cut.top n) G p) (G.target p) := by
+  induction n generalizing G with
+  | zero => rfl
+  | succ n ih => exact ih G.shift p
+
+/-- Dimension transport for existing globular cells; no cells are adjoined. -/
+def CutBoundary.castCell (G : GlobularSet.{u}) {n m : Nat} (h : n = m)
+    (p : G.Cell n) : G.Cell m := h ▸ p
+
+theorem CutBoundary.castCell_heq (G : GlobularSet.{u}) {n m : Nat} (h : n = m)
+    (p : G.Cell n) : HEq (castCell G h p) p := by cases h; rfl
+
 theorem Cut.below_iff_height {n : Nat} (c d : Cut n) : Below c d ↔ c.height < d.height := by
   constructor
   · intro h
@@ -5413,6 +5497,83 @@ structure CutModel where
   unitCompatible : operations.UnitCompatible
 
 namespace CutModel
+
+/-- The single adjacent identity used in the standard strict-category
+presentation, extracted from the highest cut. -/
+noncomputable def identity (C : CutModel.{u}) {n : Nat} (p : C.carrier.Cell n) :
+    C.carrier.Cell (n + 1) :=
+  C.operations.unit (Cut.top n) (CutBoundary.castCell C.carrier (Cut.height_top n).symm p)
+
+theorem source_identity (C : CutModel.{u}) {n : Nat} (p : C.carrier.Cell n) :
+    C.carrier.source (C.identity p) = p := by
+  exact eq_of_heq ((CutBoundary.source_top C.carrier (C.identity p)).symm.trans
+    ((heq_of_eq (C.operations.source_unit _ _)).trans (CutBoundary.castCell_heq _ _ p)))
+
+theorem target_identity (C : CutModel.{u}) {n : Nat} (p : C.carrier.Cell n) :
+    C.carrier.target (C.identity p) = p := by
+  exact eq_of_heq ((CutBoundary.target_top C.carrier (C.identity p)).symm.trans
+    ((heq_of_eq (C.operations.target_unit _ _)).trans (CutBoundary.castCell_heq _ _ p)))
+
+theorem unit_heq (C : CutModel.{u}) {n m : Nat} (h : n = m)
+    (c : Cut n) (d : Cut m) (hc : c.height = d.height)
+    (p : C.carrier.Cell c.height) (q : C.carrier.Cell d.height) (hp : HEq p q) :
+    HEq (C.operations.unit c p) (C.operations.unit d q) := by
+  cases h
+  have hd := Cut.height_injective hc
+  cases hd
+  cases eq_of_heq hp
+  rfl
+
+/-- Taking one adjacent identity after a cut identity gives precisely the
+identity at the same numerical cut one dimension higher. -/
+theorem identity_unit (C : CutModel.{u}) {n : Nat} (c : Cut n)
+    (p : C.carrier.Cell c.height) :
+    C.identity (C.operations.unit c p) = C.operations.unit c.up
+      (CutBoundary.castCell C.carrier c.height_up.symm p) := by
+  let w : Cut.Below c.up (Cut.top n) := (Cut.below_iff_height _ _).mpr
+    (by rw [c.height_up, Cut.height_top]; exact c.height_lt)
+  let q := CutBoundary.castCell C.carrier c.height_up.symm p
+  let r := CutBoundary.castCell C.carrier w.restrict_height.symm q
+  have hr : HEq r p := (CutBoundary.castCell_heq _ _ q).trans
+    (CutBoundary.castCell_heq _ _ p)
+  have hu := C.unit_heq (Cut.height_top n) w.restrict c
+    (w.restrict_height.trans c.height_up) r p hr
+  have ht : C.operations.unit w.restrict r =
+      CutBoundary.castCell C.carrier (Cut.height_top n).symm (C.operations.unit c p) :=
+    eq_of_heq (hu.trans (CutBoundary.castCell_heq _ _ _).symm)
+  have he := C.unitCompatible.unit w r q (CutBoundary.castCell_heq _ _ q)
+  rw [ht] at he
+  exact he
+
+noncomputable def identityIter (C : CutModel.{u}) {n : Nat} :
+    (k : Nat) → C.carrier.Cell n → C.carrier.Cell (n + k)
+  | 0, p => p
+  | k + 1, p => C.identity (C.identityIter k p)
+
+/-- The stored identity at an arbitrary cut is exactly repeated application
+of the adjacent identity, as required by the standard convention. -/
+theorem unit_identityIter (C : CutModel.{u}) {n : Nat} (k : Nat)
+    (c : Cut (n + k + 1)) (h : c.height = n)
+    (p : C.carrier.Cell c.height) (q : C.carrier.Cell n) (hp : HEq p q) :
+    C.operations.unit c p = C.identityIter (k + 1) q := by
+  induction k with
+  | zero =>
+    exact eq_of_heq (C.unit_heq rfl c (Cut.top n) (h.trans (Cut.height_top n).symm)
+      p (CutBoundary.castCell C.carrier (Cut.height_top n).symm q)
+      (hp.trans (CutBoundary.castCell_heq _ _ q).symm))
+  | succ k ih =>
+    let d : Cut (n + k + 1) := Cut.ofFin ⟨n, by omega⟩
+    have hd : d.height = n := Cut.height_ofFin _
+    let r := CutBoundary.castCell C.carrier hd.symm q
+    have hr : HEq r q := CutBoundary.castCell_heq _ _ q
+    calc
+      C.operations.unit c p = C.operations.unit d.up
+          (CutBoundary.castCell C.carrier d.height_up.symm r) :=
+        eq_of_heq (C.unit_heq rfl c d.up (h.trans (d.height_up.trans hd).symm)
+          p _ (hp.trans (hr.symm.trans (CutBoundary.castCell_heq _ _ r).symm)))
+      _ = C.identity (C.operations.unit d r) := (C.identity_unit d r).symm
+      _ = C.identity (C.identityIter (k + 1) q) := _root_.congrArg C.identity (ih d hd r hr)
+      _ = C.identityIter (k + 1 + 1) q := rfl
 
 structure Hom (C D : CutModel.{u}) where
   map : GlobularSet.Map C.carrier D.carrier
