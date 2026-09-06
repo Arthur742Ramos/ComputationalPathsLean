@@ -157,10 +157,15 @@ associativity and interchange inherited through every hom context, alongside
 both unit laws. `CutOperations.fold_append` proves the evaluator's chain fold
 respects concatenation; `evaluate_horizontal` applies this in every dimension
 and hom context. `flatten_cutCompose_bottom` specializes it to the actual
-flattening map. This establishes the zero-cut preservation case only.
-Preservation of higher-cut composition and identities, needed for the planned
-associativity proof, is still unfinished; strict associativity of the target's
-binary operations is not a substitute for multiplication associativity.
+flattening map. `CutOperations.fold_zipOver` now distributes higher-cut
+composition through the horizontal fold. Its label and subchain matching
+witnesses are supplied by `map_cut_composable` applied to the proved globular
+evaluator, not postulated by the concrete theorem. The empty-chain case uses
+`cutCompose_unit_idempotent`, proved for actual pasting identities and
+inherited through all hom contexts. `evaluate_cutCompose` and
+`flatten_cutCompose` therefore establish composition preservation at every
+cut and dimension. Preservation of identities is still needed for the planned
+associativity proof; this result alone is not multiplication associativity.
 
 Endpoint-indexed chain substitution now has proved left/right unit and
 associativity laws (`Chain.bind_single`, `Chain.bind_id`, `Chain.bind_assoc`).

@@ -395,6 +395,23 @@ example {A : Type} {n : Nat} (p : NativeTower.Cell A (n + 1)) :
 #print axioms Pasting.flatten_horizontal
 #print axioms Pasting.flatten_cutCompose_bottom
 
+#print axioms Pasting.cutCompose_unit_idempotent
+#print axioms Pasting.cutOperations_unitIdempotent
+#print axioms Pasting.CutOperations.UnitIdempotent.inContext
+#print axioms Pasting.CutOperations.horizontal_interchange
+#print axioms Pasting.CutOperations.fold_zipOver
+#print axioms Pasting.map_cut_composable
+#print axioms Pasting.evaluate_cutCompose
+#print axioms Pasting.flatten_cutCompose
+
+example {G : GlobularSet} {n : Nat} (c : Pasting.Cut n)
+    (p q : Pasting n (Pasting.globular G)) (h : Pasting.cutTarget c p = Pasting.cutSource c q)
+    (h' : Pasting.cutTarget c ((Pasting.flattenGlobular G).app (n := n) p) =
+      Pasting.cutSource c ((Pasting.flattenGlobular G).app (n := n) q)) :
+    (Pasting.flattenGlobular G).app (n := n) (Pasting.cutCompose c p q h) =
+      Pasting.cutCompose c ((Pasting.flattenGlobular G).app (n := n) p)
+        ((Pasting.flattenGlobular G).app (n := n) q) h' := Pasting.flatten_cutCompose c p q h h'
+
 example {G : GlobularSet} {n : Nat} (p : Pasting n G) :
     (Pasting.flattenGlobular G).app (n := n) (Pasting.map (Pasting.singletonGlobular G) p) = p :=
   Pasting.flatten_map_singleton p
