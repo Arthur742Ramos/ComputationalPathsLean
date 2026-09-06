@@ -150,3 +150,20 @@ example {G : GlobularSet} (p q r : Pasting 9 G)
 #print axioms Pasting.composeAt_left_unit
 #print axioms Pasting.composeAt_right_unit
 #print axioms Pasting.composeAt_assoc
+
+example {G : GlobularSet} (k n : Nat) (p : Pasting (n + k + 1) G) :
+    Pasting.sourceAt k n p = (Pasting.globular G).sourceIter (n := k) (n + 1)
+      (Pasting.reindex (by omega) p) := Pasting.sourceAt_eq_sourceIter k n p
+
+example {G : GlobularSet} (p : Pasting 9 G) :
+    Pasting.targetAt 4 4 p = (Pasting.globular G).targetIter (n := 4) 5 p :=
+  Pasting.targetAt_eq_targetIter 4 4 p
+
+#print axioms Pasting.sourceAt_step
+#print axioms Pasting.targetAt_step
+#print axioms Pasting.sourceAt_globular
+#print axioms Pasting.targetAt_globular
+#print axioms Pasting.sourceAt_lower
+#print axioms Pasting.targetAt_lower
+#print axioms Pasting.sourceAt_eq_sourceIter
+#print axioms Pasting.targetAt_eq_targetIter

@@ -612,6 +612,39 @@ theorem pack_heq {n m : Nat} {G : GlobularSet.{u}} {a b : G.Cell 0}
   cases hp
   rfl
 
+/-- Change only the arithmetic presentation of the dimension. -/
+def reindex {n m : Nat} {G : GlobularSet.{u}} (h : n = m) (p : Pasting n G) : Pasting m G :=
+  h ▸ p
+
+theorem reindex_trans {n m l : Nat} {G : GlobularSet.{u}} (h : n = m) (j : m = l)
+    (p : Pasting n G) : reindex j (reindex h p) = reindex (h.trans j) p := by
+  cases h
+  cases j
+  rfl
+
+theorem reindex_source {n m : Nat} {G : GlobularSet.{u}} (h : n = m)
+    (p : Pasting (n + 1) G) :
+    source (reindex (_root_.congrArg Nat.succ h) p) = reindex h (source p) := by
+  cases h
+  rfl
+
+theorem reindex_target {n m : Nat} {G : GlobularSet.{u}} (h : n = m)
+    (p : Pasting (n + 1) G) :
+    target (reindex (_root_.congrArg Nat.succ h) p) = reindex h (target p) := by
+  cases h
+  rfl
+
+theorem reindex_heq {n m : Nat} {G : GlobularSet.{u}} (h : n = m) (p : Pasting n G) :
+    HEq (reindex h p) p := by
+  cases h
+  rfl
+
+theorem reindex_pack {n m : Nat} {G : GlobularSet.{u}} {a b : G.Cell 0}
+    (h : n = m) (p : Horizontal n G a b) :
+    reindex (_root_.congrArg Nat.succ h) (pack p) = pack (p.map (fun e => reindex h e)) := by
+  cases h
+  exact _root_.congrArg pack (Chain.map_id p).symm
+
 theorem sourceZero_pack {n : Nat} {G : GlobularSet.{u}} {a b : G.Cell 0}
     (p : Horizontal n G a b) : (globular G).sourceZero (n := n + 1) (pack p) = a := by
   induction n with
@@ -870,6 +903,140 @@ theorem targetAt_adjacent (k : Nat) {G : GlobularSet.{u}} (p : Pasting (0 + k + 
     rcases p with ⟨a, b, p⟩
     exact pack_heq (Nat.zero_add k).symm _ _
       (Chain.map_heq (by rw [Nat.zero_add]) _ _ (fun {x y} e => ih e) p)
+
+theorem excess_succ_dimension (k n : Nat) : n + k + 2 = (n + 1) + k + 1 := by
+  rw [Nat.succ_add]
+
+/-- Increasing the dimension gap is exactly taking one more source in the
+original globular tower; reindex changes dimension arithmetic only. -/
+theorem sourceAt_step (k n : Nat) {G : GlobularSet.{u}} (p : Pasting (n + k + 2) G) :
+    sourceAt k (n + 1) (reindex (excess_succ_dimension k n) p) = sourceAt k n (source p) := by
+  induction k generalizing G with
+  | zero => rcases p with ⟨a, b, p⟩; rfl
+  | succ k ih =>
+    rcases p with ⟨a, b, p⟩
+    change sourceAt (k + 1) (n + 1)
+      (reindex (_root_.congrArg Nat.succ (excess_succ_dimension k n)) (pack p)) = _
+    rw [reindex_pack]
+    change pack ((p.map (fun e => reindex (excess_succ_dimension k n) e)).map
+      (fun e => sourceAt k (n + 1) e)) =
+      pack ((p.map (fun e => source e)).map (fun e => sourceAt k n e))
+    apply _root_.congrArg pack
+    simp only [Chain.map_map]
+    exact Chain.map_congr _ _ (fun e => ih e) p
+
+theorem targetAt_step (k n : Nat) {G : GlobularSet.{u}} (p : Pasting (n + k + 2) G) :
+    targetAt k (n + 1) (reindex (excess_succ_dimension k n) p) = targetAt k n (target p) := by
+  induction k generalizing G with
+  | zero => rcases p with ⟨a, b, p⟩; rfl
+  | succ k ih =>
+    rcases p with ⟨a, b, p⟩
+    change targetAt (k + 1) (n + 1)
+      (reindex (_root_.congrArg Nat.succ (excess_succ_dimension k n)) (pack p)) = _
+    rw [reindex_pack]
+    change pack ((p.map (fun e => reindex (excess_succ_dimension k n) e)).map
+      (fun e => targetAt k (n + 1) e)) =
+      pack ((p.map (fun e => target e)).map (fun e => targetAt k n e))
+    apply _root_.congrArg pack
+    simp only [Chain.map_map]
+    exact Chain.map_congr _ _ (fun e => ih e) p
+
+theorem sourceAt_globular (k n : Nat) {G : GlobularSet.{u}} (p : Pasting (n + k + 2) G) :
+    sourceAt k n (source p) = sourceAt k n (target p) := by
+  induction k generalizing G with
+  | zero => rcases p with ⟨a, b, p⟩; rfl
+  | succ k ih =>
+    rcases p with ⟨a, b, p⟩
+    apply _root_.congrArg pack
+    simp only [Chain.map_map]
+    exact Chain.map_congr _ _ (fun e => ih e) p
+
+theorem targetAt_globular (k n : Nat) {G : GlobularSet.{u}} (p : Pasting (n + k + 2) G) :
+    targetAt k n (source p) = targetAt k n (target p) := by
+  induction k generalizing G with
+  | zero => rcases p with ⟨a, b, p⟩; rfl
+  | succ k ih =>
+    rcases p with ⟨a, b, p⟩
+    apply _root_.congrArg pack
+    simp only [Chain.map_map]
+    exact Chain.map_congr _ _ (fun e => ih e) p
+
+theorem sourceAt_lower (k n : Nat) {G : GlobularSet.{u}} (p : Pasting (n + k + 2) G) :
+    source (sourceAt (k + 1) n p) =
+      sourceAt k (n + 1) (reindex (excess_succ_dimension k n) p) := by
+  induction k generalizing G with
+  | zero => rcases p with ⟨a, b, p⟩; rfl
+  | succ k ih =>
+    rcases p with ⟨a, b, p⟩
+    change _ = sourceAt (k + 1) (n + 1)
+      (reindex (_root_.congrArg Nat.succ (excess_succ_dimension k n)) (pack p))
+    rw [reindex_pack]
+    apply _root_.congrArg pack
+    simp only [Chain.map_map]
+    exact Chain.map_congr _ _ (fun e => ih e) p
+
+theorem targetAt_lower (k n : Nat) {G : GlobularSet.{u}} (p : Pasting (n + k + 2) G) :
+    target (targetAt (k + 1) n p) =
+      targetAt k (n + 1) (reindex (excess_succ_dimension k n) p) := by
+  induction k generalizing G with
+  | zero => rcases p with ⟨a, b, p⟩; rfl
+  | succ k ih =>
+    rcases p with ⟨a, b, p⟩
+    change _ = targetAt (k + 1) (n + 1)
+      (reindex (_root_.congrArg Nat.succ (excess_succ_dimension k n)) (pack p))
+    rw [reindex_pack]
+    apply _root_.congrArg pack
+    simp only [Chain.map_map]
+    exact Chain.map_congr _ _ (fun e => ih e) p
+
+/-- Direct identification with the existing tower's iterated source. -/
+theorem sourceAt_eq_sourceIter (k n : Nat) {G : GlobularSet.{u}}
+    (p : Pasting (n + k + 1) G) :
+    sourceAt k n p = (globular G).sourceIter (n := k) (n + 1)
+      (reindex (by omega) p) := by
+  induction n with
+  | zero =>
+    change sourceAt k 0 p = source (reindex (_root_.congrArg Nat.succ (Nat.zero_add k)) p)
+    rw [reindex_source (Nat.zero_add k)]
+    exact eq_of_heq ((sourceAt_adjacent k p).trans (reindex_heq (Nat.zero_add k) (source p)).symm)
+  | succ n ih =>
+    let q := reindex (excess_succ_dimension k n).symm p
+    have hs := sourceAt_step k n q
+    have hc : reindex (excess_succ_dimension k n) q = p := by
+      dsimp [q]
+      rw [reindex_trans]
+      rfl
+    rw [hc] at hs
+    refine hs.trans ((ih (source q)).trans ?_)
+    change (globular G).sourceIter (n := k) (n + 1) (reindex _ (source q)) =
+      (globular G).sourceIter (n := k) (n + 1) (source (reindex _ p))
+    apply _root_.congrArg ((globular G).sourceIter (n := k) (n + 1))
+    dsimp [q]
+    rw [reindex_source (by omega), reindex_trans, reindex_source (by omega)]
+
+theorem targetAt_eq_targetIter (k n : Nat) {G : GlobularSet.{u}}
+    (p : Pasting (n + k + 1) G) :
+    targetAt k n p = (globular G).targetIter (n := k) (n + 1)
+      (reindex (by omega) p) := by
+  induction n with
+  | zero =>
+    change targetAt k 0 p = target (reindex (_root_.congrArg Nat.succ (Nat.zero_add k)) p)
+    rw [reindex_target (Nat.zero_add k)]
+    exact eq_of_heq ((targetAt_adjacent k p).trans (reindex_heq (Nat.zero_add k) (target p)).symm)
+  | succ n ih =>
+    let q := reindex (excess_succ_dimension k n).symm p
+    have hs := targetAt_step k n q
+    have hc : reindex (excess_succ_dimension k n) q = p := by
+      dsimp [q]
+      rw [reindex_trans]
+      rfl
+    rw [hc] at hs
+    refine hs.trans ((ih (target q)).trans ?_)
+    change (globular G).targetIter (n := k) (n + 1) (reindex _ (target q)) =
+      (globular G).targetIter (n := k) (n + 1) (target (reindex _ p))
+    apply _root_.congrArg ((globular G).targetIter (n := k) (n + 1))
+    dsimp [q]
+    rw [reindex_target (by omega), reindex_trans, reindex_target (by omega)]
 
 /-- Composition at an arbitrary lower boundary. Recursion is on the actual
 boundary dimension, reducing to horizontal concatenation in each hom tower. -/

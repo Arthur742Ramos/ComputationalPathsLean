@@ -136,8 +136,13 @@ sets; at dimension gap one they agree with the existing adjacent boundary
 maps (`sourceAt_adjacent`, `targetAt_adjacent`). The general operation has
 proved source/target laws, identities (`identityAt`), both unit laws and
 associativity. The audit checks arbitrary parameters and a dimension-nine
-composition along dimension four. Compatibility between all truncation levels,
-identification of the general operations with the previous special cases,
+composition along dimension four. `sourceAt_eq_sourceIter` and
+`targetAt_eq_targetIter` now identify the truncations directly with the existing
+globular tower's iterated source and target, for arbitrary parameters. The
+arithmetic transport `reindex` changes only the dimension expression, never the
+diagram. One-step recursion, globularity and consecutive-lower-boundary laws
+are also checked. Identification of the general composition/identity operations
+with the previous special cases, their compatibility across truncation levels,
 and interchange between every pair of distinct composition dimensions still
 require proofs before claiming a free strict omega-category or its monad.
 
