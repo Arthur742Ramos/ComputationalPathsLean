@@ -361,9 +361,16 @@ with the singleton and flattening maps of the concrete pasting monad.
 `operad_left_unit` and `operad_right_unit` now prove the two application-level
 unit laws. Each checks operation equality using the actual `MonObj` unit law
 and input equality using the corresponding singleton/flattening law, so no
-input labels are discarded. Application-level associativity still needs
-verification before this is packaged as a monad or monad morphism. No concrete
-contractible monoid or native action is asserted by this conditional construction.
+input labels are discarded. `operad_assoc_operations` transports the monoid's
+associativity equation through the actual inverse associator; `operad_assoc`
+then proves application-level associativity, separately checking operations
+and complete input diagrams. `operadMonad` packages these proved maps and
+laws as a Mathlib monad. `operadArityMonadHom` is an actual monad morphism to
+`Pasting.pastingMonad`, using the verified arity transformation. Its arity
+naturality pullbacks are already covered by `arity_globular_pullback`.
+Cartesianness of the induced monad's unit and multiplication, and the concrete
+contractible operad/native action, remain to be established; the conditional
+monad construction does not assert those missing results.
 
 `evaluate` now evaluates labelled diagrams by dimension recursion into a
 target equipped with horizontal operations in all its iterated hom contexts

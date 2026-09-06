@@ -130,6 +130,20 @@ completion gate for the full weak omega-groupoid theorem. -/
 #print axioms GlobularCollection.operadMul_arity
 #print axioms GlobularCollection.operad_left_unit
 #print axioms GlobularCollection.operad_right_unit
+#print axioms GlobularCollection.operad_assoc_operations
+#print axioms GlobularCollection.operad_assoc
+#print axioms GlobularCollection.operadMonad
+#print axioms GlobularCollection.operadArityMonadHom
+
+noncomputable example (C : GlobularCollection.{u}) [CategoryTheory.MonObj C] :
+    CategoryTheory.Monad GlobularSet.{u} := C.operadMonad
+
+noncomputable example (C : GlobularCollection.{u}) [CategoryTheory.MonObj C] :
+    CategoryTheory.MonadHom C.operadMonad Pasting.pastingMonad := C.operadArityMonadHom
+
+example (C : GlobularCollection.{u}) [CategoryTheory.MonObj C] (G : GlobularSet.{u}) :
+    GlobularSet.Map.comp (C.operadMul G) (C.map (C.operadMul G)) =
+      GlobularSet.Map.comp (C.operadMul G) (C.operadMul (C.application G)) := C.operad_assoc G
 
 example (C : GlobularCollection.{u}) [CategoryTheory.MonObj C] (G : GlobularSet.{u}) :
     GlobularSet.Map.comp (C.operadMul G) (C.operadUnit (C.application G)) =

@@ -6350,6 +6350,99 @@ theorem operad_right_unit (C : GlobularCollection.{u}) [MonObj C] (G : GlobularS
         (_root_.congrArg (fun k => Pasting.map k p.val.2) (C.operadUnit_arity G)))).trans
           (Pasting.flatten_map_singleton p.val.2)
 
+theorem operad_assoc_operations (C : GlobularCollection.{u}) [MonObj C] :
+    Hom.comp (MonObj.mul (X := C))
+      (Hom.comp (Hom.substitute (MonObj.mul (X := C)) (Hom.id C)) (Hom.associateInv C C C)) =
+    Hom.comp (MonObj.mul (X := C)) (Hom.substitute (Hom.id C) (MonObj.mul (X := C))) := by
+  have h := _root_.congrArg (fun k => (associatorIso C C C).inv ≫ k) (MonObj.mul_assoc C)
+  change (associatorIso C C C).inv ≫
+      (Hom.substitute (MonObj.mul (X := C)) (Hom.id C) ≫ MonObj.mul (X := C)) =
+    (associatorIso C C C).inv ≫ ((associatorIso C C C).hom ≫
+      Hom.substitute (Hom.id C) (MonObj.mul (X := C)) ≫ MonObj.mul (X := C)) at h
+  change ((associatorIso C C C).inv ≫ Hom.substitute (MonObj.mul (X := C)) (Hom.id C)) ≫
+    MonObj.mul (X := C) = Hom.substitute (Hom.id C) (MonObj.mul (X := C)) ≫ MonObj.mul (X := C)
+  simpa only [← Category.assoc, Iso.inv_hom_id, Category.id_comp] using h
+
+/-- Associativity on complete labelled applications. The monoid equation
+controls operations; globular flattening associativity controls the labels. -/
+theorem operad_assoc (C : GlobularCollection.{u}) [MonObj C] (G : GlobularSet.{u}) :
+    GlobularSet.Map.comp (C.operadMul G) (C.map (C.operadMul G)) =
+      GlobularSet.Map.comp (C.operadMul G) (C.operadMul (C.application G)) := by
+  apply GlobularSet.Map.ext
+  intro n p
+  let r := (C.map (C.map (C.operation G))).app p
+  have ha := _root_.congrArg (fun k : Hom (C.substitute (C.substitute C)) C => k.operations.app r)
+    (C.operad_assoc_operations)
+  have ho : GlobularSet.Map.comp (C.operation G) (C.operadMul G) =
+      GlobularSet.Map.comp (MonObj.mul (X := C)).operations (C.map (C.operation G)) := by
+    apply GlobularSet.Map.ext
+    intro n p
+    rfl
+  have hr : (C.substitutionOperation C G).app ((C.map (C.operadMul G)).app p) =
+      (Hom.substitute (Hom.id C) (MonObj.mul (X := C))).operations.app r := by
+    apply Subtype.ext
+    exact Prod.ext rfl ((Pasting.map_comp (C.operadMul G) (C.operation G) p.val.2).trans
+      ((_root_.congrArg (fun k => Pasting.map k p.val.2) ho).trans
+        (Pasting.map_comp (C.map (C.operation G)) (MonObj.mul (X := C)).operations p.val.2).symm))
+  have hl : (C.substitutionOperation C G).app ((C.operadMul (C.application G)).app p) =
+      (Hom.substitute (MonObj.mul (X := C)) (Hom.id C)).operations.app
+        ((Hom.associateInv C C C).operations.app r) := by
+    apply Subtype.ext
+    refine Prod.ext ?_ ?_
+    · apply _root_.congrArg (MonObj.mul (X := C)).operations.app
+      apply Subtype.ext
+      refine Prod.ext rfl ?_
+      exact (Pasting.map_comp (C.map (C.operation G)) (C.operation C.operations) p.val.2).symm
+    · change Pasting.map (C.operation G) ((Pasting.flattenGlobular (C.application G)).app
+          (Pasting.map (C.inputs (C.application G)) p.val.2)) =
+        Pasting.map (GlobularSet.Map.id C.operations) ((Pasting.flattenGlobular C.operations).app
+          (Pasting.map (C.inputs C.operations) (Pasting.map (C.map (C.operation G)) p.val.2)))
+      refine (Pasting.flatten_natural (C.operation G) (Pasting.map (C.inputs (C.application G)) p.val.2)).trans ?_
+      refine Eq.trans ?_ (Pasting.map_id C.operations _).symm
+      apply _root_.congrArg (Pasting.flattenGlobular C.operations).app
+      exact (Pasting.map_comp (C.inputs (C.application G)) (Pasting.mapGlobular (C.operation G)) p.val.2).trans
+        (Pasting.map_comp (C.map (C.operation G)) (C.inputs C.operations) p.val.2).symm
+  apply Subtype.ext
+  refine Prod.ext ?_ ?_
+  · exact (_root_.congrArg (MonObj.mul (X := C)).operations.app hr).trans
+      (ha.symm.trans (_root_.congrArg (MonObj.mul (X := C)).operations.app hl).symm)
+  · symm
+    change (Pasting.flattenGlobular G).app (Pasting.map (C.inputs G)
+        ((Pasting.flattenGlobular (C.application G)).app (Pasting.map (C.inputs (C.application G)) p.val.2))) =
+      (Pasting.flattenGlobular G).app (Pasting.map (C.inputs G) (Pasting.map (C.operadMul G) p.val.2))
+    refine (_root_.congrArg (Pasting.flattenGlobular G).app
+      (Pasting.flatten_natural (C.inputs G) (Pasting.map (C.inputs (C.application G)) p.val.2))).trans ?_
+    refine (Pasting.flatten_assoc G (Pasting.map (Pasting.mapGlobular (C.inputs G))
+      (Pasting.map (C.inputs (C.application G)) p.val.2))).trans ?_
+    apply _root_.congrArg (Pasting.flattenGlobular G).app
+    exact ((Pasting.map_comp (Pasting.mapGlobular (C.inputs G)) (Pasting.flattenGlobular G)
+      (Pasting.map (C.inputs (C.application G)) p.val.2)).trans
+        (Pasting.map_comp (C.inputs (C.application G))
+          (GlobularSet.Map.comp (Pasting.flattenGlobular G) (Pasting.mapGlobular (C.inputs G))) p.val.2)).trans
+            ((_root_.congrArg (fun k => Pasting.map k p.val.2) (C.operadMul_arity G).symm).trans
+              (Pasting.map_comp (C.operadMul G) (C.inputs G) p.val.2).symm)
+
+/-- A collection monoid induces an actual lawful monad on globular sets.
+All laws are proved for the implemented labelled-operation maps. -/
+noncomputable def operadMonad (C : GlobularCollection.{u}) [MonObj C] : Monad GlobularSet.{u} where
+  toFunctor := C.functor
+  η := C.operadUnitTransformation
+  μ := C.operadMulTransformation
+  assoc := C.operad_assoc
+  left_unit := C.operad_left_unit
+  right_unit := C.operad_right_unit
+
+/-- Arity is a monad morphism to the concrete labelled-pasting monad.
+No quotient of operation or input data is introduced by this bridge. -/
+noncomputable def operadArityMonadHom (C : GlobularCollection.{u}) [MonObj C] :
+    MonadHom C.operadMonad Pasting.pastingMonad where
+  toNatTrans := C.arityTransformation
+  app_η := C.operadUnit_arity
+  app_μ G := by
+    apply GlobularSet.Map.ext
+    intro n p
+    rfl
+
 end GlobularCollection
 
 /-- Interpretation of composable path-labelled chains keeps the endpoints
