@@ -56,12 +56,15 @@ bridge, not just its axiom list. Imported but unused declarations do not count.
 This deliberately inspects bodies, not every constructor of an imported type. -/
 run_cmd do
   let env ← Lean.getEnv
-  for root in #[``CoherentPeak.fill, ``AssocHigher.allParallel, ``nativeAllParallel,
-      ``evalHigher, ``evalHigherRwEq] do
+  let roots := #[``CoherentPeak.fill, ``AssocSeq.terminalCoherence,
+    ``AssocHigher.normalizationSquare, ``AssocHigher.allParallel,
+    ``evalStep, ``evalTrace, ``nativePentagon, ``nativeInterchange,
+    ``nativeAllParallel, ``evalHigher, ``evalHigherRwEq]
+  for root in roots do
     for ax in ← Lean.collectAxioms root do
       unless #[`propext, `Quot.sound].contains ax do
         throwError "Unapproved axiom in {root}: {ax}"
-  let mut pending := #[``evalHigher]
+  let mut pending := roots
   let mut seen : Lean.NameSet := {}
   while !pending.isEmpty do
     let n := pending.back!
