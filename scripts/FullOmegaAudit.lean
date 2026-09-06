@@ -1,5 +1,6 @@
 import ComputationalPaths.Path.OmegaGroupoid.GlobularPasting
 import ComputationalPaths.Path.OmegaGroupoid.NativeGlobularTower
+import ComputationalPaths.Path.OmegaGroupoid.GlobularEndomorphism
 
 open ComputationalPaths
 open ComputationalPaths.Path
@@ -7,6 +8,26 @@ open ComputationalPaths.Path.OmegaFoundations
 
 /-! Incremental audit. This checks the foundations only; it is not yet a
 completion gate for the full weak omega-groupoid theorem. -/
+
+#print axioms Endomorphism.operations
+#print axioms Endomorphism.evaluation
+#print axioms Endomorphism.nativeChain_pair
+#print axioms Endomorphism.nativeContraction
+
+example (A : Type u) {n : Nat}
+    (p : GlobularSet.LiftingProblem (Endomorphism.arity (NativeTower.globular A)) n) :
+    (Endomorphism.arity (NativeTower.globular A)).app
+      ((Endomorphism.nativeContraction A).lift p).cell = p.arity :=
+  ((Endomorphism.nativeContraction A).lift p).arity_cell
+
+example (A : Type u) {n : Nat}
+    (p : ((Endomorphism.collection (NativeTower.globular A)).application
+      (NativeTower.globular A)).Cell (n + 1)) :
+    NativeTower.source ((Endomorphism.evaluation (NativeTower.globular A)).app p) =
+      (Endomorphism.evaluation (NativeTower.globular A)).app
+        (((Endomorphism.collection (NativeTower.globular A)).application
+          (NativeTower.globular A)).source p) :=
+  (Endomorphism.evaluation (NativeTower.globular A)).source_app p
 
 #print axioms NativeTower.InterpretationStage.extend
 #print axioms NativeTower.TwoSkeletonInterpretation.extend

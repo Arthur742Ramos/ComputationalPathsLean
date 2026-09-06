@@ -651,6 +651,20 @@ the audit checks that extending the identity two-skeleton recovers the
 identity map. This can support future action-law checks but supplies neither
 an operation collection nor substitution compatibility by itself.
 
+`GlobularEndomorphism.lean` constructs a concrete normalized endomorphism
+collection. Its operations recursively carry a pasting arity, parallel
+boundary operations, and an evaluation function on inputs of that arity
+which preserves both boundaries. Dimension zero is the identity operation.
+`Endomorphism.evaluation` is a globular map on the actual collection
+application. For the native tower, `nativeContraction` supplies all the
+specified lifts over arities, including dimension-one empty diagrams.
+Those one-dimensional lifts fold actual `Path.trans` traces; the higher
+lifts evaluate the given boundary operations and use `fillPositive`.
+This is a contractible collection with evaluation, **not yet a contractible
+operad or its algebra**. Operadic units, substitution and their laws remain
+required, as do comparisons with the specified native compositions and
+coherence certificates.
+
 Completion requires the mathematical target above to be instantiated, all
 proof dependencies audited, the relevant modules built, and preservation of
 the existing associativity artifact checked. Merely defining interfaces,
