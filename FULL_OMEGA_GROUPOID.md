@@ -92,8 +92,9 @@ a boundary-preserving globular map, natural in the original globular set
 (`singleton_natural`) and injective at every dimension (`singleton_injective`).
 The partial extractor `atom?` recovers original cells from these singleton
 diagrams; it rejects empty and composite chains. This provides the candidate
-unit without erasing original cells. Flattening, monad laws and the free
-strict-category universal property remain to be established.
+unit without erasing original cells. Flattening is now constructed as
+described below; the full monad laws and free strict-category universal
+property remain to be established.
 
 `evaluate` now evaluates labelled diagrams by dimension recursion into a
 target equipped with horizontal operations in all its iterated hom contexts
@@ -104,9 +105,9 @@ right-unit law. No associativity or algebra law is inferred from this alone.
 The actual pasting carrier has `horizontalComposition` at its root context;
 `packFibre`/`unpackFibre` identify its horizontal chains with its genuine hom
 cells in both directions. `horizontalComposition_fold` proves that this
-concrete fold is precisely chain substitution in every dimension. Extending
-these operations through every nested hom context using higher cuts, then
-proving the resulting multiplication's monad laws, remains unfinished.
+concrete fold is precisely chain substitution in every dimension. These
+operations now extend through every nested hom context using higher cuts;
+the full multiplication laws remain unfinished.
 
 The hom-restriction mechanism is now proved for all cuts on arbitrary
 globular sets. `CutBoundary` defines canonical boundaries by shifting the
@@ -122,16 +123,26 @@ diagram. The proof identifies the shifted pasting carrier with chains of
 hom-pasting labels and retains all those labels. `cutOperations` instantiates
 the interface with the actual `cutCompose` and `cutUnit`; source and target
 laws and both unit laws are checked for all cuts. These concrete operations
-therefore restrict through arbitrary hom depth. The interface currently
-includes cut-boundary laws only: adjacent-boundary compatibility still needs
-to be added before obtaining the full `RecursiveComposition` instance and
-monad multiplication.
+therefore restrict through arbitrary hom depth. `CutOperations.Compatible`
+now records adjacent-boundary laws, proved for the actual pasting operations
+by `cutOperations_compatible` and inherited through all hom contexts.
+`recursiveComposition` supplies the concrete evaluator target with no
+remaining composition-data hypothesis.
+
+`flattenGlobular` is now an actual globular map from doubly nested labelled
+pasting diagrams to ordinary labelled pasting diagrams, in every dimension.
+`flatten_singleton` proves the first multiplication unit equation on all
+diagrams, including empty and composite ones. Its proof uses the actual
+right-unit law inherited through all hom contexts; it does not erase labels
+or postulate an evaluator. Naturality of multiplication, its other unit
+equation, associativity, and the free universal property remain unfinished.
+Consequently this is not yet a proved monad or globular operad.
 
 Endpoint-indexed chain substitution now has proved left/right unit and
 associativity laws (`Chain.bind_single`, `Chain.bind_id`, `Chain.bind_assoc`).
 Its interpretation by actual computational paths respects substitution
 (`evalPathChain_bind`). These are ingredients for flattening nested diagrams,
-not a substitute for the missing globular monad multiplication.
+not a substitute for the full globular monad laws.
 
 Horizontal composition along the zero-dimensional boundary is now defined
 for diagrams in every positive dimension (`Pasting.horizontal`). Its exposed

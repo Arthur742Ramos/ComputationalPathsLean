@@ -354,6 +354,26 @@ example {A : Type} {n : Nat} (p : NativeTower.Cell A (n + 1)) :
 #print axioms Pasting.cutCompose_right_unit
 #print axioms Pasting.cutOperations
 
+#print axioms Pasting.source_cutCompose
+#print axioms Pasting.target_cutCompose
+#print axioms Pasting.source_cutUnit_reindex
+#print axioms Pasting.target_cutUnit_reindex
+#print axioms Pasting.cutOperations_compatible
+#print axioms Pasting.CutOperations.Compatible.hom
+#print axioms Pasting.CutOperations.RightUnital.hom
+#print axioms Pasting.recursiveComposition
+#print axioms Pasting.flattenGlobular
+#print axioms Pasting.flatten_singleton
+
+example (G : GlobularSet) {n : Nat} (p : Pasting (n + 1) (Pasting.globular G)) :
+    Pasting.source ((Pasting.flattenGlobular G).app (n := n + 1) p) =
+      (Pasting.flattenGlobular G).app (n := n) (Pasting.source p) :=
+  (Pasting.flattenGlobular G).source_app (n := n) p
+
+example (G : GlobularSet) {n : Nat} (p : Pasting n G) :
+    (Pasting.flattenGlobular G).app (Pasting.singleton (G := Pasting.globular G) p) = p :=
+  Pasting.flatten_singleton p
+
 example {G H : GlobularSet} (h : Pasting.HomContext (Pasting.globular G) H)
     {n : Nat} (c : Pasting.Cut n) (p q : H.Cell n)
     (hpq : Pasting.CutBoundary.target c H p = Pasting.CutBoundary.source c H q) :

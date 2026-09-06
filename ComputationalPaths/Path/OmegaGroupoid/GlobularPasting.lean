@@ -6,8 +6,9 @@ import Mathlib.CategoryTheory.Functor.Basic
 
 Objects label dimension zero. In dimension `n+1`, a diagram is a composable
 chain of `n`-diagrams in hom globular sets. The carrier and adjacent boundary
-maps are defined by genuine dimension recursion. This file does not yet
-construct monad multiplication or claim the free strict-category property.
+maps are defined by genuine dimension recursion. Candidate multiplication
+is an actual globular flattening map with one verified unit equation; the
+remaining monad laws and free strict-category property are not yet claimed.
 -/
 
 namespace ComputationalPaths.Path.OmegaFoundations
@@ -1744,6 +1745,17 @@ def Cut.at : (k n : Nat) → Cut (n + k + 1)
   | 0, _ => .bottom
   | k + 1, n => .lift (Cut.at k n)
 
+/-- The same composition axis one cell dimension higher. -/
+inductive Cut.Raise : {n : Nat} → Cut n → Cut (n + 1) → Prop where
+  | bottom {n : Nat} : Raise (bottom : Cut (n + 1)) (bottom : Cut (n + 2))
+  | lift {n : Nat} {c : Cut n} {d : Cut (n + 1)} : Raise c d → Raise (.lift c) (.lift d)
+
+theorem Cut.Raise.height_eq {n : Nat} {c : Cut n} {d : Cut (n + 1)} (h : Raise c d) :
+    c.height = d.height := by
+  induction h with
+  | bottom => rfl
+  | lift _ ih => exact _root_.congrArg Nat.succ ih
+
 namespace CutBoundary
 
 /-- A globular chain of globular labels. The shifted pasting carrier is
@@ -1886,6 +1898,26 @@ structure CutOperations (G : GlobularSet.{u}) where
 
 namespace CutOperations
 
+def RightUnital {G : GlobularSet.{u}} (C : CutOperations G) : Prop :=
+  ∀ {n} (c : Cut n) (p : G.Cell n),
+    C.compose c p (C.unit c (CutBoundary.target c G p))
+      (C.source_unit c (CutBoundary.target c G p)).symm = p
+
+/-- Adjacent-boundary compatibility is separate from cut-boundary laws.
+Matching witnesses are explicit; no composability or coherence is assumed
+merely because two expressions have the same normal form. -/
+structure Compatible {G : GlobularSet.{u}} (C : CutOperations G) : Prop where
+  source_compose : ∀ {n} {c : Cut n} {d : Cut (n + 1)} (_ : Cut.Raise c d)
+    (p q : G.Cell (n + 1)) h h',
+    G.source (C.compose d p q h) = C.compose c (G.source p) (G.source q) h'
+  target_compose : ∀ {n} {c : Cut n} {d : Cut (n + 1)} (_ : Cut.Raise c d)
+    (p q : G.Cell (n + 1)) h h',
+    G.target (C.compose d p q h) = C.compose c (G.target p) (G.target q) h'
+  source_unit : ∀ {n} {c : Cut n} {d : Cut (n + 1)} (_ : Cut.Raise c d)
+    (p : G.Cell c.height) (q : G.Cell d.height), HEq p q → G.source (C.unit d q) = C.unit c p
+  target_unit : ∀ {n} {c : Cut n} {d : Cut (n + 1)} (_ : Cut.Raise c d)
+    (p : G.Cell c.height) (q : G.Cell d.height), HEq p q → G.target (C.unit d q) = C.unit c p
+
 /-- All cuts restrict to each actual hom globular set. Composition is the
 parent operation one cut higher; no new cells or choices are introduced. -/
 def hom {G : GlobularSet.{u}} (C : CutOperations G) (a b : G.Cell 0) : CutOperations (G.hom a b) where
@@ -1938,6 +1970,32 @@ theorem hom_compose_val {G : GlobularSet.{u}} (C : CutOperations G) {a b : G.Cel
 theorem hom_unit_val {G : GlobularSet.{u}} (C : CutOperations G) {a b : G.Cell 0}
     {n : Nat} (c : Cut n) (p : (G.hom a b).Cell c.height) :
     ((C.hom a b).unit c p).val = C.unit (.lift c) p.val := rfl
+
+theorem hom_val_heq {G : GlobularSet.{u}} {a b : G.Cell 0} {n m : Nat}
+    (p : (G.hom a b).Cell n) (q : (G.hom a b).Cell m) (hn : n = m) (hp : HEq p q) :
+    HEq p.val q.val := by
+  cases hn
+  cases hp
+  rfl
+
+/-- Boundary compatibility, as well as the operations themselves, survives
+restriction to the genuine hom globular sets. -/
+theorem Compatible.hom {G : GlobularSet.{u}} {C : CutOperations G}
+    (L : Compatible C) (a b : G.Cell 0) : Compatible (C.hom a b) where
+  source_compose w p q h h' := Subtype.ext (L.source_compose w.lift p.val q.val _ _)
+  target_compose w p q h h' := Subtype.ext (L.target_compose w.lift p.val q.val _ _)
+  source_unit w p q hp := Subtype.ext
+    (L.source_unit w.lift p.val q.val (hom_val_heq p q w.height_eq hp))
+  target_unit w p q hp := Subtype.ext
+    (L.target_unit w.lift p.val q.val (hom_val_heq p q w.height_eq hp))
+
+theorem RightUnital.hom {G : GlobularSet.{u}} {C : CutOperations G}
+    (R : C.RightUnital) (a b : G.Cell 0) : (C.hom a b).RightUnital := by
+  intro n c p
+  apply Subtype.ext
+  change C.compose (.lift c) p.val (C.unit (.lift c) (CutBoundary.target c (G.hom a b) p).val) _ = p.val
+  simp only [← CutBoundary.target_hom]
+  exact R (.lift c) p.val
 
 end CutOperations
 
@@ -2110,6 +2168,106 @@ noncomputable def cutOperations (G : GlobularSet.{u}) : CutOperations (globular 
   unit c p := cutUnit (G := G) c p
   source_unit c p := (canonical_source_eq_cutSource c (cutUnit c p)).trans (cutSource_cutUnit c p)
   target_unit c p := (canonical_target_eq_cutTarget c (cutUnit c p)).trans (cutTarget_cutUnit c p)
+
+theorem source_cutCompose {n : Nat} {c : Cut n} {d : Cut (n + 1)} (w : Cut.Raise c d)
+    {G : GlobularSet.{u}} (p q : Pasting (n + 1) G)
+    (h : cutTarget d p = cutSource d q)
+    (h' : cutTarget c (source p) = cutSource c (source q)) :
+    source (cutCompose d p q h) = cutCompose c (source p) (source q) h' := by
+  induction w generalizing G with
+  | bottom =>
+    rcases p with ⟨a, b, p⟩
+    rcases q with ⟨c, d, q⟩
+    change b = c at h
+    cases h
+    exact _root_.congrArg pack (Chain.map_append _ p q)
+  | @lift n c d w ih =>
+    rcases p with ⟨a, b, p⟩
+    rcases q with ⟨e, f, q⟩
+    have ha : a = e := _root_.congrArg Sigma.fst h
+    have hb : b = f := _root_.congrArg (fun z => z.2.1) h
+    cases ha
+    cases hb
+    have hp : p.map (fun e => cutTarget d e) = q.map (fun e => cutSource d e) :=
+      eq_of_heq (Sigma.mk.inj (eq_of_heq (Sigma.mk.inj h).2)).2
+    have hp' : (p.map (fun e => source e)).map (fun e => cutTarget c e) =
+        (q.map (fun e => source e)).map (fun e => cutSource c e) :=
+      eq_of_heq (Sigma.mk.inj (eq_of_heq (Sigma.mk.inj h').2)).2
+    exact _root_.congrArg pack (Chain.map_zipOver _ _ _ _ _ _ _ (fun e f he hf => ih e f he hf) p q hp hp')
+
+theorem target_cutCompose {n : Nat} {c : Cut n} {d : Cut (n + 1)} (w : Cut.Raise c d)
+    {G : GlobularSet.{u}} (p q : Pasting (n + 1) G)
+    (h : cutTarget d p = cutSource d q)
+    (h' : cutTarget c (target p) = cutSource c (target q)) :
+    target (cutCompose d p q h) = cutCompose c (target p) (target q) h' := by
+  induction w generalizing G with
+  | bottom =>
+    rcases p with ⟨a, b, p⟩
+    rcases q with ⟨c, d, q⟩
+    change b = c at h
+    cases h
+    exact _root_.congrArg pack (Chain.map_append _ p q)
+  | @lift n c d w ih =>
+    rcases p with ⟨a, b, p⟩
+    rcases q with ⟨e, f, q⟩
+    have ha : a = e := _root_.congrArg Sigma.fst h
+    have hb : b = f := _root_.congrArg (fun z => z.2.1) h
+    cases ha
+    cases hb
+    have hp : p.map (fun e => cutTarget d e) = q.map (fun e => cutSource d e) :=
+      eq_of_heq (Sigma.mk.inj (eq_of_heq (Sigma.mk.inj h).2)).2
+    have hp' : (p.map (fun e => target e)).map (fun e => cutTarget c e) =
+        (q.map (fun e => target e)).map (fun e => cutSource c e) :=
+      eq_of_heq (Sigma.mk.inj (eq_of_heq (Sigma.mk.inj h').2)).2
+    exact _root_.congrArg pack (Chain.map_zipOver _ _ _ _ _ _ _ (fun e f he hf => ih e f he hf) p q hp hp')
+
+theorem source_cutUnit_reindex {n : Nat} {c : Cut n} {d : Cut (n + 1)} (w : Cut.Raise c d)
+    {G : GlobularSet.{u}} (p : Pasting c.height G) :
+    source (cutUnit d (reindex w.height_eq p)) = cutUnit c p := by
+  induction w generalizing G with
+  | bottom => rfl
+  | @lift n c d w ih =>
+    rcases p with ⟨a, b, p⟩
+    change source (cutUnit (.lift d) (reindex (_root_.congrArg Nat.succ w.height_eq) (pack p))) = _
+    refine (_root_.congrArg (fun z : Pasting (d.height + 1) G => source (cutUnit (.lift d) z))
+      (reindex_pack w.height_eq p)).trans ?_
+    change pack (((p.map (fun e => reindex w.height_eq e)).map (fun e => cutUnit d e)).map
+      (fun e => source e)) = pack (p.map (fun e => cutUnit c e))
+    exact _root_.congrArg pack ((Chain.map_map _ _ _).trans
+      ((Chain.map_map _ _ p).trans (Chain.map_congr _ _ (fun e => ih e) p)))
+
+theorem target_cutUnit_reindex {n : Nat} {c : Cut n} {d : Cut (n + 1)} (w : Cut.Raise c d)
+    {G : GlobularSet.{u}} (p : Pasting c.height G) :
+    target (cutUnit d (reindex w.height_eq p)) = cutUnit c p := by
+  induction w generalizing G with
+  | bottom => rfl
+  | @lift n c d w ih =>
+    rcases p with ⟨a, b, p⟩
+    change target (cutUnit (.lift d) (reindex (_root_.congrArg Nat.succ w.height_eq) (pack p))) = _
+    refine (_root_.congrArg (fun z : Pasting (d.height + 1) G => target (cutUnit (.lift d) z))
+      (reindex_pack w.height_eq p)).trans ?_
+    change pack (((p.map (fun e => reindex w.height_eq e)).map (fun e => cutUnit d e)).map
+      (fun e => target e)) = pack (p.map (fun e => cutUnit c e))
+    exact _root_.congrArg pack ((Chain.map_map _ _ _).trans
+      ((Chain.map_map _ _ p).trans (Chain.map_congr _ _ (fun e => ih e) p)))
+
+/-- All adjacent boundaries commute with the concrete cut operations. -/
+theorem cutOperations_compatible (G : GlobularSet.{u}) : CutOperations.Compatible (cutOperations G) where
+  source_compose w p q h h' := source_cutCompose w p q _ _
+  target_compose w p q h h' := target_cutCompose w p q _ _
+  source_unit w p q hp := by
+    have hq : reindex w.height_eq p = q := eq_of_heq ((reindex_heq w.height_eq p).trans hp)
+    exact (_root_.congrArg (fun z => source (cutUnit _ z)) hq.symm).trans (source_cutUnit_reindex w p)
+  target_unit w p q hp := by
+    have hq : reindex w.height_eq p = q := eq_of_heq ((reindex_heq w.height_eq p).trans hp)
+    exact (_root_.congrArg (fun z => target (cutUnit _ z)) hq.symm).trans (target_cutUnit_reindex w p)
+
+theorem cutOperations_rightUnital (G : GlobularSet.{u}) : (cutOperations G).RightUnital := by
+  intro n c p
+  change Pasting n G at p
+  change cutCompose c p (cutUnit c (CutBoundary.target c (globular G) p)) _ = p
+  simp only [canonical_target_eq_cutTarget]
+  exact cutCompose_right_unit c p
 
 theorem cutSource_at (k n : Nat) {G : GlobularSet.{u}} (p : Pasting (n + k + 1) G) :
     HEq (cutSource (Cut.at k n) p) (sourceAt k n p) := by
@@ -2345,6 +2503,37 @@ structure HorizontalComposition (H : GlobularSet.{u}) where
   target_mul : ∀ {n a b c} (p : (H.hom a b).Cell (n + 1)) (q : (H.hom b c).Cell (n + 1)),
     (H.hom a c).target (mul p q) = mul ((H.hom a b).target p) ((H.hom b c).target q)
 
+def CutOperations.horizontalUnit {H : GlobularSet.{u}} (C : CutOperations H)
+    (n : Nat) (a : H.Cell 0) : (H.hom a a).Cell n :=
+  ⟨C.unit (.bottom : Cut (n + 1)) a,
+    C.source_unit (.bottom : Cut (n + 1)) a, C.target_unit (.bottom : Cut (n + 1)) a⟩
+
+def CutOperations.horizontalMul {H : GlobularSet.{u}} (C : CutOperations H)
+    {n : Nat} {a b c : H.Cell 0} (p : (H.hom a b).Cell n) (q : (H.hom b c).Cell n) :
+    (H.hom a c).Cell n :=
+  ⟨C.compose (.bottom : Cut (n + 1)) p.val q.val (p.property.2.trans q.property.1.symm),
+    (C.source_compose (.bottom : Cut (n + 1)) p.val q.val _).trans p.property.1,
+    (C.target_compose (.bottom : Cut (n + 1)) p.val q.val _).trans q.property.2⟩
+
+/-- Compatible cut operations give the horizontal operations used by the
+evaluator, on the genuine hom fibres of the same globular set. -/
+def CutOperations.horizontal {H : GlobularSet.{u}} (C : CutOperations H) (L : C.Compatible) :
+    HorizontalComposition H where
+  unit := C.horizontalUnit
+  mul := C.horizontalMul
+  source_unit n a := Subtype.ext (L.source_unit (Cut.Raise.bottom (n := n)) a a (HEq.rfl))
+  target_unit n a := Subtype.ext (L.target_unit (Cut.Raise.bottom (n := n)) a a (HEq.rfl))
+  source_mul {n a b c} p q := Subtype.ext (L.source_compose (Cut.Raise.bottom (n := n)) p.val q.val _ _)
+  target_mul {n a b c} p q := Subtype.ext (L.target_compose (Cut.Raise.bottom (n := n)) p.val q.val _ _)
+
+theorem CutOperations.horizontal_right_unit {H : GlobularSet.{u}} {C : CutOperations H}
+    (L : C.Compatible) (R : C.RightUnital) {n : Nat} {a b : H.Cell 0} (p : (H.hom a b).Cell n) :
+    (C.horizontal L).mul p ((C.horizontal L).unit n b) = p := by
+  apply Subtype.ext
+  change C.compose (.bottom : Cut (n + 1)) p.val (C.unit (.bottom : Cut (n + 1)) b) _ = p.val
+  have h : CutBoundary.target (.bottom : Cut (n + 1)) H p.val = b := p.property.2
+  simpa only [h] using R (.bottom : Cut (n + 1)) p.val
+
 /-- All finite iterated hom contexts of a fixed globular set. This allows a
 single evaluation recursion to descend into the actual target hom sets. -/
 inductive HomContext (H : GlobularSet.{u}) : GlobularSet.{u} → Type (u + 1) where
@@ -2362,8 +2551,31 @@ theorem CutOperations.inContext_hom {H K : GlobularSet.{u}} (C : CutOperations H
     (h : HomContext H K) (a b : K.Cell 0) :
     C.inContext (h.hom a b) = (C.inContext h).hom a b := rfl
 
+theorem CutOperations.Compatible.inContext {H K : GlobularSet.{u}} {C : CutOperations H}
+    (L : C.Compatible) (h : HomContext H K) : (C.inContext h).Compatible := by
+  induction h with
+  | root => exact L
+  | hom h a b ih => exact ih.hom a b
+
+theorem CutOperations.RightUnital.inContext {H K : GlobularSet.{u}} {C : CutOperations H}
+    (R : C.RightUnital) (h : HomContext H K) : (C.inContext h).RightUnital := by
+  induction h with
+  | root => exact R
+  | hom h a b ih => exact ih.hom a b
+
 abbrev RecursiveComposition (H : GlobularSet.{u}) :=
   ∀ {K : GlobularSet.{u}}, HomContext H K → HorizontalComposition K
+
+/-- The concrete pasting carrier now supplies operations in every iterated
+hom context, including the boundary equations needed by evaluation. -/
+noncomputable def recursiveComposition (G : GlobularSet.{u}) : RecursiveComposition (globular G) :=
+  fun h => ((cutOperations G).inContext h).horizontal ((cutOperations_compatible G).inContext h)
+
+theorem recursiveComposition_right_unit (G : GlobularSet.{u}) {K : GlobularSet.{u}}
+    (h : HomContext (globular G) K) {n : Nat} {a b : K.Cell 0} (p : (K.hom a b).Cell n) :
+    (recursiveComposition G h).mul p ((recursiveComposition G h).unit n b) = p :=
+  CutOperations.horizontal_right_unit ((cutOperations_compatible G).inContext h)
+    (CutOperations.RightUnital.inContext (cutOperations_rightUnital G) h) p
 
 namespace HorizontalComposition
 
@@ -2389,8 +2601,8 @@ theorem target_fold {H : GlobularSet.{u}} (C : HorizontalComposition H)
 end HorizontalComposition
 
 /-- Evaluate every labelled pasting cell by dimension recursion, using the
-target's operations in its actual iterated hom sets. A later instantiation
-with the strict pasting target supplies the candidate multiplication. -/
+target's operations in its actual iterated hom sets. The concrete pasting
+target instantiation below supplies candidate multiplication. -/
 def evaluate {H : GlobularSet.{u}} (C : RecursiveComposition H) :
     {n : Nat} → {G K : GlobularSet.{u}} → HomContext H K →
       GlobularSet.Map G K → Pasting n G → K.Cell n
@@ -2440,6 +2652,13 @@ def evaluateGlobular {H : GlobularSet.{u}} (C : RecursiveComposition H)
   source_app := source_evaluate C h f
   target_app := target_evaluate C h f
 
+/-- Flatten genuinely nested labelled pasting diagrams in every dimension.
+This is the candidate monad multiplication as an actual globular map;
+its naturality and monad equations still require separate proofs. -/
+noncomputable def flattenGlobular (G : GlobularSet.{u}) :
+    GlobularSet.Map (globular (globular G)) (globular G) :=
+  evaluateGlobular (recursiveComposition G) .root (GlobularSet.Map.id (globular G))
+
 /-- Evaluation extends the original labelling whenever each target hom
 context has a right unit. The labels are recovered exactly, not quotiented. -/
 theorem evaluate_singleton {H : GlobularSet.{u}} (C : RecursiveComposition H)
@@ -2456,6 +2675,14 @@ theorem evaluate_singleton {H : GlobularSet.{u}} (C : RecursiveComposition H)
         (f.hom _ _) (singleton d)) ((C h).unit n (f.app (G.targetZero c)))).val = _
     rw [ih, unitLaw]
     rfl
+
+/-- The first multiplication unit equation holds on every pasting diagram,
+retaining all labels and empty chains exactly. -/
+theorem flatten_singleton {G : GlobularSet.{u}} {n : Nat} (p : Pasting n G) :
+    (flattenGlobular G).app (singleton (G := globular G) p) = p :=
+  evaluate_singleton (recursiveComposition G)
+    (fun {K} h {n a b} p => recursiveComposition_right_unit G h (n := n) (a := a) (b := b) p)
+    .root (GlobularSet.Map.id (globular G)) p
 
 /-- Expose the existing horizontal chain as a cell of the genuine hom
 globular set of pasting diagrams. -/
