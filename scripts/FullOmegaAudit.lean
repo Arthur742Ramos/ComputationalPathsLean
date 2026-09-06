@@ -139,6 +139,36 @@ example (A : Type u) :
 #print axioms Pasting.CutModel.freeForget_monad
 #print axioms Pasting.Cut.finEquiv
 #print axioms Pasting.CutModel.unit_identityIter
+#print axioms Pasting.CutBoundary.source_eq_sourceIter
+#print axioms Pasting.CutBoundary.target_eq_targetIter
+#print axioms Pasting.CutModel.sourceIter_compose
+#print axioms Pasting.CutModel.targetIter_compose
+#print axioms Pasting.CutModel.identity_compose
+
+example (C : Pasting.CutModel) {n : Nat} (c : Pasting.Cut n) (k : Nat)
+    (p q : C.carrier.Cell (n + k))
+    (h : Pasting.CutBoundary.target (c.upIter k) C.carrier p =
+      Pasting.CutBoundary.source (c.upIter k) C.carrier q) :
+    C.carrier.sourceIter k (C.operations.compose (c.upIter k) p q h) =
+      C.operations.compose c (C.carrier.sourceIter k p) (C.carrier.sourceIter k q)
+        (Pasting.CutBoundary.sourceIter_matching C.carrier c k p q h) :=
+  C.sourceIter_compose c k p q h _
+
+example (C : Pasting.CutModel) {n : Nat} (c : Pasting.Cut n) (k : Nat)
+    (p q : C.carrier.Cell (n + k))
+    (h : Pasting.CutBoundary.target (c.upIter k) C.carrier p =
+      Pasting.CutBoundary.source (c.upIter k) C.carrier q) :
+    C.carrier.targetIter k (C.operations.compose (c.upIter k) p q h) =
+      C.operations.compose c (C.carrier.targetIter k p) (C.carrier.targetIter k q)
+        (Pasting.CutBoundary.targetIter_matching C.carrier c k p q h) :=
+  C.targetIter_compose c k p q h _
+
+example (C : Pasting.CutModel) {n : Nat} (c : Pasting.Cut n)
+    (p q : C.carrier.Cell n)
+    (h : Pasting.CutBoundary.target c C.carrier p = Pasting.CutBoundary.source c C.carrier q) :
+    C.identity (C.operations.compose c p q h) =
+      C.operations.compose c.up (C.identity p) (C.identity q) (C.identity_matching c p q h) :=
+  C.identity_compose c p q h _
 
 example (n : Nat) : Pasting.Cut n ≃ Fin n := Pasting.Cut.finEquiv n
 example (C : Pasting.CutModel) {n : Nat} (p : C.carrier.Cell n) :

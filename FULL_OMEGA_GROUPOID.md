@@ -785,3 +785,15 @@ second. For a non-endomorphism these displayed unit composites are not
 generally defined. We retain the type-correct convention: source identity
 on the left, target identity on the right. The discrepancy was checked on
 the rendered source pages, not inferred solely from extracted text.
+
+The forward boundary and nullary-exchange comparison now has explicit
+all-dimensional proofs. `source_eq_sourceIter` and `target_eq_targetIter`
+identify the structural cut boundaries with ordinary repeated adjacent
+boundaries. `sourceIter_compose` and `targetIter_compose` prove preservation
+of composition by every boundary above the composition axis, while the
+matching lemmas derive the required boundary composability from the original
+inputs. `identity_compose` proves adjacent-identity preservation of every
+lower composition, with `identity_matching` deriving its composability.
+The audit instantiates these laws without an extra matching assumption.
+These results discharge those forward law translations; packaging the
+complete standard presentation and proving its converse remain open.

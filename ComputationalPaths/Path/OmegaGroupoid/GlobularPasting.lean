@@ -3782,6 +3782,117 @@ def CutBoundary.castCell (G : GlobularSet.{u}) {n m : Nat} (h : n = m)
 theorem CutBoundary.castCell_heq (G : GlobularSet.{u}) {n m : Nat} (h : n = m)
     (p : G.Cell n) : HEq (castCell G h p) p := by cases h; rfl
 
+theorem CutBoundary.source_heq (G : GlobularSet.{u}) {n m : Nat} (h : n = m)
+    (c : Cut n) (d : Cut m) (hc : c.height = d.height)
+    (p : G.Cell n) (q : G.Cell m) (hp : HEq p q) :
+    HEq (source c G p) (source d G q) := by
+  cases h
+  cases Cut.height_injective hc
+  cases eq_of_heq hp
+  rfl
+
+theorem CutBoundary.target_heq (G : GlobularSet.{u}) {n m : Nat} (h : n = m)
+    (c : Cut n) (d : Cut m) (hc : c.height = d.height)
+    (p : G.Cell n) (q : G.Cell m) (hp : HEq p q) :
+    HEq (target c G p) (target d G q) := by
+  cases h
+  cases Cut.height_injective hc
+  cases eq_of_heq hp
+  rfl
+
+theorem CutBoundary.source_up_source (G : GlobularSet.{u}) {n : Nat} (c : Cut n)
+    (p : G.Cell (n + 1)) : HEq (source c G (G.source p)) (source c.up G p) := by
+  induction c generalizing G with
+  | bottom => rfl
+  | lift c ih => exact ih G.shift p
+
+theorem CutBoundary.target_up_target (G : GlobularSet.{u}) {n : Nat} (c : Cut n)
+    (p : G.Cell (n + 1)) : HEq (target c G (G.target p)) (target c.up G p) := by
+  induction c generalizing G with
+  | bottom => rfl
+  | lift c ih => exact ih G.shift p
+
+theorem CutBoundary.source_up_target (G : GlobularSet.{u}) {n : Nat} (c : Cut n)
+    (p : G.Cell (n + 1)) : HEq (source c G (G.target p)) (source c.up G p) := by
+  induction c generalizing G with
+  | bottom => exact heq_of_eq (G.sourceZero_globular p).symm
+  | lift c ih => exact ih G.shift p
+
+theorem CutBoundary.target_up_source (G : GlobularSet.{u}) {n : Nat} (c : Cut n)
+    (p : G.Cell (n + 1)) : HEq (target c G (G.source p)) (target c.up G p) := by
+  induction c generalizing G with
+  | bottom => exact heq_of_eq (G.targetZero_globular p)
+  | lift c ih => exact ih G.shift p
+
+theorem CutBoundary.source_matching (G : GlobularSet.{u}) {n : Nat} (c : Cut n)
+    (p q : G.Cell (n + 1)) (h : target c.up G p = source c.up G q) :
+    target c G (G.source p) = source c G (G.source q) :=
+  eq_of_heq ((target_up_source G c p).trans
+    ((heq_of_eq h).trans (source_up_source G c q).symm))
+
+theorem CutBoundary.target_matching (G : GlobularSet.{u}) {n : Nat} (c : Cut n)
+    (p q : G.Cell (n + 1)) (h : target c.up G p = source c.up G q) :
+    target c G (G.target p) = source c G (G.target q) :=
+  eq_of_heq ((target_up_target G c p).trans
+    ((heq_of_eq h).trans (source_up_target G c q).symm))
+
+/-- Raise cell dimension any number of times without changing the axis. -/
+def Cut.upIter {n : Nat} : (k : Nat) → Cut n → Cut (n + k)
+  | 0, c => c
+  | k + 1, c => (c.upIter k).up
+
+theorem Cut.height_upIter {n : Nat} (c : Cut n) (k : Nat) :
+    (c.upIter k).height = c.height := by
+  induction k with
+  | zero => rfl
+  | succ k ih => exact (c.upIter k).height_up.trans ih
+
+theorem CutBoundary.sourceIter_matching (G : GlobularSet.{u}) {n : Nat} (c : Cut n)
+    (k : Nat) (p q : G.Cell (n + k))
+    (h : target (c.upIter k) G p = source (c.upIter k) G q) :
+    target c G (G.sourceIter k p) = source c G (G.sourceIter k q) := by
+  induction k with
+  | zero => exact h
+  | succ k ih => exact ih (G.source p) (G.source q) (source_matching G (c.upIter k) p q h)
+
+theorem CutBoundary.targetIter_matching (G : GlobularSet.{u}) {n : Nat} (c : Cut n)
+    (k : Nat) (p q : G.Cell (n + k))
+    (h : target (c.upIter k) G p = source (c.upIter k) G q) :
+    target c G (G.targetIter k p) = source c G (G.targetIter k q) := by
+  induction k with
+  | zero => exact h
+  | succ k ih => exact ih (G.target p) (G.target q) (target_matching G (c.upIter k) p q h)
+
+/-- Structural cut source is exactly repeated adjacent source, at every
+ordinary numerical boundary dimension. -/
+theorem CutBoundary.source_eq_sourceIter (G : GlobularSet.{u}) {n : Nat} (k : Nat)
+    (c : Cut (n + k + 1)) (h : c.height = n) (p : G.Cell (n + k + 1)) :
+    HEq (source c G p) (G.sourceIter (k + 1) p) := by
+  induction k with
+  | zero =>
+    have hc : c = Cut.top n := Cut.height_injective (h.trans (Cut.height_top n).symm)
+    cases hc
+    exact source_top G p
+  | succ k ih =>
+    let d : Cut (n + k + 1) := Cut.ofFin ⟨n, by omega⟩
+    have hd : d.height = n := Cut.height_ofFin _
+    exact (source_heq G rfl c d.up (h.trans (d.height_up.trans hd).symm) p p HEq.rfl).trans
+      ((source_up_source G d p).symm.trans (ih d hd (G.source p)))
+
+theorem CutBoundary.target_eq_targetIter (G : GlobularSet.{u}) {n : Nat} (k : Nat)
+    (c : Cut (n + k + 1)) (h : c.height = n) (p : G.Cell (n + k + 1)) :
+    HEq (target c G p) (G.targetIter (k + 1) p) := by
+  induction k with
+  | zero =>
+    have hc : c = Cut.top n := Cut.height_injective (h.trans (Cut.height_top n).symm)
+    cases hc
+    exact target_top G p
+  | succ k ih =>
+    let d : Cut (n + k + 1) := Cut.ofFin ⟨n, by omega⟩
+    have hd : d.height = n := Cut.height_ofFin _
+    exact (target_heq G rfl c d.up (h.trans (d.height_up.trans hd).symm) p p HEq.rfl).trans
+      ((target_up_target G d p).symm.trans (ih d hd (G.target p)))
+
 theorem Cut.below_iff_height {n : Nat} (c d : Cut n) : Below c d ↔ c.height < d.height := by
   constructor
   · intro h
@@ -5498,6 +5609,42 @@ structure CutModel where
 
 namespace CutModel
 
+/-- Boundary preservation at every level strictly above the composition
+axis, obtained by dimension induction from adjacent compatibility. -/
+theorem sourceIter_compose (C : CutModel.{u}) {n : Nat} (c : Cut n) (k : Nat)
+    (p q : C.carrier.Cell (n + k))
+    (h : CutBoundary.target (c.upIter k) C.carrier p =
+      CutBoundary.source (c.upIter k) C.carrier q)
+    (h' : CutBoundary.target c C.carrier (C.carrier.sourceIter k p) =
+      CutBoundary.source c C.carrier (C.carrier.sourceIter k q)) :
+    C.carrier.sourceIter k (C.operations.compose (c.upIter k) p q h) =
+      C.operations.compose c (C.carrier.sourceIter k p) (C.carrier.sourceIter k q) h' := by
+  induction k with
+  | zero => rfl
+  | succ k ih =>
+    have hs := CutBoundary.source_matching C.carrier (c.upIter k) p q h
+    change C.carrier.sourceIter k (C.carrier.source
+      (C.operations.compose (c.upIter k).up p q h)) = _
+    rw [C.compatible.source_compose (c.upIter k).raise_up p q h hs]
+    exact ih (C.carrier.source p) (C.carrier.source q) hs h'
+
+theorem targetIter_compose (C : CutModel.{u}) {n : Nat} (c : Cut n) (k : Nat)
+    (p q : C.carrier.Cell (n + k))
+    (h : CutBoundary.target (c.upIter k) C.carrier p =
+      CutBoundary.source (c.upIter k) C.carrier q)
+    (h' : CutBoundary.target c C.carrier (C.carrier.targetIter k p) =
+      CutBoundary.source c C.carrier (C.carrier.targetIter k q)) :
+    C.carrier.targetIter k (C.operations.compose (c.upIter k) p q h) =
+      C.operations.compose c (C.carrier.targetIter k p) (C.carrier.targetIter k q) h' := by
+  induction k with
+  | zero => rfl
+  | succ k ih =>
+    have hs := CutBoundary.target_matching C.carrier (c.upIter k) p q h
+    change C.carrier.targetIter k (C.carrier.target
+      (C.operations.compose (c.upIter k).up p q h)) = _
+    rw [C.compatible.target_compose (c.upIter k).raise_up p q h hs]
+    exact ih (C.carrier.target p) (C.carrier.target q) hs h'
+
 /-- The single adjacent identity used in the standard strict-category
 presentation, extracted from the highest cut. -/
 noncomputable def identity (C : CutModel.{u}) {n : Nat} (p : C.carrier.Cell n) :
@@ -5514,6 +5661,17 @@ theorem target_identity (C : CutModel.{u}) {n : Nat} (p : C.carrier.Cell n) :
   exact eq_of_heq ((CutBoundary.target_top C.carrier (C.identity p)).symm.trans
     ((heq_of_eq (C.operations.target_unit _ _)).trans (CutBoundary.castCell_heq _ _ p)))
 
+theorem identity_matching (C : CutModel.{u}) {n : Nat} (c : Cut n)
+    (p q : C.carrier.Cell n)
+    (h : CutBoundary.target c C.carrier p = CutBoundary.source c C.carrier q) :
+    CutBoundary.target c.up C.carrier (C.identity p) =
+      CutBoundary.source c.up C.carrier (C.identity q) :=
+  eq_of_heq ((CutBoundary.target_up_target C.carrier c (C.identity p)).symm.trans
+    ((heq_of_eq (_root_.congrArg (CutBoundary.target c C.carrier) (C.target_identity p))).trans
+      ((heq_of_eq h).trans
+        ((heq_of_eq (_root_.congrArg (CutBoundary.source c C.carrier) (C.source_identity q))).symm.trans
+          (CutBoundary.source_up_source C.carrier c (C.identity q))))))
+
 theorem unit_heq (C : CutModel.{u}) {n m : Nat} (h : n = m)
     (c : Cut n) (d : Cut m) (hc : c.height = d.height)
     (p : C.carrier.Cell c.height) (q : C.carrier.Cell d.height) (hp : HEq p q) :
@@ -5523,6 +5681,42 @@ theorem unit_heq (C : CutModel.{u}) {n m : Nat} (h : n = m)
   cases hd
   cases eq_of_heq hp
   rfl
+
+theorem compose_heq (C : CutModel.{u}) {n m : Nat} (h : n = m)
+    (c : Cut n) (d : Cut m) (hc : c.height = d.height)
+    (p q : C.carrier.Cell n) (r s : C.carrier.Cell m)
+    (hp : HEq p r) (hq : HEq q s) h₁ h₂ :
+    HEq (C.operations.compose c p q h₁) (C.operations.compose d r s h₂) := by
+  cases h
+  cases Cut.height_injective hc
+  cases eq_of_heq hp
+  cases eq_of_heq hq
+  rfl
+
+/-- Nullary exchange in the adjacent-identity convention: the adjacent
+identity preserves composition at every lower numerical axis. -/
+theorem identity_compose (C : CutModel.{u}) {n : Nat} (c : Cut n)
+    (p q : C.carrier.Cell n) h h' :
+    C.identity (C.operations.compose c p q h) =
+      C.operations.compose c.up (C.identity p) (C.identity q) h' := by
+  let w : Cut.Below c.up (Cut.top n) := (Cut.below_iff_height _ _).mpr
+    (by rw [c.height_up, Cut.height_top]; exact c.height_lt)
+  let r := CutBoundary.castCell C.carrier (Cut.height_top n).symm p
+  let s := CutBoundary.castCell C.carrier (Cut.height_top n).symm q
+  have hh : w.restrict.height = c.height := w.restrict_height.trans c.height_up
+  have hr : HEq r p := CutBoundary.castCell_heq _ _ p
+  have hs : HEq s q := CutBoundary.castCell_heq _ _ q
+  have hm : CutBoundary.target w.restrict C.carrier r = CutBoundary.source w.restrict C.carrier s :=
+    eq_of_heq ((CutBoundary.target_heq C.carrier (Cut.height_top n) w.restrict c hh r p hr).trans
+      ((heq_of_eq h).trans
+        (CutBoundary.source_heq C.carrier (Cut.height_top n) w.restrict c hh s q hs).symm))
+  have hc := C.compose_heq (Cut.height_top n) w.restrict c hh r s p q hr hs hm h
+  have ht : C.operations.compose w.restrict r s hm =
+      CutBoundary.castCell C.carrier (Cut.height_top n).symm (C.operations.compose c p q h) :=
+    eq_of_heq (hc.trans (CutBoundary.castCell_heq _ _ _).symm)
+  have he := C.unitCompatible.compose w r s hm h'
+  rw [ht] at he
+  exact he
 
 /-- Taking one adjacent identity after a cut identity gives precisely the
 identity at the same numerical cut one dimension higher. -/
