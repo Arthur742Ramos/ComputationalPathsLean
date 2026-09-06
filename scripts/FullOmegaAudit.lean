@@ -134,6 +134,19 @@ completion gate for the full weak omega-groupoid theorem. -/
 #print axioms GlobularCollection.operad_assoc
 #print axioms GlobularCollection.operadMonad
 #print axioms GlobularCollection.operadArityMonadHom
+#print axioms GlobularSet.square_globular_pullback
+#print axioms GlobularCollection.operadUnit_cartesian
+#print axioms GlobularCollection.operadMul_cartesian
+#print axioms GlobularCollection.operadUnit_globular_pullback
+#print axioms GlobularCollection.operadMul_globular_pullback
+
+example (C : GlobularCollection.{u}) [CategoryTheory.MonObj C] {G H X : GlobularSet.{u}}
+    (f : GlobularSet.Map G H) (p : GlobularSet.Map X (C.application G))
+    (q : GlobularSet.Map X (C.application (C.application H)))
+    (h : GlobularSet.Map.comp (C.map f) p = GlobularSet.Map.comp (C.operadMul H) q) :
+    ∃! r : GlobularSet.Map X (C.application (C.application G)),
+      GlobularSet.Map.comp (C.operadMul G) r = p ∧
+      GlobularSet.Map.comp (C.map (C.map f)) r = q := C.operadMul_globular_pullback f p q h
 
 noncomputable example (C : GlobularCollection.{u}) [CategoryTheory.MonObj C] :
     CategoryTheory.Monad GlobularSet.{u} := C.operadMonad

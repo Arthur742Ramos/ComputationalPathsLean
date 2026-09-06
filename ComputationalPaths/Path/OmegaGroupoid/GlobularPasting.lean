@@ -5420,6 +5420,41 @@ theorem terminalMap_unique {G : GlobularSet.{u}} (f : Map G terminal.{u}) : f = 
   intro n p
   exact @Subsingleton.elim PUnit _ _ _
 
+/-- Cellwise unique lifts of a globular square assemble into a unique
+globular cone lift. Boundary compatibility follows from uniqueness. -/
+theorem square_globular_pullback {A B C D X : GlobularSet.{u}}
+    (f : Map A B) (g : Map A C) (h : Map B D) (k : Map C D)
+    (lift : ∀ {n} (p : B.Cell n) (q : C.Cell n), h.app p = k.app q →
+      ∃! r : A.Cell n, f.app r = p ∧ g.app r = q)
+    (p : Map X B) (q : Map X C) (hpq : Map.comp h p = Map.comp k q) :
+    ∃! d : Map X A, Map.comp f d = p ∧ Map.comp g d = q := by
+  have ex (n : Nat) (x : X.Cell n) := lift (p.app x) (q.app x)
+    (_root_.congrArg (fun t : Map X D => t.app x) hpq)
+  let d {n : Nat} (x : X.Cell n) := (ex n x).choose
+  have hd {n : Nat} (x : X.Cell n) : f.app (d x) = p.app x ∧ g.app (d x) = q.app x :=
+    (ex n x).choose_spec.1
+  let r : Map X A := {
+    app := d
+    source_app := fun x => (ex _ (X.source x)).choose_spec.2 _ ⟨
+      (f.source_app _).symm.trans ((_root_.congrArg B.source (hd x).1).trans (p.source_app x)),
+      (g.source_app _).symm.trans ((_root_.congrArg C.source (hd x).2).trans (q.source_app x))⟩
+    target_app := fun x => (ex _ (X.target x)).choose_spec.2 _ ⟨
+      (f.target_app _).symm.trans ((_root_.congrArg B.target (hd x).1).trans (p.target_app x)),
+      (g.target_app _).symm.trans ((_root_.congrArg C.target (hd x).2).trans (q.target_app x))⟩ }
+  refine ⟨r, ⟨?_, ?_⟩, ?_⟩
+  · apply Map.ext
+    intro n x
+    exact (hd x).1
+  · apply Map.ext
+    intro n x
+    exact (hd x).2
+  · intro s hs
+    apply Map.ext
+    intro n x
+    exact (ex n x).choose_spec.2 (s.app x) ⟨
+      _root_.congrArg (fun t : Map X B => t.app x) hs.1,
+      _root_.congrArg (fun t : Map X C => t.app x) hs.2⟩
+
 end GlobularSet
 
 /-- A collection of operations with arities in the implemented pasting
@@ -6442,6 +6477,64 @@ noncomputable def operadArityMonadHom (C : GlobularCollection.{u}) [MonObj C] :
     apply GlobularSet.Map.ext
     intro n p
     rfl
+
+/-- Unit naturality uniquely lifts the original globular cell, not just
+its singleton input shape. -/
+theorem operadUnit_cartesian (C : GlobularCollection.{u}) [MonObj C]
+    {G H : GlobularSet.{u}} (f : GlobularSet.Map G H) {n : Nat}
+    (p : (C.application G).Cell n) (q : H.Cell n)
+    (h : (C.map f).app p = (C.operadUnit H).app q) :
+    ∃! r : G.Cell n, (C.operadUnit G).app r = p ∧ f.app r = q := by
+  have ho := _root_.congrArg (fun z : (C.application H).Cell n => z.val.1) h
+  have hi := _root_.congrArg (fun z : (C.application H).Cell n => z.val.2) h
+  obtain ⟨r, ⟨hr, hf⟩, hu⟩ := Pasting.singleton_cartesian f p.val.2 q hi
+  refine ⟨r, ⟨Subtype.ext (Prod.ext ho.symm hr), hf⟩, ?_⟩
+  intro s hs
+  exact hu s ⟨_root_.congrArg (fun z : (C.application G).Cell n => z.val.2) hs.1, hs.2⟩
+
+/-- Multiplication naturality uniquely recovers all nested operations and
+labels using the cartesian collection map and substitution isomorphism. -/
+theorem operadMul_cartesian (C : GlobularCollection.{u}) [MonObj C]
+    {G H : GlobularSet.{u}} (f : GlobularSet.Map G H) {n : Nat}
+    (p : (C.application G).Cell n) (q : (C.application (C.application H)).Cell n)
+    (h : (C.map f).app p = (C.operadMul H).app q) :
+    ∃! r : (C.application (C.application G)).Cell n,
+      (C.operadMul G).app r = p ∧ (C.map (C.map f)).app r = q := by
+  obtain ⟨s, ⟨hs, hf⟩, hu⟩ := (MonObj.mul (X := C)).application_cartesian f p
+    ((C.substitutionComparison C H).app q) h
+  obtain ⟨r, hr, hur⟩ := C.substitutionComparison_unique_lift C G s
+  have hn (t : (C.application (C.application G)).Cell n) :=
+    _root_.congrArg (fun k : GlobularSet.Map (C.application (C.application G))
+      ((C.substitute C).application H) => k.app t) (C.substitutionComparison_natural C f)
+  have hfr : (C.map (C.map f)).app r = q := by
+    have he := (hn r).trans ((_root_.congrArg ((C.substitute C).map f).app hr).trans hf)
+    obtain ⟨w, hw, huw⟩ := C.substitutionComparison_unique_lift C H ((C.substitutionComparison C H).app q)
+    exact (huw _ he).trans (huw q rfl).symm
+  refine ⟨r, ⟨(_root_.congrArg ((MonObj.mul (X := C)).application G).app hr).trans hs, hfr⟩, ?_⟩
+  intro t ht
+  apply hur t
+  apply hu ((C.substitutionComparison C G).app t)
+  exact ⟨ht.1, (hn t).symm.trans (_root_.congrArg (C.substitutionComparison C H).app ht.2)⟩
+
+theorem operadUnit_globular_pullback (C : GlobularCollection.{u}) [MonObj C]
+    {G H X : GlobularSet.{u}} (f : GlobularSet.Map G H)
+    (p : GlobularSet.Map X (C.application G)) (q : GlobularSet.Map X H)
+    (h : GlobularSet.Map.comp (C.map f) p = GlobularSet.Map.comp (C.operadUnit H) q) :
+    ∃! r : GlobularSet.Map X G,
+      GlobularSet.Map.comp (C.operadUnit G) r = p ∧ GlobularSet.Map.comp f r = q :=
+  GlobularSet.square_globular_pullback (C.operadUnit G) f (C.map f) (C.operadUnit H)
+    (C.operadUnit_cartesian f) p q h
+
+theorem operadMul_globular_pullback (C : GlobularCollection.{u}) [MonObj C]
+    {G H X : GlobularSet.{u}} (f : GlobularSet.Map G H)
+    (p : GlobularSet.Map X (C.application G))
+    (q : GlobularSet.Map X (C.application (C.application H)))
+    (h : GlobularSet.Map.comp (C.map f) p = GlobularSet.Map.comp (C.operadMul H) q) :
+    ∃! r : GlobularSet.Map X (C.application (C.application G)),
+      GlobularSet.Map.comp (C.operadMul G) r = p ∧
+      GlobularSet.Map.comp (C.map (C.map f)) r = q :=
+  GlobularSet.square_globular_pullback (C.operadMul G) (C.map (C.map f)) (C.map f) (C.operadMul H)
+    (C.operadMul_cartesian f) p q h
 
 end GlobularCollection
 

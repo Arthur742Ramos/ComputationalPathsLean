@@ -368,9 +368,16 @@ and complete input diagrams. `operadMonad` packages these proved maps and
 laws as a Mathlib monad. `operadArityMonadHom` is an actual monad morphism to
 `Pasting.pastingMonad`, using the verified arity transformation. Its arity
 naturality pullbacks are already covered by `arity_globular_pullback`.
-Cartesianness of the induced monad's unit and multiplication, and the concrete
-contractible operad/native action, remain to be established; the conditional
-monad construction does not assert those missing results.
+`operadUnit_cartesian` now uniquely recovers an original cell using singleton
+recovery and the retained operation. `operadMul_cartesian` uniquely recovers
+the complete nested operation using the cartesian monoid multiplication map
+and substitution comparison isomorphism. The two `_globular_pullback`
+theorems establish unique lifts for arbitrary globular cones; the shared
+`GlobularSet.square_globular_pullback` proof forces both boundary equations
+by cellwise uniqueness. Together with application pullback preservation,
+these prove the cartesian properties of the induced monad. The concrete
+contractible operad/native action remains to be constructed; this conditional
+bridge is not the full weak omega-groupoid theorem.
 
 `evaluate` now evaluates labelled diagrams by dimension recursion into a
 target equipped with horizontal operations in all its iterated hom contexts
