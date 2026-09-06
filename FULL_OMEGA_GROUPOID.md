@@ -264,6 +264,23 @@ establishes the cartesian properties of this concrete labelled-pasting monad.
 The standard free-strict-category identification, globular operad/action,
 and compatibility with the native weak operations remain completion gates.
 
+The collection construction now follows the slice presentation in
+[Raftogianis, Definition 3.1 and Proposition 3.2, pp. 23–24](https://arxiv.org/pdf/1711.07958).
+`GlobularSet.terminal` has a unique cell at every dimension and a unique map
+from each globular set. `GlobularCollection` consists of an operation carrier
+and an arity map into pastings of that terminal object. Its `application G`
+is the actual pullback of the operation arity and the shape map from labelled
+pastings of `G`; hence it retains both the operation and every input label.
+`functor` and `arityTransformation` verify relabelling and naturality.
+`arity_globular_pullback` proves that arity naturality is cartesian, while
+`application_pullback_universal` proves that the induced collection functor
+preserves globular pullbacks. `applicationTerminalIso` recovers the original
+operation carrier at the terminal globular set, with `atTerminal_arity`
+identifying its arity exactly. These are verified collection data, not an
+operad: substitution, its monad laws, contraction, and the native algebra
+action still need to be constructed. No equivalence of entire categories of
+collections is asserted by the object-level terminal isomorphism alone.
+
 `evaluate` now evaluates labelled diagrams by dimension recursion into a
 target equipped with horizontal operations in all its iterated hom contexts
 (`RecursiveComposition`). The evaluator is implemented, not a field assumed

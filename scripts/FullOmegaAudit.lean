@@ -82,6 +82,34 @@ completion gate for the full weak omega-groupoid theorem. -/
 #print axioms Pasting.flatten_cartesian
 #print axioms Pasting.flatten_globular_pullback
 #print axioms Pasting.homFlattenCartesianAt
+#print axioms GlobularSet.terminalMap_unique
+#print axioms GlobularCollection.functor
+#print axioms GlobularCollection.arityTransformation
+#print axioms GlobularCollection.arity_cartesian
+#print axioms GlobularCollection.arity_globular_pullback
+#print axioms GlobularCollection.application_pullback_universal
+#print axioms GlobularCollection.applicationTerminalIso
+#print axioms GlobularCollection.atTerminal_arity
+
+example (C : GlobularCollection.{u}) {G H X : GlobularSet.{u}}
+    (f : GlobularSet.Map G H) (p : GlobularSet.Map X (Pasting.globular G))
+    (q : GlobularSet.Map X (C.application H))
+    (h : GlobularSet.Map.comp (Pasting.mapGlobular f) p = GlobularSet.Map.comp (C.inputs H) q) :
+    ∃! d : GlobularSet.Map X (C.application G),
+      GlobularSet.Map.comp (C.inputs G) d = p ∧ GlobularSet.Map.comp (C.map f) d = q :=
+  C.arity_globular_pullback f p q h
+
+example (C : GlobularCollection.{u}) {G H K X : GlobularSet.{u}}
+    (f : GlobularSet.Map G K) (g : GlobularSet.Map H K)
+    (p : GlobularSet.Map X (C.application G)) (q : GlobularSet.Map X (C.application H))
+    (h : GlobularSet.Map.comp (C.map f) p = GlobularSet.Map.comp (C.map g) q) :
+    ∃! d : GlobularSet.Map X (C.application (GlobularSet.pullback f g)),
+      GlobularSet.Map.comp (C.map (GlobularSet.pullbackFst f g)) d = p ∧
+      GlobularSet.Map.comp (C.map (GlobularSet.pullbackSnd f g)) d = q :=
+  C.application_pullback_universal f g p q h
+
+example (C : GlobularCollection.{u}) :
+    CategoryTheory.Iso (C.application GlobularSet.terminal) C.operations := C.applicationTerminalIso
 
 example {G H : GlobularSet.{u}} (f : GlobularSet.Map G H) {n : Nat}
     (p : Pasting n G) (q : Pasting n (Pasting.globular H))

@@ -5398,6 +5398,203 @@ noncomputable def cutOperationsAlgebra {H : GlobularSet.{u}} (C : CutOperations 
 
 end Pasting
 
+namespace GlobularSet
+
+/-- The terminal globular set has exactly one cell at every dimension. -/
+def terminal : GlobularSet.{u} where
+  Cell _ := PUnit.{u + 1}
+  source _ := PUnit.unit
+  target _ := PUnit.unit
+  source_source _ := rfl
+  target_source _ := rfl
+
+def terminalMap (G : GlobularSet.{u}) : Map G terminal.{u} where
+  app _ := PUnit.unit
+  source_app _ := rfl
+  target_app _ := rfl
+
+theorem terminalMap_unique {G : GlobularSet.{u}} (f : Map G terminal.{u}) : f = terminalMap G := by
+  apply Map.ext
+  intro n p
+  exact @Subsingleton.elim PUnit _ _ _
+
+end GlobularSet
+
+/-- A collection of operations with arities in the implemented pasting
+monad. This is the slice presentation of Raftogianis, Proposition 3.2;
+substitution and an operad structure are additional data, not presumed. -/
+structure GlobularCollection where
+  operations : GlobularSet.{u}
+  arity : GlobularSet.Map operations (Pasting.globular GlobularSet.terminal.{u})
+
+namespace GlobularCollection
+
+/-- Forget labels, retaining the entire recursive globular pasting shape. -/
+def shape (G : GlobularSet.{u}) : GlobularSet.Map (Pasting.globular G)
+    (Pasting.globular GlobularSet.terminal.{u}) := Pasting.mapGlobular (GlobularSet.terminalMap G)
+
+theorem shape_map {G H : GlobularSet.{u}} (f : GlobularSet.Map G H)
+    {n : Nat} (p : Pasting n G) : (shape H).app (Pasting.map f p) = (shape G).app p := by
+  exact (Pasting.map_comp f (GlobularSet.terminalMap H) p).trans
+    (_root_.congrArg (fun k => Pasting.map k p)
+      (GlobularSet.terminalMap_unique (GlobularSet.Map.comp (GlobularSet.terminalMap H) f)))
+
+/-- An operation and an actual labelled input diagram with matching arity. -/
+def application (C : GlobularCollection.{u}) (G : GlobularSet.{u}) : GlobularSet.{u} :=
+  GlobularSet.pullback C.arity (shape G)
+
+def operation (C : GlobularCollection.{u}) (G : GlobularSet.{u}) :
+    GlobularSet.Map (C.application G) C.operations := GlobularSet.pullbackFst C.arity (shape G)
+
+def inputs (C : GlobularCollection.{u}) (G : GlobularSet.{u}) :
+    GlobularSet.Map (C.application G) (Pasting.globular G) := GlobularSet.pullbackSnd C.arity (shape G)
+
+/-- Relabelling leaves the operation itself unchanged. -/
+def map (C : GlobularCollection.{u}) {G H : GlobularSet.{u}} (f : GlobularSet.Map G H) :
+    GlobularSet.Map (C.application G) (C.application H) where
+  app p := ⟨⟨p.val.1, Pasting.map f p.val.2⟩, p.property.trans (shape_map f p.val.2).symm⟩
+  source_app p := Subtype.ext (Prod.ext rfl ((Pasting.mapGlobular f).source_app p.val.2))
+  target_app p := Subtype.ext (Prod.ext rfl ((Pasting.mapGlobular f).target_app p.val.2))
+
+def functor (C : GlobularCollection.{u}) : CategoryTheory.Functor GlobularSet.{u} GlobularSet.{u} where
+  obj := C.application
+  map := C.map
+  map_id G := by
+    apply GlobularSet.Map.ext
+    intro n p
+    exact Subtype.ext (Prod.ext rfl (Pasting.map_id G p.val.2))
+  map_comp f g := by
+    apply GlobularSet.Map.ext
+    intro n p
+    exact Subtype.ext (Prod.ext rfl (Pasting.map_comp f g p.val.2).symm)
+
+/-- The collection's arity transformation is an actual natural transformation. -/
+def arityTransformation (C : GlobularCollection.{u}) :
+    CategoryTheory.NatTrans C.functor Pasting.pastingFunctor where
+  app := C.inputs
+  naturality {X Y} f := by
+    apply GlobularSet.Map.ext
+    intro n p
+    rfl
+
+/-- Each arity naturality square has a unique labelled-operation lift. -/
+theorem arity_cartesian (C : GlobularCollection.{u}) {G H : GlobularSet.{u}}
+    (f : GlobularSet.Map G H) {n : Nat} (p : Pasting n G) (q : (C.application H).Cell n)
+    (h : Pasting.map f p = (C.inputs H).app q) :
+    ∃! r : (C.application G).Cell n, (C.inputs G).app r = p ∧ (C.map f).app r = q := by
+  let r : (C.application G).Cell n := ⟨⟨q.val.1, p⟩,
+    q.property.trans ((_root_.congrArg (shape H).app h.symm).trans (shape_map f p))⟩
+  refine ⟨r, ⟨rfl, Subtype.ext (Prod.ext rfl h)⟩, ?_⟩
+  intro s hs
+  apply Subtype.ext
+  exact Prod.ext (_root_.congrArg (fun t : (C.application H).Cell n => t.val.1) hs.2) hs.1
+
+/-- The same square is a pullback in globular sets, including both boundary
+equations and uniqueness for arbitrary globular cones. -/
+theorem arity_globular_pullback (C : GlobularCollection.{u}) {G H X : GlobularSet.{u}}
+    (f : GlobularSet.Map G H) (p : GlobularSet.Map X (Pasting.globular G))
+    (q : GlobularSet.Map X (C.application H))
+    (h : GlobularSet.Map.comp (Pasting.mapGlobular f) p = GlobularSet.Map.comp (C.inputs H) q) :
+    ∃! d : GlobularSet.Map X (C.application G),
+      GlobularSet.Map.comp (C.inputs G) d = p ∧ GlobularSet.Map.comp (C.map f) d = q := by
+  let d : GlobularSet.Map X (C.application G) := GlobularSet.pullbackLift C.arity (shape G)
+    (GlobularSet.Map.comp (C.operation H) q) p (by
+      apply GlobularSet.Map.ext
+      intro n x
+      have hx := _root_.congrArg (fun k : GlobularSet.Map X (Pasting.globular H) => k.app x) h
+      exact (q.app x).property.trans
+        ((_root_.congrArg (shape H).app hx.symm).trans (shape_map f (p.app x))))
+  refine ⟨d, ⟨?_, ?_⟩, ?_⟩
+  · apply GlobularSet.Map.ext
+    intro n x
+    rfl
+  · apply GlobularSet.Map.ext
+    intro n x
+    exact Subtype.ext (Prod.ext rfl
+      (_root_.congrArg (fun k : GlobularSet.Map X (Pasting.globular H) => k.app x) h))
+  · intro e he
+    apply GlobularSet.Map.ext
+    intro n x
+    apply Subtype.ext
+    exact Prod.ext
+      (_root_.congrArg (fun k : GlobularSet.Map X (C.application H) => (k.app x).val.1) he.2)
+      (_root_.congrArg (fun k : GlobularSet.Map X (Pasting.globular G) => k.app x) he.1)
+
+/-- The induced collection functor preserves globular pullbacks. Both
+operation data and recursively labelled inputs are recovered uniquely. -/
+theorem application_pullback_universal (C : GlobularCollection.{u}) {G H K X : GlobularSet.{u}}
+    (f : GlobularSet.Map G K) (g : GlobularSet.Map H K)
+    (p : GlobularSet.Map X (C.application G)) (q : GlobularSet.Map X (C.application H))
+    (h : GlobularSet.Map.comp (C.map f) p = GlobularSet.Map.comp (C.map g) q) :
+    ∃! d : GlobularSet.Map X (C.application (GlobularSet.pullback f g)),
+      GlobularSet.Map.comp (C.map (GlobularSet.pullbackFst f g)) d = p ∧
+      GlobularSet.Map.comp (C.map (GlobularSet.pullbackSnd f g)) d = q := by
+  obtain ⟨t, ht, hu⟩ := Pasting.pasting_pullback_universal f g
+    (GlobularSet.Map.comp (C.inputs G) p) (GlobularSet.Map.comp (C.inputs H) q) (by
+      apply GlobularSet.Map.ext
+      intro n x
+      exact _root_.congrArg (fun k : GlobularSet.Map X (C.application K) => (k.app x).val.2) h)
+  obtain ⟨d, hd, hdu⟩ := C.arity_globular_pullback (GlobularSet.pullbackFst f g) t p ht.1
+  have hdq : GlobularSet.Map.comp (C.map (GlobularSet.pullbackSnd f g)) d = q := by
+    apply GlobularSet.Map.ext
+    intro n x
+    apply Subtype.ext
+    refine Prod.ext ?_ ?_
+    · exact (_root_.congrArg (fun k : GlobularSet.Map X (C.application G) => (k.app x).val.1) hd.2).trans
+        (_root_.congrArg (fun k : GlobularSet.Map X (C.application K) => (k.app x).val.1) h)
+    · exact (_root_.congrArg (fun z => Pasting.map (GlobularSet.pullbackSnd f g) z)
+        (_root_.congrArg (fun k : GlobularSet.Map X (Pasting.globular (GlobularSet.pullback f g)) => k.app x) hd.1)).trans
+          (_root_.congrArg (fun k : GlobularSet.Map X (Pasting.globular H) => k.app x) ht.2)
+  refine ⟨d, ⟨hd.2, hdq⟩, ?_⟩
+  intro e he
+  apply hdu e
+  refine ⟨?_, he.1⟩
+  apply hu (GlobularSet.Map.comp (C.inputs (GlobularSet.pullback f g)) e)
+  constructor
+  · apply GlobularSet.Map.ext
+    intro n x
+    exact _root_.congrArg (fun k : GlobularSet.Map X (C.application G) => (k.app x).val.2) he.1
+  · apply GlobularSet.Map.ext
+    intro n x
+    exact _root_.congrArg (fun k : GlobularSet.Map X (C.application H) => (k.app x).val.2) he.2
+
+/-- Forgetting labels over the terminal globular set changes nothing. -/
+theorem shape_terminal {n : Nat} (p : Pasting n GlobularSet.terminal.{u}) :
+    (shape GlobularSet.terminal).app p = p := by
+  have h : GlobularSet.terminalMap GlobularSet.terminal.{u} =
+      GlobularSet.Map.id GlobularSet.terminal :=
+    (GlobularSet.terminalMap_unique (GlobularSet.Map.id GlobularSet.terminal)).symm
+  exact (_root_.congrArg (fun k => Pasting.map k p) h).trans (Pasting.map_id _ p)
+
+/-- Recover the original operation by labelling its arity in the terminal
+globular set. This is inverse to the operation projection at the terminal. -/
+def atTerminal (C : GlobularCollection.{u}) :
+    GlobularSet.Map C.operations (C.application GlobularSet.terminal) where
+  app p := ⟨⟨p, C.arity.app p⟩, (shape_terminal (C.arity.app p)).symm⟩
+  source_app p := Subtype.ext (Prod.ext rfl (C.arity.source_app p))
+  target_app p := Subtype.ext (Prod.ext rfl (C.arity.target_app p))
+
+def applicationTerminalIso (C : GlobularCollection.{u}) :
+    CategoryTheory.Iso (C.application GlobularSet.terminal) C.operations where
+  hom := C.operation GlobularSet.terminal
+  inv := C.atTerminal
+  hom_inv_id := by
+    apply GlobularSet.Map.ext
+    intro n p
+    exact Subtype.ext (Prod.ext rfl (p.property.trans (shape_terminal p.val.2)))
+  inv_hom_id := by
+    apply GlobularSet.Map.ext
+    intro n p
+    rfl
+
+theorem atTerminal_arity (C : GlobularCollection.{u}) :
+    GlobularSet.Map.comp (C.inputs GlobularSet.terminal) C.atTerminal = C.arity := by
+  apply GlobularSet.Map.ext
+  intro n p
+  rfl
+
+end GlobularCollection
+
 /-- Interpretation of composable path-labelled chains keeps the endpoints
 and composes the actual computational traces. -/
 noncomputable def evalPathChain {A : Type u} {a b : A} :
