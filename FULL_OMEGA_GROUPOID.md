@@ -168,6 +168,16 @@ any preserving map by evaluation of its restriction to generators, and
 identification of those target laws with an established strict omega-category
 presentation, nor a proof of cartesianness or a native weak operadic action.
 
+`evaluate_multiplication` now proves that evaluating a flattened diagram
+agrees with evaluating its evaluated labels. Together with the generator unit
+law, `cutOperationsAlgebra` packages every target satisfying the stated cut
+laws as a Mathlib Eilenberg-Moore algebra for `pastingMonad`.
+`preserves_evaluation` proves that cut-preserving maps intertwine these
+actions. The audit instantiates this bridge on the actual labelled-pasting
+cut operations. The reverse reconstruction of cut laws from arbitrary monad
+algebras is not yet proved; this bridge does not give the native tower a weak
+operadic action.
+
 The multiplication associativity proof uses strict cut-operation
 associativity and interchange inherited through every hom context, alongside
 both unit laws. `CutOperations.fold_append` proves the evaluator's chain fold

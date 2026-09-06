@@ -11,6 +11,17 @@ completion gate for the full weak omega-groupoid theorem. -/
 #print axioms Pasting.preserves_recovered
 #print axioms Pasting.preserves_ext
 #print axioms Pasting.existsUnique_preserving_extension
+#print axioms Pasting.evaluate_multiplication
+#print axioms Pasting.preserves_evaluation
+#print axioms Pasting.cutOperationsAlgebra
+
+noncomputable example (G : GlobularSet) :
+    CategoryTheory.Monad.Algebra Pasting.pastingMonad :=
+  Pasting.cutOperationsAlgebra (Pasting.cutOperations G)
+    (Pasting.cutOperations_compatible G) (Pasting.cutOperations_leftUnital G)
+    (Pasting.cutOperations_rightUnital G) (Pasting.cutOperations_associative G)
+    (Pasting.cutOperations_interchange G) (Pasting.cutOperations_unitIdempotent G)
+    (Pasting.cutOperations_unitCompatible G)
 
 example {G H : GlobularSet} (C : Pasting.CutOperations H)
     (L : C.Compatible) (U : C.LeftUnital) (R : C.RightUnital) (A : C.Associative)

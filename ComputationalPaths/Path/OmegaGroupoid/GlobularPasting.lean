@@ -1,7 +1,7 @@
 import ComputationalPaths.Path.OmegaGroupoid.GlobularFoundations
 import Mathlib.CategoryTheory.Functor.Basic
 import Mathlib.CategoryTheory.NatTrans
-import Mathlib.CategoryTheory.Monad.Basic
+import Mathlib.CategoryTheory.Monad.Algebra
 
 /-!
 # Recursively labelled globular pasting diagrams
@@ -3613,6 +3613,62 @@ noncomputable def pastingMonad : CategoryTheory.Monad GlobularSet.{u} where
     exact (flatten_assoc G p).symm
   left_unit G := flatten_unit_left G
   right_unit G := flatten_unit_right G
+
+/-- Evaluating a nested diagram agrees with first evaluating its labels.
+This is the algebra multiplication law for the actual pasting monad. -/
+theorem evaluate_multiplication {H : GlobularSet.{u}} (C : CutOperations H)
+    (L : C.Compatible) (U : C.LeftUnital) (A : C.Associative)
+    (I : C.Interchange) (J : C.UnitIdempotent) (V : C.UnitCompatible)
+    {n : Nat} (p : Pasting n (globular H)) :
+    (evaluateGlobular (C.recursive L) .root (GlobularSet.Map.id H)).app
+      ((flattenGlobular H).app p) =
+    (evaluateGlobular (C.recursive L) .root (GlobularSet.Map.id H)).app
+      (map (evaluateGlobular (C.recursive L) .root (GlobularSet.Map.id H)) p) := by
+  let e := evaluateGlobular (C.recursive L) .root (GlobularSet.Map.id H)
+  have hpost := evaluate_postcompose (cutOperations H) C
+    (cutOperations_compatible H) L .root .root e
+    (evaluateGlobular_preserves C L U A I J V (GlobularSet.Map.id H))
+    (GlobularSet.Map.id (globular H)) p
+  have hpre := evaluate_precompose (C.recursive L) .root (GlobularSet.Map.id H) e p
+  have he : GlobularSet.Map.comp e (GlobularSet.Map.id (globular H)) =
+      GlobularSet.Map.comp (GlobularSet.Map.id H) e := by
+    apply GlobularSet.Map.ext
+    intro m c
+    rfl
+  exact hpost.trans ((_root_.congrArg (fun f => evaluate (C.recursive L) .root f p) he).trans
+    hpre.symm)
+
+/-- A map preserving cut operations intertwines the evaluation actions.
+Thus the bridge respects morphisms, not just the underlying objects. -/
+theorem preserves_evaluation {H K : GlobularSet.{u}}
+    (C : CutOperations H) (D : CutOperations K) (L : C.Compatible) (M : D.Compatible)
+    (f : GlobularSet.Map H K) (P : CutOperations.Preserves C D f)
+    {n : Nat} (p : Pasting n H) :
+    f.app (evaluate (C.recursive L) .root (GlobularSet.Map.id H) p) =
+      evaluate (D.recursive M) .root (GlobularSet.Map.id K) (map f p) := by
+  have hpost := evaluate_postcompose C D L M .root .root f P (GlobularSet.Map.id H) p
+  have hpre := evaluate_precompose (D.recursive M) .root (GlobularSet.Map.id K) f p
+  have he : GlobularSet.Map.comp f (GlobularSet.Map.id H) =
+      GlobularSet.Map.comp (GlobularSet.Map.id K) f := by
+    apply GlobularSet.Map.ext
+    intro m c
+    rfl
+  exact hpost.trans ((_root_.congrArg (fun g => evaluate (D.recursive M) .root g p) he).trans
+    hpre.symm)
+
+/-- Every target satisfying the explicit strict cut laws gives an actual
+Eilenberg-Moore algebra. No weak operadic action is asserted by this bridge. -/
+noncomputable def cutOperationsAlgebra {H : GlobularSet.{u}} (C : CutOperations H)
+    (L : C.Compatible) (U : C.LeftUnital) (R : C.RightUnital) (A : C.Associative)
+    (I : C.Interchange) (J : C.UnitIdempotent) (V : C.UnitCompatible) :
+    CategoryTheory.Monad.Algebra pastingMonad where
+  A := H
+  a := evaluateGlobular (C.recursive L) .root (GlobularSet.Map.id H)
+  unit := evaluateGlobular_extends C L R (GlobularSet.Map.id H)
+  assoc := by
+    apply GlobularSet.Map.ext
+    intro n p
+    exact evaluate_multiplication C L U A I J V p
 
 end Pasting
 
