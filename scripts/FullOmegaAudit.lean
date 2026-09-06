@@ -144,6 +144,18 @@ example (A : Type u) :
 #print axioms Pasting.CutModel.sourceIter_compose
 #print axioms Pasting.CutModel.targetIter_compose
 #print axioms Pasting.CutModel.identity_compose
+#print axioms Pasting.StrictPresentation.toCutModel
+#print axioms Pasting.StrictPresentation.roundTrip
+#print axioms Pasting.CutModel.strictPresentation_roundTrip
+#print axioms Pasting.StrictPresentation.extend_compose
+
+example (G : GlobularSet) (S : Pasting.StrictPresentation G) :
+    S.toCutModel.strictPresentation = S := S.roundTrip
+example (C : Pasting.CutModel) : C.strictPresentation.toCutModel = C :=
+  C.strictPresentation_roundTrip
+example (G : GlobularSet) (S : Pasting.StrictPresentation G) :
+    S.operations.UnitCompatible ∧ S.operations.UnitIdempotent :=
+  ⟨S.unitCompatible, S.unitIdempotent⟩
 
 example (C : Pasting.CutModel) {n : Nat} (c : Pasting.Cut n) (k : Nat)
     (p q : C.carrier.Cell (n + k))

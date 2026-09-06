@@ -797,3 +797,22 @@ lower composition, with `identity_matching` deriving its composability.
 The audit instantiates these laws without an extra matching assumption.
 These results discharge those forward law translations; packaging the
 complete standard presentation and proving its converse remain open.
+
+The converse and both object-level round trips are now verified.
+`StrictPresentation` stores binary compositions indexed by `Cut n` (already
+proved equivalent to `Fin n`) and only one adjacent identity map. Its axioms
+are adjacent composite boundaries, associativity, the two ordinary unit
+laws, binary exchange and adjacent nullary exchange. Higher identities are
+constructed by `AdjacentIdentities.extend`, not supplied as extra fields.
+`extend_compose` derives iterated nullary exchange; `unitCompatible` and
+`unitIdempotent` derive the stronger cut-law packages from these axioms.
+Thus `StrictPresentation.toCutModel` requires no additional identity law.
+
+`CutModel.strictPresentation_roundTrip` recovers the complete original cut
+model, and `StrictPresentation.roundTrip` recovers the complete original
+adjacent-identity presentation. These are equalities of records, not merely
+agreements of boundaries. The earlier all-boundary and index-equivalence
+proofs account for the numerical and iterated-boundary form of the standard
+definition. The remaining comparison gate is the corresponding morphism
+equivalence and transport of the free/forgetful adjunction to this
+presentation; those are not claimed by the object-level round trips alone.

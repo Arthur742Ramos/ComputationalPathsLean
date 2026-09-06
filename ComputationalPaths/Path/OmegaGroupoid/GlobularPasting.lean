@@ -2589,6 +2589,14 @@ structure CutOperations (G : GlobularSet.{u}) where
 
 namespace CutOperations
 
+@[ext] theorem ext {G : GlobularSet.{u}} (C D : CutOperations G)
+    (hc : @C.compose = @D.compose) (hu : @C.unit = @D.unit) : C = D := by
+  cases C
+  cases D
+  cases hc
+  cases hu
+  rfl
+
 /-- A globular map preserving the actual operations at every cut. -/
 structure Preserves {G H : GlobularSet.{u}} (C : CutOperations G) (D : CutOperations H)
     (f : GlobularSet.Map G H) : Prop where
@@ -5594,6 +5602,294 @@ noncomputable def cutOperationsAlgebra {H : GlobularSet.{u}} (C : CutOperations 
     intro n p
     exact evaluate_multiplication C L U A I J V p
 
+/-- Adjacent identities with their two boundary equations, independently of
+cut identities, strict composition laws, and any higher filling hypothesis. -/
+structure AdjacentIdentities (G : GlobularSet.{u}) where
+  identity : {n : Nat} → G.Cell n → G.Cell (n + 1)
+  source_identity : ∀ {n} (p : G.Cell n), G.source (identity p) = p
+  target_identity : ∀ {n} (p : G.Cell n), G.target (identity p) = p
+
+namespace AdjacentIdentities
+
+@[ext] theorem ext {G : GlobularSet.{u}} (I J : AdjacentIdentities G)
+    (h : @I.identity = @J.identity) : I = J := by
+  cases I
+  cases J
+  cases h
+  rfl
+
+def extend {G : GlobularSet.{u}} (I : AdjacentIdentities G) {n m : Nat}
+    (h : n ≤ m) (p : G.Cell n) : G.Cell m := Nat.leRecOn h I.identity p
+
+theorem extend_refl {G : GlobularSet.{u}} (I : AdjacentIdentities G) {n : Nat}
+    (p : G.Cell n) : I.extend (Nat.le_refl n) p = p := Nat.leRecOn_self p
+
+theorem extend_succ {G : GlobularSet.{u}} (I : AdjacentIdentities G) {n m : Nat}
+    (h : n ≤ m) (p : G.Cell n) :
+    I.extend (Nat.le_step h) p = I.identity (I.extend h p) := Nat.leRecOn_succ h p
+
+theorem extend_trans {G : GlobularSet.{u}} (I : AdjacentIdentities G) {n m k : Nat}
+    (h : n ≤ m) (j : m ≤ k) (p : G.Cell n) :
+    I.extend j (I.extend h p) = I.extend (Nat.le_trans h j) p := (Nat.leRecOn_trans h j p).symm
+
+theorem extend_heq {G : GlobularSet.{u}} (I : AdjacentIdentities G) {n m n' m' : Nat}
+    (hn : n = n') (hm : m = m') (h : n ≤ m) (j : n' ≤ m')
+    (p : G.Cell n) (q : G.Cell n') (hp : HEq p q) : HEq (I.extend h p) (I.extend j q) := by
+  cases hn
+  cases hm
+  cases eq_of_heq hp
+  rfl
+
+theorem source_extend {G : GlobularSet.{u}} (I : AdjacentIdentities G) {n m : Nat}
+    (h : n ≤ m) (p : G.Cell n) : G.source (I.extend (Nat.le_step h) p) = I.extend h p := by
+  rw [I.extend_succ, I.source_identity]
+
+theorem target_extend {G : GlobularSet.{u}} (I : AdjacentIdentities G) {n m : Nat}
+    (h : n ≤ m) (p : G.Cell n) : G.target (I.extend (Nat.le_step h) p) = I.extend h p := by
+  rw [I.extend_succ, I.target_identity]
+
+theorem source_extend_cut {G : GlobularSet.{u}} (I : AdjacentIdentities G) {n m : Nat}
+    (h : n < m) (c : Cut m) (hc : c.height = n) (p : G.Cell n) :
+    HEq (CutBoundary.source c G (I.extend h.le p)) p := by
+  induction m with
+  | zero => omega
+  | succ m ih =>
+    rcases Nat.lt_or_eq_of_le (Nat.le_of_lt_succ h) with hlt | rfl
+    · let d : Cut m := Cut.ofFin ⟨n, hlt⟩
+      have hd : d.height = n := Cut.height_ofFin _
+      exact (CutBoundary.source_heq G rfl c d.up
+        (hc.trans (d.height_up.trans hd).symm) _ _ HEq.rfl).trans
+        ((CutBoundary.source_up_source G d _).symm.trans
+          ((heq_of_eq (_root_.congrArg (CutBoundary.source d G) (I.source_extend hlt.le p))).trans
+            (ih hlt d hd)))
+    · have he : c = Cut.top n := Cut.height_injective (hc.trans (Cut.height_top n).symm)
+      cases he
+      exact (CutBoundary.source_top G _).trans
+        (heq_of_eq ((I.source_extend (Nat.le_refl n) p).trans (I.extend_refl p)))
+
+theorem target_extend_cut {G : GlobularSet.{u}} (I : AdjacentIdentities G) {n m : Nat}
+    (h : n < m) (c : Cut m) (hc : c.height = n) (p : G.Cell n) :
+    HEq (CutBoundary.target c G (I.extend h.le p)) p := by
+  induction m with
+  | zero => omega
+  | succ m ih =>
+    rcases Nat.lt_or_eq_of_le (Nat.le_of_lt_succ h) with hlt | rfl
+    · let d : Cut m := Cut.ofFin ⟨n, hlt⟩
+      have hd : d.height = n := Cut.height_ofFin _
+      exact (CutBoundary.target_heq G rfl c d.up
+        (hc.trans (d.height_up.trans hd).symm) _ _ HEq.rfl).trans
+        ((CutBoundary.target_up_target G d _).symm.trans
+          ((heq_of_eq (_root_.congrArg (CutBoundary.target d G) (I.target_extend hlt.le p))).trans
+            (ih hlt d hd)))
+    · have he : c = Cut.top n := Cut.height_injective (hc.trans (Cut.height_top n).symm)
+      cases he
+      exact (CutBoundary.target_top G _).trans
+        (heq_of_eq ((I.target_extend (Nat.le_refl n) p).trans (I.extend_refl p)))
+
+/-- Every higher identity is constructed from the adjacent identity map. -/
+def cutUnit {G : GlobularSet.{u}} (I : AdjacentIdentities G) {n : Nat}
+    (c : Cut n) (p : G.Cell c.height) : G.Cell n := I.extend c.height_lt.le p
+
+theorem source_cutUnit {G : GlobularSet.{u}} (I : AdjacentIdentities G) {n : Nat}
+    (c : Cut n) (p : G.Cell c.height) : CutBoundary.source c G (I.cutUnit c p) = p :=
+  eq_of_heq (I.source_extend_cut c.height_lt c rfl p)
+
+theorem target_cutUnit {G : GlobularSet.{u}} (I : AdjacentIdentities G) {n : Nat}
+    (c : Cut n) (p : G.Cell c.height) : CutBoundary.target c G (I.cutUnit c p) = p :=
+  eq_of_heq (I.target_extend_cut c.height_lt c rfl p)
+
+theorem source_cutUnit_raise {G : GlobularSet.{u}} (I : AdjacentIdentities G) {n : Nat}
+    {c : Cut n} {d : Cut (n + 1)} (w : Cut.Raise c d)
+    (p : G.Cell c.height) (q : G.Cell d.height) (hp : HEq p q) :
+    G.source (I.cutUnit d q) = I.cutUnit c p := by
+  have hd : d.height ≤ n := by rw [← w.height_eq]; exact c.height_lt.le
+  exact (I.source_extend hd q).trans
+    (eq_of_heq (I.extend_heq w.height_eq.symm rfl hd c.height_lt.le q p hp.symm))
+
+theorem target_cutUnit_raise {G : GlobularSet.{u}} (I : AdjacentIdentities G) {n : Nat}
+    {c : Cut n} {d : Cut (n + 1)} (w : Cut.Raise c d)
+    (p : G.Cell c.height) (q : G.Cell d.height) (hp : HEq p q) :
+    G.target (I.cutUnit d q) = I.cutUnit c p := by
+  have hd : d.height ≤ n := by rw [← w.height_eq]; exact c.height_lt.le
+  exact (I.target_extend hd q).trans
+    (eq_of_heq (I.extend_heq w.height_eq.symm rfl hd c.height_lt.le q p hp.symm))
+
+/-- Nested cut identities reduce to a single identity extension. This is
+derived from iteration, not required as additional structure. -/
+theorem cutUnit_cutUnit {G : GlobularSet.{u}} (I : AdjacentIdentities G) {n : Nat}
+    {c d : Cut n} (w : Cut.Below c d) (p : G.Cell w.restrict.height)
+    (q : G.Cell c.height) (hp : HEq p q) :
+    I.cutUnit d (I.cutUnit w.restrict p) = I.cutUnit c q := by
+  exact eq_of_heq ((heq_of_eq (I.extend_trans w.restrict.height_lt.le d.height_lt.le p)).trans
+    (I.extend_heq w.restrict_height rfl _ _ p q hp))
+
+/-- Identity extension retains both boundaries at any lower composition
+axis; no compatibility with composition is assumed here. -/
+theorem extend_boundaries {G : GlobularSet.{u}} (I : AdjacentIdentities G) {n m : Nat}
+    (hnm : n ≤ m) (c : Cut n) (d : Cut m) (hd : c.height = d.height) (p : G.Cell n) :
+    HEq (CutBoundary.source d G (I.extend hnm p)) (CutBoundary.source c G p) ∧
+      HEq (CutBoundary.target d G (I.extend hnm p)) (CutBoundary.target c G p) := by
+  induction m, hnm using Nat.le_induction with
+  | base =>
+    cases Cut.height_injective hd
+    rw [I.extend_refl]
+    exact ⟨HEq.rfl, HEq.rfl⟩
+  | succ m hnm ih =>
+    let e : Cut m := Cut.ofFin ⟨c.height, Nat.lt_of_lt_of_le c.height_lt hnm⟩
+    have he : e.height = c.height := Cut.height_ofFin _
+    have he' : d.height = e.up.height := hd.symm.trans (e.height_up.trans he).symm
+    have hb := ih e he.symm
+    constructor
+    · exact (CutBoundary.source_heq G rfl d e.up he' _ _ HEq.rfl).trans
+        ((CutBoundary.source_up_source G e _).symm.trans
+          ((heq_of_eq (_root_.congrArg (CutBoundary.source e G) (I.source_extend hnm p))).trans hb.1))
+    · exact (CutBoundary.target_heq G rfl d e.up he' _ _ HEq.rfl).trans
+        ((CutBoundary.target_up_target G e _).symm.trans
+          ((heq_of_eq (_root_.congrArg (CutBoundary.target e G) (I.target_extend hnm p))).trans hb.2))
+
+theorem extend_matching {G : GlobularSet.{u}} (I : AdjacentIdentities G) {n m : Nat}
+    (hnm : n ≤ m) (c : Cut n) (d : Cut m) (hd : c.height = d.height) (p q : G.Cell n)
+    (h : CutBoundary.target c G p = CutBoundary.source c G q) :
+    CutBoundary.target d G (I.extend hnm p) = CutBoundary.source d G (I.extend hnm q) :=
+  eq_of_heq ((I.extend_boundaries hnm c d hd p).2.trans
+    ((heq_of_eq h).trans (I.extend_boundaries hnm c d hd q).1.symm))
+
+end AdjacentIdentities
+
+/-- Binary composition data without separately stored higher identities. -/
+structure CutCompositions (G : GlobularSet.{u}) where
+  compose : {n : Nat} → (c : Cut n) → (p q : G.Cell n) →
+    CutBoundary.target c G p = CutBoundary.source c G q → G.Cell n
+  source_compose : ∀ {n} (c : Cut n) (p q : G.Cell n) h,
+    CutBoundary.source c G (compose c p q h) = CutBoundary.source c G p
+  target_compose : ∀ {n} (c : Cut n) (p q : G.Cell n) h,
+    CutBoundary.target c G (compose c p q h) = CutBoundary.target c G q
+
+@[ext] theorem CutCompositions.ext {G : GlobularSet.{u}} (C D : CutCompositions G)
+    (h : @C.compose = @D.compose) : C = D := by
+  cases C
+  cases D
+  cases h
+  rfl
+
+def CutCompositions.withIdentities {G : GlobularSet.{u}} (D : CutCompositions G)
+    (I : AdjacentIdentities G) : CutOperations G where
+  compose := D.compose
+  source_compose := D.source_compose
+  target_compose := D.target_compose
+  unit := I.cutUnit
+  source_unit := I.source_cutUnit
+  target_unit := I.target_cutUnit
+
+theorem CutCompositions.compose_heq {G : GlobularSet.{u}} (D : CutCompositions G)
+    {n m : Nat} (hnm : n = m) (c : Cut n) (d : Cut m) (hc : c.height = d.height)
+    (p q : G.Cell n) (r s : G.Cell m) (hp : HEq p r) (hq : HEq q s) h h' :
+    HEq (D.compose c p q h) (D.compose d r s h') := by
+  cases hnm
+  cases Cut.height_injective hc
+  cases eq_of_heq hp
+  cases eq_of_heq hq
+  rfl
+
+/-- A strict presentation uses adjacent identity and binary compositions;
+all higher identities in its laws are generated by iteration. The structural
+axis index is equivalent to the ordinary `k < n` index by `Cut.finEquiv`. -/
+structure StrictPresentation (G : GlobularSet.{u}) where
+  identities : AdjacentIdentities G
+  compositions : CutCompositions G
+  source_compose : ∀ {n} {c : Cut n} {d : Cut (n + 1)} (w : Cut.Raise c d)
+    (p q : G.Cell (n + 1)) h h',
+    G.source (compositions.compose d p q h) = compositions.compose c (G.source p) (G.source q) h'
+  target_compose : ∀ {n} {c : Cut n} {d : Cut (n + 1)} (w : Cut.Raise c d)
+    (p q : G.Cell (n + 1)) h h',
+    G.target (compositions.compose d p q h) = compositions.compose c (G.target p) (G.target q) h'
+  leftUnital : (compositions.withIdentities identities).LeftUnital
+  rightUnital : (compositions.withIdentities identities).RightUnital
+  associative : (compositions.withIdentities identities).Associative
+  interchange : (compositions.withIdentities identities).Interchange
+  nullary_exchange : ∀ {n} (c : Cut n) (p q : G.Cell n) h h',
+    identities.identity (compositions.compose c p q h) =
+      compositions.compose c.up (identities.identity p) (identities.identity q) h'
+
+namespace StrictPresentation
+
+@[ext] theorem ext {G : GlobularSet.{u}} (S T : StrictPresentation G)
+    (hi : S.identities = T.identities) (hc : S.compositions = T.compositions) : S = T := by
+  cases S
+  cases T
+  cases hi
+  cases hc
+  rfl
+
+def operations {G : GlobularSet.{u}} (S : StrictPresentation G) : CutOperations G :=
+  S.compositions.withIdentities S.identities
+
+theorem compatible {G : GlobularSet.{u}} (S : StrictPresentation G) : S.operations.Compatible where
+  source_compose := S.source_compose
+  target_compose := S.target_compose
+  source_unit := S.identities.source_cutUnit_raise
+  target_unit := S.identities.target_cutUnit_raise
+
+/-- Iterated nullary exchange supplies preservation by identity extension
+through every dimension gap, with matching derived from the input cells. -/
+theorem extend_compose {G : GlobularSet.{u}} (S : StrictPresentation G) {n m : Nat}
+    (hnm : n ≤ m) (c : Cut n) (d : Cut m) (hd : c.height = d.height)
+    (p q : G.Cell n) h h' :
+    S.identities.extend hnm (S.compositions.compose c p q h) =
+      S.compositions.compose d (S.identities.extend hnm p) (S.identities.extend hnm q) h' := by
+  induction m, hnm using Nat.le_induction with
+  | base =>
+    simp only [S.identities.extend_refl]
+    exact eq_of_heq (S.compositions.compose_heq rfl c d hd p q p q HEq.rfl HEq.rfl h _)
+  | succ m hnm ih =>
+    let e : Cut m := Cut.ofFin ⟨c.height, Nat.lt_of_lt_of_le c.height_lt hnm⟩
+    have he : e.height = c.height := Cut.height_ofFin _
+    have hm := S.identities.extend_matching hnm c e he.symm p q h
+    have hu := S.identities.extend_matching (Nat.le_step hnm) c e.up
+      (e.height_up.trans he).symm p q h
+    rw [S.identities.extend_succ hnm p, S.identities.extend_succ hnm q] at hu
+    calc
+      S.identities.extend (Nat.le_step hnm) (S.compositions.compose c p q h) =
+          S.identities.identity (S.identities.extend hnm (S.compositions.compose c p q h)) :=
+        S.identities.extend_succ hnm _
+      _ = S.identities.identity
+          (S.compositions.compose e (S.identities.extend hnm p) (S.identities.extend hnm q) hm) :=
+        _root_.congrArg S.identities.identity (ih e he.symm hm)
+      _ = S.compositions.compose e.up
+          (S.identities.identity (S.identities.extend hnm p))
+          (S.identities.identity (S.identities.extend hnm q)) hu := S.nullary_exchange e _ _ hm hu
+      _ = _ := eq_of_heq (S.compositions.compose_heq rfl e.up d
+        ((e.height_up.trans he).trans hd) _ _ _ _
+        (heq_of_eq (S.identities.extend_succ hnm p).symm)
+        (heq_of_eq (S.identities.extend_succ hnm q).symm) hu h')
+
+theorem unitCompatible {G : GlobularSet.{u}} (S : StrictPresentation G) :
+    S.operations.UnitCompatible where
+  compose w p q h h' := S.extend_compose _ w.restrict _ w.restrict_height p q h h'
+  unit := S.identities.cutUnit_cutUnit
+
+/-- Higher-cut idempotence of a lower identity is a consequence of the
+ordinary unit law and identity iteration, not an extra strict axiom. -/
+theorem unitIdempotent {G : GlobularSet.{u}} (S : StrictPresentation G) :
+    S.operations.UnitIdempotent := by
+  intro n c d w p h
+  let r := CutBoundary.castCell G w.restrict_height.symm p
+  let e := S.identities.cutUnit w.restrict r
+  have hx : S.identities.cutUnit d e = S.identities.cutUnit c p :=
+    S.identities.cutUnit_cutUnit w r p (CutBoundary.castCell_heq _ _ p)
+  have hs : CutBoundary.source d G (S.identities.cutUnit c p) = e :=
+    (_root_.congrArg (CutBoundary.source d G) hx.symm).trans (S.identities.source_cutUnit d e)
+  have he := S.leftUnital d (S.identities.cutUnit c p)
+  change S.compositions.compose d (S.identities.cutUnit d
+    (CutBoundary.source d G (S.identities.cutUnit c p))) (S.identities.cutUnit c p) _ = _ at he
+  have hu := (_root_.congrArg (S.identities.cutUnit d) hs).trans hx
+  have hz := S.compositions.compose_heq rfl d d rfl _ _ _ _
+    (heq_of_eq hu) HEq.rfl
+    (S.operations.target_unit d (CutBoundary.source d G (S.identities.cutUnit c p))) h
+  exact (eq_of_heq hz).symm.trans he
+
+end StrictPresentation
+
 /-- Bundled models of the explicitly verified cut laws. This name deliberately
 does not identify them with an external presentation of strict omega-categories. -/
 structure CutModel where
@@ -5607,7 +5903,28 @@ structure CutModel where
   unitIdempotent : operations.UnitIdempotent
   unitCompatible : operations.UnitCompatible
 
+/-- The adjacent-identity strict presentation reconstructs every cut law
+required by the verified free-model adjunction. -/
+def StrictPresentation.toCutModel {G : GlobularSet.{u}} (S : StrictPresentation G) : CutModel.{u} where
+  carrier := G
+  operations := S.operations
+  compatible := S.compatible
+  leftUnital := S.leftUnital
+  rightUnital := S.rightUnital
+  associative := S.associative
+  interchange := S.interchange
+  unitIdempotent := S.unitIdempotent
+  unitCompatible := S.unitCompatible
+
 namespace CutModel
+
+@[ext] theorem ext (C D : CutModel.{u}) (h : C.carrier = D.carrier)
+    (ho : HEq C.operations D.operations) : C = D := by
+  cases C
+  cases D
+  cases h
+  cases eq_of_heq ho
+  rfl
 
 /-- Boundary preservation at every level strictly above the composition
 axis, obtained by dimension induction from adjacent compatibility. -/
@@ -5768,6 +6085,98 @@ theorem unit_identityIter (C : CutModel.{u}) {n : Nat} (k : Nat)
       _ = C.identity (C.operations.unit d r) := (C.identity_unit d r).symm
       _ = C.identity (C.identityIter (k + 1) q) := _root_.congrArg C.identity (ih d hd r hr)
       _ = C.identityIter (k + 1 + 1) q := rfl
+
+noncomputable def adjacentIdentities (C : CutModel.{u}) : AdjacentIdentities C.carrier where
+  identity := C.identity
+  source_identity := C.source_identity
+  target_identity := C.target_identity
+
+theorem adjacent_extend_cut (C : CutModel.{u}) {n m : Nat} (h : n < m)
+    (c : Cut m) (hc : c.height = n) (p : C.carrier.Cell n)
+    (q : C.carrier.Cell c.height) (hp : HEq p q) :
+    C.adjacentIdentities.extend h.le p = C.operations.unit c q := by
+  induction m with
+  | zero => omega
+  | succ m ih =>
+    rcases Nat.lt_or_eq_of_le (Nat.le_of_lt_succ h) with hlt | rfl
+    · let d : Cut m := Cut.ofFin ⟨n, hlt⟩
+      have hd : d.height = n := Cut.height_ofFin _
+      let r := CutBoundary.castCell C.carrier hd.symm p
+      have hr : HEq r p := CutBoundary.castCell_heq _ _ p
+      calc
+        C.adjacentIdentities.extend h.le p = C.identity (C.adjacentIdentities.extend hlt.le p) :=
+          C.adjacentIdentities.extend_succ hlt.le p
+        _ = C.identity (C.operations.unit d r) := _root_.congrArg C.identity (ih hlt d hd r hr.symm)
+        _ = C.operations.unit d.up (CutBoundary.castCell C.carrier d.height_up.symm r) :=
+          C.identity_unit d r
+        _ = C.operations.unit c q := eq_of_heq (C.unit_heq rfl d.up c
+          ((d.height_up.trans hd).trans hc.symm) _ q
+          ((CutBoundary.castCell_heq _ _ r).trans (hr.trans hp)))
+    · calc
+        C.adjacentIdentities.extend h.le p = C.identity p :=
+          (C.adjacentIdentities.extend_succ (Nat.le_refl n) p).trans
+            (_root_.congrArg C.identity (C.adjacentIdentities.extend_refl p))
+        _ = C.operations.unit c q := eq_of_heq (C.unit_heq rfl (Cut.top n) c
+          ((Cut.height_top n).trans hc.symm) _ q ((CutBoundary.castCell_heq _ _ p).trans hp))
+
+theorem adjacent_cutUnit (C : CutModel.{u}) {n : Nat} (c : Cut n) (p : C.carrier.Cell c.height) :
+    C.adjacentIdentities.cutUnit c p = C.operations.unit c p :=
+  C.adjacent_extend_cut c.height_lt c rfl p p HEq.rfl
+
+def compositions (C : CutModel.{u}) : CutCompositions C.carrier where
+  compose := C.operations.compose
+  source_compose := C.operations.source_compose
+  target_compose := C.operations.target_compose
+
+/-- Reconstructing cut identities from adjacent identities retains the
+original complete operation record, not merely its cell boundaries. -/
+theorem operations_recovered (C : CutModel.{u}) :
+    C.compositions.withIdentities C.adjacentIdentities = C.operations := by
+  apply CutOperations.ext
+  · rfl
+  · funext n c p
+    exact C.adjacent_cutUnit c p
+
+noncomputable def strictPresentation (C : CutModel.{u}) : StrictPresentation C.carrier where
+  identities := C.adjacentIdentities
+  compositions := C.compositions
+  source_compose := C.compatible.source_compose
+  target_compose := C.compatible.target_compose
+  leftUnital := C.operations_recovered.symm ▸ C.leftUnital
+  rightUnital := C.operations_recovered.symm ▸ C.rightUnital
+  associative := C.operations_recovered.symm ▸ C.associative
+  interchange := C.operations_recovered.symm ▸ C.interchange
+  nullary_exchange := C.identity_compose
+
+theorem strictPresentation_operations (C : CutModel.{u}) :
+    C.strictPresentation.toCutModel.operations = C.operations := C.operations_recovered
+
+theorem strictPresentation_roundTrip (C : CutModel.{u}) : C.strictPresentation.toCutModel = C :=
+  CutModel.ext _ _ rfl (heq_of_eq C.operations_recovered)
+
+end CutModel
+
+namespace StrictPresentation
+
+theorem identity_recovered
+    {G : GlobularSet.{u}} (S : StrictPresentation G) {n : Nat} (p : G.Cell n) :
+    S.toCutModel.identity p = S.identities.identity p := by
+  exact eq_of_heq ((S.identities.extend_heq (Cut.height_top n) rfl _ (Nat.le_succ n)
+    _ p (CutBoundary.castCell_heq _ _ p)).trans (heq_of_eq (Nat.leRecOn_succ' p)))
+
+theorem roundTrip
+    {G : GlobularSet.{u}} (S : StrictPresentation G) :
+    S.toCutModel.strictPresentation = S := by
+  apply StrictPresentation.ext
+  · apply AdjacentIdentities.ext
+    funext n p
+    exact S.identity_recovered p
+  · apply CutCompositions.ext
+    rfl
+
+end StrictPresentation
+
+namespace CutModel
 
 structure Hom (C D : CutModel.{u}) where
   map : GlobularSet.Map C.carrier D.carrier
