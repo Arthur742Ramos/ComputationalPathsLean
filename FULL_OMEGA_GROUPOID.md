@@ -600,7 +600,7 @@ their boundaries. Identities and globularity are checked at every dimension.
 This carrier construction alone does not establish an operadic action,
 and does not replace the independent, presentation-sensitive associativity
 certificate. The endomorphism action and algebra laws are now verified below;
-the required operation and certificate comparisons are still outstanding.
+the status of the operation and certificate comparisons is tracked below.
 
 The candidate now has adjacent composition and reversal at every positive
 dimension, with verified source/target laws. `compose_paths` and
@@ -631,8 +631,10 @@ exact `Step.trans_refl_left` and `Step.trans_refl_right` derivations. Higher
 instances use the declared coskeletal extension. The audit checks that all
 these coherence cells are themselves coinductively weakly invertible, at an
 arbitrary dimension. These are actual operations of the candidate tower,
-but their operadic origin and the required pentagon/interchange comparison
-with the independent associativity certificate remain to be established.
+but this native construction alone does not establish their operadic origin
+or compare them with the independent associativity certificate. The later
+sections construct the selected operations and their pentagon comparison;
+the selected interchange comparison remains open.
 
 The current rewrite theory has a totality theorem for `RwEq` on parallel
 paths. A structural weak omega-groupoid theorem does not automatically give a
@@ -902,7 +904,29 @@ composites. Its source, target, and double-identity arity are verified.
 `appliedOperationPentagon` evaluates that specific operation on any full
 labelled 3-diagram satisfying its arity equation and retains the actions of
 the short and long composites as its exact native boundaries; the resulting
-3-cell is weakly invertible. The concrete quadruple-path input and comparison
-to the unchanged primitive `Step`/`RwEq` pentagon still need to be
-instantiated. This is not yet the completed selected pentagon comparison,
-and the selected interchange comparison also remains open.
+3-cell is weakly invertible.
+
+`fourPathPentagon` now instantiates this operation on any four composable
+raw paths, using the double identity of their complete labelled quadruple
+diagram. Its arity equation is discharged. `nestedBinary_operation` proves
+that nested application projects to the actual multiplication tree.
+`fourLeftApplication_inputs` and `fourRightApplication_inputs` retain the
+same full labelled input; their operation evaluations are the exact left-
+and right-associated fourfold `Path.trans` expressions. Consequently
+`fourPathPentagonShort`, `fourPathPentagonLong`, and
+`fourPathPentagon_boundary` expose the actual operation-composite actions
+with checked raw path endpoints.
+
+`NativeAssociativity.selectedPentagonComparison` compares this concrete
+pentagon with the primitive native pentagon after pasting in explicit
+short- and long-boundary comparisons. More importantly,
+`certificatePentagonComparison` uses the image of the **unchanged independent
+`AssocHigher.pentagon` certificate itself** as its central 3-cell. Its target
+is that image with the two named boundary comparisons pasted around it,
+using selected operadic composition. The comparison is a weakly invertible
+4-cell in the declared coskeletal extension, not equality of raw rewrite
+histories or a faithfulness theorem. `certificatePentagonBoundary_trace_counts`
+and `certificatePentagonBoundary_targets_distinct` verify that the preserved
+boundary traces still have two and three steps and remain unequal. This
+discharges the explicit selected pentagon comparison. The selected
+interchange comparison remains open.

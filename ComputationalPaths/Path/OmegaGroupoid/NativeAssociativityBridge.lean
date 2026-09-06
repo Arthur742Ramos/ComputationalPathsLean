@@ -315,6 +315,158 @@ theorem tree_three {α : Type v} {A : Type u} {a : A} (label : α → Path a a)
     (x y z : FreeMagma α) : evalTree label ((x * y) * z) =
       Path.trans (Path.trans (evalTree label x) (evalTree label y)) (evalTree label z) := rfl
 
+/-- Compare the short operation-composite action to the preserved two-step
+primitive derivation without identifying their rewrite histories. -/
+noncomputable def selectedPentagonShortComparison {A : Type u} {a b c d e : A}
+    (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e) :
+    { h : NativeTower.Cell A 3 // NativeTower.source h = (NativeOperadic.fourPathPentagonShort p q r s).val ∧
+      NativeTower.target h = two (pentagonLeft p q r s) } :=
+  ⟨NativeTower.fillPositive (NativeOperadic.fourPathPentagonShort p q r s).val (two (pentagonLeft p q r s))
+      (NativeOperadic.fourPathPentagonShort p q r s).property.1
+      (NativeOperadic.fourPathPentagonShort p q r s).property.2,
+    NativeTower.fillPositive_boundary _ _ _ _⟩
+
+/-- The long-side comparison likewise retains the original three-step
+derivation as its exact target, including its original bracketing. -/
+noncomputable def selectedPentagonLongComparison {A : Type u} {a b c d e : A}
+    (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e) :
+    { h : NativeTower.Cell A 3 // NativeTower.source h = (NativeOperadic.fourPathPentagonLong p q r s).val ∧
+      NativeTower.target h = two (pentagonRight p q r s) } :=
+  ⟨NativeTower.fillPositive (NativeOperadic.fourPathPentagonLong p q r s).val (two (pentagonRight p q r s))
+      (NativeOperadic.fourPathPentagonLong p q r s).property.1
+      (NativeOperadic.fourPathPentagonLong p q r s).property.2,
+    NativeTower.fillPositive_boundary _ _ _ _⟩
+
+/-- Paste the original primitive pentagon between the two explicit boundary
+comparisons, using the selected operadic composition on native 3-cells. -/
+noncomputable def pentagonWithComparedBoundaries {A : Type u} {a b c d e : A}
+    (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e) :
+    { h : NativeTower.Cell A 3 // NativeTower.source h = (NativeOperadic.fourPathPentagonShort p q r s).val ∧
+      NativeTower.target h = (NativeOperadic.fourPathPentagonLong p q r s).val } := by
+  let l := selectedPentagonShortComparison p q r s
+  let m := three (pentagonCoherence p q r s)
+  let r := selectedPentagonLongComparison p q r s
+  let hm := m.property.2.trans ((NativeTower.source_reverse (n := 2) r.val).trans r.property.2).symm
+  let t := NativeOperadic.compose (A := A) (n := 2) m.val (NativeTower.reverse (n := 2) r.val) hm
+  have ht := NativeOperadic.compose_boundary (A := A) (n := 2) m.val (NativeTower.reverse (n := 2) r.val) hm
+  let hl := l.property.2.trans (ht.1.trans m.property.1).symm
+  exact ⟨NativeOperadic.compose (A := A) (n := 2) l.val t hl,
+    (NativeOperadic.compose_boundary (A := A) (n := 2) l.val t hl).1.trans l.property.1,
+    (NativeOperadic.compose_boundary (A := A) (n := 2) l.val t hl).2.trans
+      (ht.2.trans ((NativeTower.target_reverse (n := 2) r.val).trans r.property.1))⟩
+
+/-- The selected operadic pentagon compares to the preserved primitive
+pentagon with its boundary comparisons pasted in. This lives in the declared
+coskeletal fourth layer; it is not equality of raw rewrite histories. -/
+noncomputable def selectedPentagonComparison {A : Type u} {a b c d e : A}
+    (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e) :
+    { h : NativeTower.Cell A 4 // NativeTower.source h = (NativeOperadic.fourPathPentagon p q r s).val ∧
+      NativeTower.target h = (pentagonWithComparedBoundaries p q r s).val } :=
+  ⟨NativeTower.fillPositive (NativeOperadic.fourPathPentagon p q r s).val
+      (pentagonWithComparedBoundaries p q r s).val
+      ((NativeOperadic.fourPathPentagon_boundary p q r s).1.trans
+        (pentagonWithComparedBoundaries p q r s).property.1.symm)
+      ((NativeOperadic.fourPathPentagon_boundary p q r s).2.trans
+        (pentagonWithComparedBoundaries p q r s).property.2.symm),
+    NativeTower.fillPositive_boundary _ _ _ _⟩
+
+theorem selectedPentagonComparison_invertible {A : Type u} {a b c d e : A}
+    (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e) :
+    NativeOperadic.WeaklyInvertible 3 (selectedPentagonComparison p q r s).val :=
+  NativeOperadic.all_cells_weaklyInvertible _ _
+
+/-- Boundary comparison to the exact short trace of the independent tree
+certificate, not a newly chosen two-cell with the same endpoints. -/
+noncomputable def certificatePentagonShortComparison {α : Type v} {A : Type u} {a : A}
+    (label : α → Path a a) (w x y z : FreeMagma α) :
+    { h : NativeTower.Cell A 3 // NativeTower.source h =
+        (NativeOperadic.fourPathPentagonShort (evalTree label w) (evalTree label x)
+          (evalTree label y) (evalTree label z)).val ∧
+      NativeTower.target h = trace label (pentagonShort w x y z).toRwEq } :=
+  ⟨NativeTower.fillPositive _ _
+      (NativeOperadic.fourPathPentagonShort (evalTree label w) (evalTree label x)
+        (evalTree label y) (evalTree label z)).property.1
+      (NativeOperadic.fourPathPentagonShort (evalTree label w) (evalTree label x)
+        (evalTree label y) (evalTree label z)).property.2,
+    NativeTower.fillPositive_boundary _ _ _ _⟩
+
+noncomputable def certificatePentagonLongComparison {α : Type v} {A : Type u} {a : A}
+    (label : α → Path a a) (w x y z : FreeMagma α) :
+    { h : NativeTower.Cell A 3 // NativeTower.source h =
+        (NativeOperadic.fourPathPentagonLong (evalTree label w) (evalTree label x)
+          (evalTree label y) (evalTree label z)).val ∧
+      NativeTower.target h = trace label (pentagonLong w x y z).toRwEq } :=
+  ⟨NativeTower.fillPositive _ _
+      (NativeOperadic.fourPathPentagonLong (evalTree label w) (evalTree label x)
+        (evalTree label y) (evalTree label z)).property.1
+      (NativeOperadic.fourPathPentagonLong (evalTree label w) (evalTree label x)
+        (evalTree label y) (evalTree label z)).property.2,
+    NativeTower.fillPositive_boundary _ _ _ _⟩
+
+/-- The central 3-cell is the image of the unchanged independent pentagon
+certificate itself; the outer cells only adjust its explicit boundaries. -/
+noncomputable def certificatePentagonWithComparedBoundaries {α : Type v} {A : Type u} {a : A}
+    (label : α → Path a a) (w x y z : FreeMagma α) :
+    { h : NativeTower.Cell A 3 // NativeTower.source h =
+        (NativeOperadic.fourPathPentagonShort (evalTree label w) (evalTree label x)
+          (evalTree label y) (evalTree label z)).val ∧
+      NativeTower.target h =
+        (NativeOperadic.fourPathPentagonLong (evalTree label w) (evalTree label x)
+          (evalTree label y) (evalTree label z)).val } := by
+  let l := certificatePentagonShortComparison label w x y z
+  let m := certificate label (AssocHigher.pentagon w x y z)
+  let r := certificatePentagonLongComparison label w x y z
+  let hm := m.property.2.trans ((NativeTower.source_reverse (n := 2) r.val).trans r.property.2).symm
+  let t := NativeOperadic.compose (A := A) (n := 2) m.val (NativeTower.reverse (n := 2) r.val) hm
+  have ht := NativeOperadic.compose_boundary (A := A) (n := 2) m.val (NativeTower.reverse (n := 2) r.val) hm
+  let hl := l.property.2.trans (ht.1.trans m.property.1).symm
+  exact ⟨NativeOperadic.compose (A := A) (n := 2) l.val t hl,
+    (NativeOperadic.compose_boundary (A := A) (n := 2) l.val t hl).1.trans l.property.1,
+    (NativeOperadic.compose_boundary (A := A) (n := 2) l.val t hl).2.trans
+      (ht.2.trans ((NativeTower.target_reverse (n := 2) r.val).trans r.property.1))⟩
+
+/-- Comparison of the actual selected operadic pentagon to the preserved
+independent certificate, relative to its named raw trace boundary bridges. -/
+noncomputable def certificatePentagonComparison {α : Type v} {A : Type u} {a : A}
+    (label : α → Path a a) (w x y z : FreeMagma α) :
+    { h : NativeTower.Cell A 4 // NativeTower.source h =
+        (NativeOperadic.fourPathPentagon (evalTree label w) (evalTree label x)
+          (evalTree label y) (evalTree label z)).val ∧
+      NativeTower.target h = (certificatePentagonWithComparedBoundaries label w x y z).val } :=
+  ⟨NativeTower.fillPositive _ _
+      ((NativeOperadic.fourPathPentagon_boundary (evalTree label w) (evalTree label x)
+        (evalTree label y) (evalTree label z)).1.trans
+        (certificatePentagonWithComparedBoundaries label w x y z).property.1.symm)
+      ((NativeOperadic.fourPathPentagon_boundary (evalTree label w) (evalTree label x)
+        (evalTree label y) (evalTree label z)).2.trans
+        (certificatePentagonWithComparedBoundaries label w x y z).property.2.symm),
+    NativeTower.fillPositive_boundary _ _ _ _⟩
+
+theorem certificatePentagonComparison_invertible {α : Type v} {A : Type u} {a : A}
+    (label : α → Path a a) (w x y z : FreeMagma α) :
+    NativeOperadic.WeaklyInvertible 3 (certificatePentagonComparison label w x y z).val :=
+  NativeOperadic.all_cells_weaklyInvertible _ _
+
+theorem certificatePentagonBoundary_trace_counts {α : Type v} {A : Type u} {a : A}
+    (label : α → Path a a) (w x y z : FreeMagma α) :
+    traceSteps (NativeTower.target (certificatePentagonShortComparison label w x y z).val) = 2 ∧
+      traceSteps (NativeTower.target (certificatePentagonLongComparison label w x y z).val) = 3 :=
+  ⟨(_root_.congrArg traceSteps (certificatePentagonShortComparison label w x y z).property.2).trans
+      (pentagon_trace_counts label w x y z).1,
+    (_root_.congrArg traceSteps (certificatePentagonLongComparison label w x y z).property.2).trans
+      (pentagon_trace_counts label w x y z).2⟩
+
+/-- Adding the comparison cells has not identified the two independent raw
+rewrite histories: their targets remain provably distinct. -/
+theorem certificatePentagonBoundary_targets_distinct {α : Type v} {A : Type u} {a : A}
+    (label : α → Path a a) (w x y z : FreeMagma α) :
+    NativeTower.target (certificatePentagonShortComparison label w x y z).val ≠
+      NativeTower.target (certificatePentagonLongComparison label w x y z).val := by
+  intro h
+  exact pentagon_traces_distinct label w x y z
+    ((certificatePentagonShortComparison label w x y z).property.2.symm.trans
+      (h.trans (certificatePentagonLongComparison label w x y z).property.2))
+
 end NativeAssociativity
 
 end ComputationalPaths.Path.OmegaFoundations

@@ -1419,6 +1419,301 @@ theorem appliedOperationPentagon_invertible {A : Type u}
     WeaklyInvertible 2 (appliedOperationPentagon f g h k d hd).val :=
   all_cells_weaklyInvertible _ _
 
+/-- Relabelling preserves the adjacent identity diagram in every dimension. -/
+theorem map_identityDiagram {G H : GlobularSet.{u + 1}} (f : GlobularSet.Map G H)
+    {n : Nat} (p : Pasting n G) :
+    Pasting.map f (Pasting.identity p) = Pasting.identity (Pasting.map f p) := by
+  induction n generalizing G H with
+  | zero => rfl
+  | succ n ih =>
+    rcases p with ⟨a, b, p⟩
+    apply _root_.congrArg Pasting.pack
+    exact (Chain.mapAlong_natural _ _ _ _ _ (fun {x y} e => (ih (f.hom x y) e).symm) p).symm
+
+/-- The full quadruple input retains all four original path labels. -/
+noncomputable def fourPathDiagram {A : Type u} {a b c d e : A}
+    (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e) : Pasting 1 (carrier A) :=
+  (Pasting.cutOperations (carrier A)).compose .bottom
+    ((Pasting.cutOperations (carrier A)).compose .bottom
+      ((Pasting.cutOperations (carrier A)).compose .bottom (pathDiagram p) (pathDiagram q) rfl)
+      (pathDiagram r) rfl) (pathDiagram s) rfl
+
+theorem shape_one_compose {A : Type u} (p q : Pasting 1 (carrier A)) h :
+    (GlobularCollection.shape (carrier A)).app (n := 1)
+      ((Pasting.cutOperations (carrier A)).compose .bottom p q h) =
+    binaryArity ((GlobularCollection.shape (carrier A)).app (n := 1) p)
+      ((GlobularCollection.shape (carrier A)).app (n := 1) q) :=
+  (Pasting.mapGlobular_preserves (GlobularSet.terminalMap (carrier A))).compose .bottom p q h _
+
+theorem pathDiagram_shape {A : Type u} {a b : A} (p : Path a b) :
+    (GlobularCollection.shape (carrier A)).app (n := 1) (pathDiagram p) =
+      (collection A).arity.app (n := 1) (one A 1) :=
+  (Pasting.map_singleton (GlobularSet.terminalMap (carrier A)) _).trans (one_arity A 1).symm
+
+set_option backward.isDefEq.respectTransparency false in
+theorem fourPathDiagram_shape {A : Type u} {a b c d e : A}
+    (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e) :
+    (GlobularCollection.shape (carrier A)).app (n := 1) (fourPathDiagram p q r s) =
+      (collection A).arity.app (n := 1)
+        (operationBinary (operationBinary (operationBinary (one A 1) (one A 1)) (one A 1)) (one A 1)) := by
+  unfold fourPathDiagram
+  simp only [shape_one_compose, pathDiagram_shape, operationBinary_arity]
+
+/-- The specific double-identity quadruple diagram on which the pentagon
+operation acts, with no abstract admissibility assumption left to supply. -/
+noncomputable def fourPathPentagonDiagram {A : Type u} {a b c d e : A}
+    (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e) : Pasting 3 (carrier A) :=
+  Pasting.identity (Pasting.identity (fourPathDiagram p q r s))
+
+theorem fourPathPentagonDiagram_arity {A : Type u} {a b c d e : A}
+    (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e) :
+    (collection A).arity.app (n := 3) (operationPentagon (one A 1) (one A 1) (one A 1) (one A 1)).cell =
+      (GlobularCollection.shape (carrier A)).app (n := 3) (fourPathPentagonDiagram p q r s) := by
+  have hm := map_identityDiagram (GlobularSet.terminalMap (carrier A))
+    (Pasting.identity (fourPathDiagram p q r s))
+  have hi := map_identityDiagram (GlobularSet.terminalMap (carrier A)) (fourPathDiagram p q r s)
+  exact (operationPentagon_arity _ _ _ _).trans
+    ((_root_.congrArg (fun x : Pasting 1 GlobularSet.terminal => Pasting.identity (Pasting.identity x))
+      (fourPathDiagram_shape p q r s).symm).trans
+      ((_root_.congrArg (Pasting.identity (n := 2)) hi.symm).trans hm.symm))
+
+/-- The operadic pentagon instantiated on any four composable raw paths. -/
+noncomputable def fourPathPentagon {A : Type u} {a b c d e : A}
+    (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e) :=
+  appliedOperationPentagon (one A 1) (one A 1) (one A 1) (one A 1)
+    (fourPathPentagonDiagram p q r s) (fourPathPentagonDiagram_arity p q r s)
+
+theorem fourPathPentagon_invertible {A : Type u} {a b c d e : A}
+    (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e) :
+    WeaklyInvertible 2 (fourPathPentagon p q r s).val := all_cells_weaklyInvertible _ _
+
+/-- Projecting a nested binary application to its operation gives exactly
+the binary operation composite, not merely an equal carrier evaluation. -/
+theorem nestedBinary_operation {A : Type u} {n : Nat} (c : Pasting.Cut n)
+    (x y : ((collection A).application (carrier A)).Cell n) h h' :
+    (substitutedInput (nestedBinary c x y h)).val.1 =
+      operationComposeAt c x.val.1 y.val.1 h' := by
+  let f := (collection A).operation (carrier A)
+  have hl := labelledInstructionsOn_natural (A := A) f
+    (binaryDiagramOn ((collection A).application (carrier A)) c x y h)
+  have hm := binaryDiagramOn_map f c x y h h'
+  exact (_root_.congrArg (Endomorphism.multiplication (carrier A)).operations.app hl).trans
+    (_root_.congrArg (fun d => (Endomorphism.multiplication (carrier A)).operations.app
+      ((labelledInstructionsOn A (collection A).operations).app d)) hm)
+
+theorem pathInput_operation {A : Type u} {a b : A} (p : Path a b) :
+    (pathInput p).val.1 = one A 1 :=
+  (_root_.congrArg (instructions A).app
+    (Pasting.map_singleton (GlobularSet.terminalMap (carrier A)) _)).trans (instruction_singleton A 1)
+
+theorem application_zero_ext {A : Type u}
+    {x y : ((collection A).application (carrier A)).Cell 0}
+    (h : (Endomorphism.evaluation (carrier A)).app x = (Endomorphism.evaluation (carrier A)).app y) :
+    x = y := Subtype.ext (Prod.ext (@Subsingleton.elim PUnit _ _ _) h)
+
+theorem application_matching {A : Type u}
+    (x y : ((collection A).application (carrier A)).Cell 1)
+    (h : NativeTower.target ((Endomorphism.evaluation (carrier A)).app x) =
+      NativeTower.source ((Endomorphism.evaluation (carrier A)).app y)) :
+    ((collection A).application (carrier A)).target x =
+      ((collection A).application (carrier A)).source y :=
+  application_zero_ext (((Endomorphism.evaluation (carrier A)).target_app x).symm.trans
+    (h.trans ((Endomorphism.evaluation (carrier A)).source_app y)))
+
+/-- A full labelled operad application computing a specified raw path. -/
+structure PathApplication {A : Type u} {a b : A} (p : Path a b) where
+  cell : ((collection A).application (carrier A)).Cell 1
+  evaluation : (Endomorphism.evaluation (carrier A)).app cell = ULift.up (⟨a, b, p⟩ : PathOne A)
+
+noncomputable def PathApplication.singleton {A : Type u} {a b : A} (p : Path a b) : PathApplication p :=
+  ⟨pathInput p, pathInput_evaluation p⟩
+
+theorem PathApplication.matching {A : Type u} {a b c : A} {p : Path a b} {q : Path b c}
+    (x : PathApplication p) (y : PathApplication q) :
+    ((collection A).application (carrier A)).target x.cell =
+      ((collection A).application (carrier A)).source y.cell :=
+  application_matching x.cell y.cell ((_root_.congrArg (NativeTower.target (n := 0)) x.evaluation).trans
+    (_root_.congrArg (NativeTower.source (n := 0)) y.evaluation).symm)
+
+noncomputable def PathApplication.binary {A : Type u} {a b c : A} {p : Path a b} {q : Path b c}
+    (x : PathApplication p) (y : PathApplication q) : PathApplication (Path.trans p q) := by
+  let h := x.matching y
+  let hm := (_root_.congrArg (NativeTower.target (n := 0)) x.evaluation).trans
+    (_root_.congrArg (NativeTower.source (n := 0)) y.evaluation).symm
+  exact ⟨substitutedInput (nestedBinary .bottom x.cell y.cell h),
+    (substitutedInput_evaluation _).trans
+      ((nestedBinary_evaluation .bottom x.cell y.cell h hm).trans
+        ((composeAt_congr .bottom x.evaluation y.evaluation hm rfl).trans (composeAt_paths p q)))⟩
+
+theorem PathApplication.singleton_operation {A : Type u} {a b : A} (p : Path a b) :
+    (PathApplication.singleton p).cell.val.1 = one A 1 := pathInput_operation p
+
+theorem PathApplication.binary_operation {A : Type u} {a b c : A} {p : Path a b} {q : Path b c}
+    (x : PathApplication p) (y : PathApplication q) :
+    (x.binary y).cell.val.1 = operationBinary x.cell.val.1 y.cell.val.1 :=
+  nestedBinary_operation .bottom x.cell y.cell (x.matching y) _
+
+noncomputable def fourLeftApplication {A : Type u} {a b c d e : A}
+    (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e) :
+    PathApplication (Path.trans (Path.trans (Path.trans p q) r) s) :=
+  (((PathApplication.singleton p).binary (PathApplication.singleton q)).binary
+    (PathApplication.singleton r)).binary (PathApplication.singleton s)
+
+noncomputable def fourRightApplication {A : Type u} {a b c d e : A}
+    (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e) :
+    PathApplication (Path.trans p (Path.trans q (Path.trans r s))) :=
+  (PathApplication.singleton p).binary ((PathApplication.singleton q).binary
+    ((PathApplication.singleton r).binary (PathApplication.singleton s)))
+
+theorem fourLeftApplication_operation {A : Type u} {a b c d e : A}
+    (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e) :
+    (fourLeftApplication p q r s).cell.val.1 =
+      operationBinary (operationBinary (operationBinary (one A 1) (one A 1)) (one A 1)) (one A 1) := by
+  unfold fourLeftApplication
+  simp only [PathApplication.binary_operation, PathApplication.singleton_operation]
+
+theorem fourRightApplication_operation {A : Type u} {a b c d e : A}
+    (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e) :
+    (fourRightApplication p q r s).cell.val.1 =
+      operationBinary (one A 1) (operationBinary (one A 1) (operationBinary (one A 1) (one A 1))) := by
+  unfold fourRightApplication
+  simp only [PathApplication.binary_operation, PathApplication.singleton_operation]
+
+theorem PathApplication.binary_inputs {A : Type u} {a b c : A} {p : Path a b} {q : Path b c}
+    (x : PathApplication p) (y : PathApplication q) {d₁ d₂ : Pasting 1 (carrier A)}
+    (hx : x.cell.val.2 = d₁) (hy : y.cell.val.2 = d₂) h' :
+    (x.binary y).cell.val.2 = (Pasting.cutOperations (carrier A)).compose .bottom d₁ d₂ h' := by
+  let f := (collection A).inputs (carrier A)
+  have hm := (Pasting.CutBoundary.target_map (.bottom : Pasting.Cut 1) f x.cell).trans
+    ((_root_.congrArg f.app (x.matching y)).trans
+      (Pasting.CutBoundary.source_map (.bottom : Pasting.Cut 1) f y.cell).symm)
+  exact (nestedBinary_inputs .bottom x.cell y.cell (x.matching y) hm).trans
+    (eq_of_heq ((Pasting.CutModel.free (carrier A)).compose_heq rfl
+      (.bottom : Pasting.Cut 1) (.bottom : Pasting.Cut 1) rfl
+      _ _ _ _ (heq_of_eq hx) (heq_of_eq hy) hm h'))
+
+theorem fourLeftApplication_inputs {A : Type u} {a b c d e : A}
+    (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e) :
+    (fourLeftApplication p q r s).cell.val.2 = fourPathDiagram p q r s :=
+  PathApplication.binary_inputs _ _
+    (PathApplication.binary_inputs _ _ (PathApplication.binary_inputs _ _ rfl rfl rfl) rfl rfl) rfl rfl
+
+theorem fourPathDiagram_assoc {A : Type u} {a b c d e : A}
+    (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e) :
+    fourPathDiagram p q r s = (Pasting.cutOperations (carrier A)).compose .bottom (pathDiagram p)
+      ((Pasting.cutOperations (carrier A)).compose .bottom (pathDiagram q)
+        ((Pasting.cutOperations (carrier A)).compose .bottom (pathDiagram r) (pathDiagram s) rfl) rfl) rfl :=
+  (Pasting.cutOperations_associative (carrier A) .bottom
+    ((Pasting.cutOperations (carrier A)).compose .bottom (pathDiagram p) (pathDiagram q) rfl)
+    (pathDiagram r) (pathDiagram s) rfl rfl rfl rfl).trans
+    (Pasting.cutOperations_associative (carrier A) .bottom (pathDiagram p) (pathDiagram q)
+      ((Pasting.cutOperations (carrier A)).compose .bottom (pathDiagram r) (pathDiagram s) rfl)
+      rfl rfl rfl rfl)
+
+theorem fourRightApplication_inputs {A : Type u} {a b c d e : A}
+    (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e) :
+    (fourRightApplication p q r s).cell.val.2 = fourPathDiagram p q r s :=
+  (PathApplication.binary_inputs _ _ rfl
+    (PathApplication.binary_inputs _ _ rfl (PathApplication.binary_inputs _ _ rfl rfl rfl) rfl) rfl).trans
+      (fourPathDiagram_assoc p q r s).symm
+
+theorem PathApplication.applyOperation_eq {A : Type u} {a b : A} {p : Path a b}
+    (x : PathApplication p) {o : (collection A).operations.Cell 1} {d : Pasting 1 (carrier A)}
+    (ho : x.cell.val.1 = o) (hd : x.cell.val.2 = d) h :
+    applyOperation o d h = ULift.up (⟨a, b, p⟩ : PathOne A) :=
+  (_root_.congrArg (Endomorphism.evaluation (carrier A)).app
+    (Subtype.ext (Prod.ext ho.symm hd.symm))).trans x.evaluation
+
+theorem fourLeftOperation_evaluation {A : Type u} {a b c d e : A}
+    (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e) h :
+    applyOperation
+      (operationBinary (operationBinary (operationBinary (one A 1) (one A 1)) (one A 1)) (one A 1))
+      (fourPathDiagram p q r s) h =
+      ULift.up (⟨a, e, Path.trans (Path.trans (Path.trans p q) r) s⟩ : PathOne A) :=
+  (fourLeftApplication p q r s).applyOperation_eq
+    (fourLeftApplication_operation p q r s) (fourLeftApplication_inputs p q r s) h
+
+theorem fourRightOperation_evaluation {A : Type u} {a b c d e : A}
+    (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e) h :
+    applyOperation
+      (operationBinary (one A 1) (operationBinary (one A 1) (operationBinary (one A 1) (one A 1))))
+      (fourPathDiagram p q r s) h =
+      ULift.up (⟨a, e, Path.trans p (Path.trans q (Path.trans r s))⟩ : PathOne A) :=
+  (fourRightApplication p q r s).applyOperation_eq
+    (fourRightApplication_operation p q r s) (fourRightApplication_inputs p q r s) h
+
+theorem applyOperation_source {A : Type u} {n : Nat}
+    (o : (collection A).operations.Cell (n + 1)) (d : Pasting (n + 1) (carrier A)) h hs :
+    NativeTower.source (applyOperation o d h) =
+      applyOperation ((collection A).operations.source o) (Pasting.source d) hs :=
+  (Endomorphism.evaluation (carrier A)).source_app ⟨⟨o, d⟩, h⟩
+
+theorem applyOperation_target {A : Type u} {n : Nat}
+    (o : (collection A).operations.Cell (n + 1)) (d : Pasting (n + 1) (carrier A)) h ht :
+    NativeTower.target (applyOperation o d h) =
+      applyOperation ((collection A).operations.target o) (Pasting.target d) ht :=
+  (Endomorphism.evaluation (carrier A)).target_app ⟨⟨o, d⟩, h⟩
+
+theorem Operation2Between.identityInputArity {A : Type u}
+    {o r : (collection A).operations.Cell 1} (p : Operation2Between o r) (hp : p.IdentityArity)
+    (d : Pasting 1 (carrier A))
+    (ho : (collection A).arity.app (n := 1) o = (GlobularCollection.shape (carrier A)).app (n := 1) d) :
+    (collection A).arity.app (n := 2) p.cell =
+      (GlobularCollection.shape (carrier A)).app (n := 2) (Pasting.identity d) :=
+  hp.trans ((_root_.congrArg (Pasting.identity (n := 1)) ho).trans
+    (map_identityDiagram (GlobularSet.terminalMap (carrier A)) d).symm)
+
+/-- Acting on the identity of a full labelled input preserves the fixed
+operation endpoints and does not replace the chosen 2-operation. -/
+noncomputable def Operation2Between.actionOnIdentity {A : Type u}
+    {o r : (collection A).operations.Cell 1} (p : Operation2Between o r) (hp : p.IdentityArity)
+    (d : Pasting 1 (carrier A))
+    (ho : (collection A).arity.app (n := 1) o = (GlobularCollection.shape (carrier A)).app (n := 1) d) :
+    { c : NativeTower.Cell A 2 // NativeTower.source c = applyOperation o d ho ∧
+      NativeTower.target c = applyOperation r d ((p.arity_endpoints hp).symm.trans ho) } := by
+  let hr := (p.arity_endpoints hp).symm.trans ho
+  let hs := (_root_.congrArg ((collection A).arity.app (n := 1)) p.source_cell).trans
+    (ho.trans (_root_.congrArg ((GlobularCollection.shape (carrier A)).app (n := 1))
+      (Pasting.source_identity (carrier A) d)).symm)
+  let ht := (_root_.congrArg ((collection A).arity.app (n := 1)) p.target_cell).trans
+    (hr.trans (_root_.congrArg ((GlobularCollection.shape (carrier A)).app (n := 1))
+      (Pasting.target_identity (carrier A) d)).symm)
+  exact ⟨applyOperation p.cell (Pasting.identity d) (p.identityInputArity hp d ho),
+    (applyOperation_source p.cell _ _ hs).trans
+      (applyOperation_congr p.source_cell (Pasting.source_identity (carrier A) d) hs ho),
+    (applyOperation_target p.cell _ _ ht).trans
+      (applyOperation_congr p.target_cell (Pasting.target_identity (carrier A) d) ht hr)⟩
+
+noncomputable def fourPathPentagonShort {A : Type u} {a b c d e : A}
+    (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e) :
+    { h : NativeTower.Cell A 2 //
+      NativeTower.source h = ULift.up (⟨a, e, Path.trans (Path.trans (Path.trans p q) r) s⟩ : PathOne A) ∧
+      NativeTower.target h = ULift.up (⟨a, e, Path.trans p (Path.trans q (Path.trans r s))⟩ : PathOne A) } := by
+  let h := (operationPentagonShort (one A 1) (one A 1) (one A 1) (one A 1)).actionOnIdentity
+    (operationPentagonShort_identityArity _ _ _ _) (fourPathDiagram p q r s) (fourPathDiagram_shape p q r s).symm
+  exact ⟨h.val, h.property.1.trans (fourLeftOperation_evaluation p q r s _),
+    h.property.2.trans (fourRightOperation_evaluation p q r s _)⟩
+
+noncomputable def fourPathPentagonLong {A : Type u} {a b c d e : A}
+    (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e) :
+    { h : NativeTower.Cell A 2 //
+      NativeTower.source h = ULift.up (⟨a, e, Path.trans (Path.trans (Path.trans p q) r) s⟩ : PathOne A) ∧
+      NativeTower.target h = ULift.up (⟨a, e, Path.trans p (Path.trans q (Path.trans r s))⟩ : PathOne A) } := by
+  let h := (operationPentagonLong (one A 1) (one A 1) (one A 1) (one A 1)).actionOnIdentity
+    (operationPentagonLong_identityArity _ _ _ _) (fourPathDiagram p q r s) (fourPathDiagram_shape p q r s).symm
+  exact ⟨h.val, h.property.1.trans (fourLeftOperation_evaluation p q r s _),
+    h.property.2.trans (fourRightOperation_evaluation p q r s _)⟩
+
+theorem fourPathPentagon_boundary {A : Type u} {a b c d e : A}
+    (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e) :
+    NativeTower.source (fourPathPentagon p q r s).val = (fourPathPentagonShort p q r s).val ∧
+      NativeTower.target (fourPathPentagon p q r s).val = (fourPathPentagonLong p q r s).val := by
+  constructor
+  · exact (fourPathPentagon p q r s).property.1.trans
+      (applyOperation_congr rfl (Pasting.source_identity (carrier A) (Pasting.identity (fourPathDiagram p q r s))) _ _)
+  · exact (fourPathPentagon p q r s).property.2.trans
+      (applyOperation_congr rfl (Pasting.target_identity (carrier A) (Pasting.identity (fourPathDiagram p q r s))) _ _)
+
 end NativeOperadic
 
 end ComputationalPaths.Path.OmegaFoundations
