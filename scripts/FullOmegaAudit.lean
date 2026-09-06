@@ -2,6 +2,7 @@ import ComputationalPaths.Path.OmegaGroupoid.GlobularPasting
 import ComputationalPaths.Path.OmegaGroupoid.NativeGlobularTower
 import ComputationalPaths.Path.OmegaGroupoid.GlobularEndomorphism
 import ComputationalPaths.Path.OmegaGroupoid.NativeOperadicOperations
+import ComputationalPaths.Path.OmegaGroupoid.NativeAssociativityBridge
 
 open ComputationalPaths
 open ComputationalPaths.Path
@@ -9,6 +10,29 @@ open ComputationalPaths.Path.OmegaFoundations
 
 /-! Incremental audit. This checks the foundations only; it is not yet a
 completion gate for the full weak omega-groupoid theorem. -/
+
+#print axioms NativeOperadic.compose_paths
+#print axioms NativeAssociativity.operadicAssociator_derivation
+#print axioms NativeAssociativity.certificate
+#print axioms NativeAssociativity.certificate_pentagon
+#print axioms NativeAssociativity.certificate_interchange
+#print axioms NativeAssociativity.pentagon_traces_distinct
+#print axioms NativeAssociativity.three_parallel_images
+#print axioms NativeAssociativity.twoCompositionComparison_invertible
+#print axioms NativeAssociativity.compositionComparison_invertible
+
+example {α A : Type} {a : A} (label : α → Path a a)
+    {x y : FreeMagma α}
+    {p q : PalomarAssociativity.AssocRwEq x y} (h : PalomarAssociativity.AssocHigher p q) :
+    NativeTower.source (NativeAssociativity.certificate label h).val = NativeAssociativity.trace label p ∧
+      NativeTower.target (NativeAssociativity.certificate label h).val = NativeAssociativity.trace label q :=
+  (NativeAssociativity.certificate label h).property
+
+example {α A : Type} {a : A} (label : α → Path a a)
+    (w x y z : FreeMagma α) :
+    NativeAssociativity.trace label (PalomarAssociativity.pentagonShort w x y z).toRwEq ≠
+      NativeAssociativity.trace label (PalomarAssociativity.pentagonLong w x y z).toRwEq :=
+  NativeAssociativity.pentagon_traces_distinct label w x y z
 
 #print axioms NativeOperadic.operation
 #print axioms NativeOperadic.input_boundary

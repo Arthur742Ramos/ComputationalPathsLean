@@ -720,6 +720,27 @@ and interchange certificate comparisons still require verification. The
 standard instruction recursion is now verified over the implemented monad;
 that does not by itself discharge the monad comparison.
 
+`NativeAssociativityBridge.lean` now reuses the unchanged independent
+`AssocHigherBridge.evalHigher` interpretation. `certificate` retains the exact
+raw `evalTrace` two-cell boundaries; pentagon and interchange map through
+their existing named native certificates. `pentagon_traces_distinct` checks
+that the two- and three-step histories remain distinct in the tower itself.
+`three` translates structural composition and inversion recursively, while
+primitive meta-steps enter the declared coskeletal layer.
+`three_parallel_images` explicitly records the loss of three-cell information
+in that target; it does not identify the original source certificates.
+
+`NativeOperadic.compose_paths` now proves that standard one-dimensional
+composition is exactly `Path.trans`. Consequently `operadicAssociator`
+retains the literal `Step.trans_assoc` witness with standard operadic
+boundaries, including heterogeneously composable paths. Invertible
+`twoCompositionComparison` and `compositionComparison` cells relate native
+certificate composition to standard operadic composition at the next two
+levels. The original independent audit is rerun separately. This establishes
+the explicit certificate-image and composition comparisons, but does not yet
+provide a complete comparison of horizontal whiskering and every selected
+operadic pentagon/interchange coherence operation.
+
 Completion requires the mathematical target above to be instantiated, all
 proof dependencies audited, the relevant modules built, and preservation of
 the existing associativity artifact checked. Merely defining interfaces,

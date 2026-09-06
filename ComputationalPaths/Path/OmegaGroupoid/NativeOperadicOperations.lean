@@ -187,6 +187,20 @@ theorem standardEvaluation_unit (A : Type u) :
   intro n p
   exact standardEvaluation_singleton p
 
+theorem standardEvaluation_one_nonsingleton {A : Type u}
+    (p : Pasting 1 (carrier A))
+    (h : (GlobularCollection.shape (carrier A)).app (n := 1) p ≠
+      Pasting.singleton (G := GlobularSet.terminal) (n := 1) PUnit.unit) :
+    (standardEvaluation A).app (n := 1) p =
+      (Endomorphism.nativeOne A ((GlobularCollection.shape (carrier A)).app p)).eval p rfl := by
+  have ho : (instruction A 1 ((GlobularCollection.shape (carrier A)).app p)).val =
+      Endomorphism.nativeOne A ((GlobularCollection.shape (carrier A)).app p) :=
+    instruction_contraction A _ h
+  have hi : (labelledInstructions A).app (n := 1) p =
+      (⟨⟨Endomorphism.nativeOne A ((GlobularCollection.shape (carrier A)).app p), p⟩, rfl⟩ :
+        ((collection A).application (carrier A)).Cell 1) := Subtype.ext (Prod.ext ho rfl)
+  exact _root_.congrArg ((Endomorphism.evaluation (carrier A)).app (n := 1)) hi
+
 /-- Choose an operation solely from its arity and the unit boundaries.
 This is the adjacent instance of contraction-based pasting instructions. -/
 noncomputable def operation {A : Type u} {n : Nat}
@@ -306,6 +320,35 @@ theorem compose_boundary {A : Type u} {n : Nat} (p q : (carrier A).Cell (n + 1))
       ((_root_.congrArg (standardEvaluation A).app
         ((Pasting.target_vertical _ _ _).trans (Pasting.target_singleton _ q))).trans
           (standardEvaluation_singleton (NativeTower.target q)))⟩
+
+set_option backward.isDefEq.respectTransparency.types false in
+/-- The standard operadic binary operation preserves the original
+one-dimensional trace concatenation exactly. -/
+theorem compose_paths {A : Type u} {a b c : A} (p : Path a b) (q : Path b c) :
+    compose (A := A) (n := 0) (ULift.up (⟨a, b, p⟩ : PathOne A))
+      (ULift.up (⟨b, c, q⟩ : PathOne A)) rfl =
+        ULift.up (⟨a, c, Path.trans p q⟩ : PathOne A) := by
+  let d : Pasting 1 (carrier A) := Pasting.vertical
+    (Pasting.singleton (G := carrier A) (n := 1) (ULift.up (⟨a, b, p⟩ : PathOne A)))
+    (Pasting.singleton (G := carrier A) (n := 1) (ULift.up (⟨b, c, q⟩ : PathOne A))) rfl
+  have hd : (GlobularCollection.shape (carrier A)).app (n := 1) d ≠
+      Pasting.singleton (G := GlobularSet.terminal) (n := 1) PUnit.unit := by
+    intro h
+    have hc := _root_.congrArg (Pasting.atom? (G := GlobularSet.terminal) (n := 1)) h
+    change none = some PUnit.unit at hc
+    cases hc
+  change (standardEvaluation A).app (n := 1) d = _
+  refine (standardEvaluation_one_nonsingleton d hd).trans ?_
+  have andRec {P Q : Prop} (h : P ∧ Q) (x : Path a b) :
+      And.rec (fun _ _ => x) h = x := by cases h; rfl
+  have andRec' {P Q : Prop} (h : P ∧ Q) (x : Path b c) :
+      And.rec (fun _ _ => x) h = x := by cases h; rfl
+  simp [Endomorphism.nativeOne, d, Pasting.vertical, Pasting.singleton,
+    Pasting.pack, Pasting.horizontal, Chain.single, Chain.append,
+    Endomorphism.nativeChain, Endomorphism.nativeEdge,
+    carrier, id, NativeTower.globular, GlobularSet.sourceZero, GlobularSet.targetZero,
+    NativeTower.source, NativeTower.target, sourceOne, targetOne, NativeTower.Cell]
+  simp only [andRec, andRec']
 
 /-- An explicit comparison with the previous native composite; equality
 of distinct raw rewrite derivations is not asserted. -/
