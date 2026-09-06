@@ -1,4 +1,5 @@
 import ComputationalPaths.Path.OmegaGroupoid.GlobularPasting
+import ComputationalPaths.Path.OmegaGroupoid.NativeGlobularTower
 
 open ComputationalPaths
 open ComputationalPaths.Path
@@ -260,3 +261,19 @@ example {G : GlobularSet} {n : Nat} (c d : Pasting.Cut n) (hc : Pasting.Cut.Belo
 #print axioms Chain.zipOver_grid
 #print axioms Pasting.cutGrid_composable
 #print axioms Pasting.cutCompose_interchange_grid
+
+example (A : Type) : RealizesPathSkeleton (NativeTower.globular A) A := NativeTower.realizes A
+
+example {A : Type} (p : NativeTower.Cell A 9) :
+    NativeTower.source (NativeTower.identity p) = p := NativeTower.source_identity p
+
+example {A : Type} {n : Nat} (p q : NativeTower.Cell A (n + 3))
+    (hs : NativeTower.source p = NativeTower.source q)
+    (ht : NativeTower.target p = NativeTower.target q) : p = q := NativeTower.higher_ext p q hs ht
+
+#print axioms NativeTower.globular
+#print axioms NativeTower.realizes
+#print axioms NativeTower.identities
+#print axioms NativeTower.higher_ext
+#print axioms NativeTower.associator_derivation
+#print axioms NativeTower.distinct_rewrite_cells

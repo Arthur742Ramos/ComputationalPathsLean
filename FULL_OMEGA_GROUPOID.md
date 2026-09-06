@@ -62,11 +62,13 @@ proved. A finite-dimensional package does not complete this objective.
   data, its boundary laws, an associator cell and vertical composition;
 - `RealizesPathSkeleton`, the required correspondence interface.
 
-These definitions and lemmas build without proof holes. They do **not** yet
-instantiate the full carrier or prove an operadic action or invertibility.
+These definitions and lemmas build without proof holes. The candidate native
+carrier described below now instantiates the correspondence interface; an
+operadic action and all-dimensional weak invertibility are still unproved.
 
 ```sh
 lake build ComputationalPaths.Path.OmegaGroupoid.GlobularPasting
+lake build ComputationalPaths.Path.OmegaGroupoid.NativeGlobularTower
 lake env lean scripts/FullOmegaAudit.lean
 ```
 
@@ -183,6 +185,24 @@ its universal property, and supplying the eventual weak-groupoid action and
 invertibility, remain incomplete.
 
 ## Semantic audit and completion gates
+
+`NativeGlobularTower.lean` now constructs a candidate recursive carrier whose
+first three levels are exactly the original objects, raw `Path` traces and
+Type-valued `RwEq` syntax, with universe lifts only where necessary.
+`NativeTower.realizes` instantiates all equivalences and boundary equations in
+`RealizesPathSkeleton`. The existing primitive associator is retained literally;
+`distinct_rewrite_cells` proves that reflexivity and its syntactic composite
+remain different two-cells.
+
+Above dimension two this candidate explicitly adjoins a cell for each parallel
+pair, recursively: it is a coskeletal extension of the raw two-skeleton. These
+cells are not asserted to be native higher rewrite derivations. The limitation
+is proved by `higher_ext`: cells of dimension at least three are determined by
+their boundaries. Identities and globularity are checked at every dimension.
+This construction does not establish an operadic action or weak invertibility,
+and does not replace the independent, presentation-sensitive associativity
+certificate. The action must still be constructed and its algebra laws verified
+before this candidate can support the requested theorem.
 
 The current rewrite theory has a totality theorem for `RwEq` on parallel
 paths. A structural weak omega-groupoid theorem does not automatically give a
