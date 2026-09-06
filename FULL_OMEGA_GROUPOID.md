@@ -115,9 +115,19 @@ and intermediate-vertex equality from the supplied equality of boundary chains;
 it does not assume fillers or erase labels. The checked source and target laws
 package the result in its exact composite-boundary fibre (`verticalCell`).
 Alignment distributes over concatenation (`Chain.zipOver_append`), an ingredient
-for interchange. Associativity and units for this new vertical operation,
-composition at arbitrary intermediate boundaries, and the full interchange
-and monad laws remain outstanding.
+for interchange. Both unit laws and associativity for this vertical operation
+are now proved in every positive dimension (`vertical_left_unit`,
+`vertical_right_unit`, `vertical_assoc`). Their equalities compare the complete
+diagrams, not just boundary projections. The proofs lift the corresponding
+label laws through boundary-aligned chains (`zipOver_map_left`,
+`zipOver_map_right`, `zipOver_assoc`). Composition at arbitrary intermediate
+boundaries and the full interchange and monad laws remain outstanding.
+The extreme-boundary interchange law is now checked separately:
+`vertical_horizontal_interchange` commutes zero-boundary concatenation with
+adjacent-boundary composition in all dimensions at least two. Its endpoint
+fibre operation is identified with `vertical` by `pack_verticalFibre`; it is
+not a disconnected replacement operation. This still leaves interchange
+between arbitrary intermediate-dimensional compositions to construct.
 
 ## Semantic audit and completion gates
 

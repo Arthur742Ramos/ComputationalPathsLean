@@ -106,3 +106,22 @@ example {G : GlobularSet} (p q : Pasting 9 G)
 #print axioms Chain.zipOver_append
 #print axioms Pasting.vertical
 #print axioms Pasting.verticalCell
+
+example {G : GlobularSet} (n : Nat) (p : Pasting (n + 1) G) :
+    Pasting.vertical (Pasting.identity (Pasting.source p)) p
+      (Pasting.target_identity G (Pasting.source p)) = p := Pasting.vertical_left_unit p
+
+example {G : GlobularSet} (p q r : Pasting 9 G)
+    (h : Pasting.target p = Pasting.source q) (k : Pasting.target q = Pasting.source r) :
+    Pasting.vertical (Pasting.vertical p q h) r ((Pasting.target_vertical p q h).trans k) =
+      Pasting.vertical p (Pasting.vertical q r k) (h.trans (Pasting.source_vertical q r k).symm) :=
+  Pasting.vertical_assoc p q r h k
+
+#print axioms Chain.zipOver_map_left
+#print axioms Chain.zipOver_map_right
+#print axioms Chain.zipOver_assoc
+#print axioms Pasting.vertical_left_unit
+#print axioms Pasting.vertical_right_unit
+#print axioms Pasting.vertical_assoc
+#print axioms Pasting.pack_verticalFibre
+#print axioms Pasting.vertical_horizontal_interchange

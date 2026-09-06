@@ -12,7 +12,7 @@ construct monad multiplication or claim the free strict-category property.
 
 namespace ComputationalPaths.Path.OmegaFoundations
 
-universe u v w
+universe u v w u₁
 
 /-- A composable, endpoint-indexed finite chain. -/
 inductive Chain {O : Type u} (E : O → O → Type v) : O → O → Type (max u v) where
@@ -32,7 +32,7 @@ def map (f : {x y : O} → E x y → F x y) {x y : O} : Chain E x y → Chain F 
   | .nil x => .nil x
   | .cons e p => .cons (f e) (map f p)
 
-theorem map_map {D : O → O → Type u}
+theorem map_map {D : O → O → Type u₁}
     (f : {x y : O} → E x y → F x y) (g : {x y : O} → F x y → D x y)
     {x y : O} (p : Chain E x y) : (p.map f).map g = p.map (fun e => g (f e)) := by
   induction p with
@@ -124,6 +124,32 @@ theorem map_zipOver_left {O : Type u} {E F D R B : O → O → Type v}
       change Chain.cons (b (op e f he')) ((zipOver s t op p q hp').map b) = Chain.cons (l e) (p.map l)
       exact _root_.congrArg₂ Chain.cons (law e f he') (ih q hp')
 
+theorem zipOver_map_left {O : Type u} {E D : O → O → Type v}
+    (s t : {x y : O} → E x y → D x y)
+    (op : {x y : O} → (e f : E x y) → s e = t f → E x y)
+    (i : {x y : O} → E x y → E x y)
+    (hi : ∀ {x y} (e : E x y), s (i e) = t e)
+    (law : ∀ {x y} (e : E x y), op (i e) e (hi e) = e)
+    {x y : O} (p : Chain E x y) :
+    zipOver s t op (p.map i) p
+      ((map_map i s p).trans (map_congr _ t hi p)) = p := by
+  induction p with
+  | nil => rfl
+  | cons e p ih => exact _root_.congrArg₂ Chain.cons (law e) ih
+
+theorem zipOver_map_right {O : Type u} {E D : O → O → Type v}
+    (s t : {x y : O} → E x y → D x y)
+    (op : {x y : O} → (e f : E x y) → s e = t f → E x y)
+    (i : {x y : O} → E x y → E x y)
+    (hi : ∀ {x y} (e : E x y), s e = t (i e))
+    (law : ∀ {x y} (e : E x y), op e (i e) (hi e) = e)
+    {x y : O} (p : Chain E x y) :
+    zipOver s t op p (p.map i)
+      ((map_congr s _ hi p).trans (map_map i t p).symm) = p := by
+  induction p with
+  | nil => rfl
+  | cons e p ih => exact _root_.congrArg₂ Chain.cons (law e) ih
+
 theorem map_zipOver_right {O : Type u} {E F D R B : O → O → Type v}
     (s : {x y : O} → E x y → D x y)
     (t : {x y : O} → F x y → D x y)
@@ -178,6 +204,47 @@ theorem zipOver_append {O : Type u} {E F D R : O → O → Type v}
       have he' := eq_of_heq he
       have hp' := eq_of_heq hp
       exact _root_.congrArg (Chain.cons (op e f he')) (ih q hp' p' q' h')
+
+theorem zipOver_assoc {O : Type u} {E D : O → O → Type v}
+    (s t : {x y : O} → E x y → D x y)
+    (op : {x y : O} → (e f : E x y) → s e = t f → E x y)
+    (ls : ∀ {x y} (e f : E x y) (h : s e = t f), s (op e f h) = s f)
+    (lt : ∀ {x y} (e f : E x y) (h : s e = t f), t (op e f h) = t e)
+    (assoc : ∀ {x y} (e f g : E x y) (h : s e = t f) (k : s f = t g),
+      op (op e f h) g ((ls e f h).trans k) = op e (op f g k) (h.trans (lt f g k).symm))
+    {x y : O} (p q r : Chain E x y) (h : p.map s = q.map t) (k : q.map s = r.map t) :
+    zipOver s t op (zipOver s t op p q h) r
+      ((map_zipOver_right s t op s s ls p q h).trans k) =
+    zipOver s t op p (zipOver s t op q r k)
+      (h.trans (map_zipOver_left s t op t t lt q r k).symm) := by
+  induction p with
+  | nil x =>
+    cases q with
+    | nil =>
+      cases r with
+      | nil => rfl
+      | cons g r => cases k
+    | cons f q => cases h
+  | @cons x z y e p ih =>
+    cases q with
+    | nil => cases h
+    | @cons _ z' _ f q =>
+      have hc := h
+      simp only [map] at hc
+      injection hc with hx hz hy he hp
+      cases hz
+      have he' := eq_of_heq he
+      have hp' := eq_of_heq hp
+      cases r with
+      | nil => cases k
+      | @cons _ z'' _ g r =>
+        have kc := k
+        simp only [map] at kc
+        injection kc with hx hz hy hf hq
+        cases hz
+        have hf' := eq_of_heq hf
+        have hq' := eq_of_heq hq
+        exact _root_.congrArg₂ Chain.cons (assoc e f g he' hf') (ih q r hp' hq')
 
 variable {O : Type u} {E : O → O → Type v} {F : O → O → Type w}
 
@@ -674,6 +741,91 @@ noncomputable def verticalCell {n : Nat} {G : GlobularSet.{u}}
     (p q : Pasting (n + 1) G) (h : target p = source q) :
     (globular G).CellOver ((globular G).compositeBoundary (n := n) p q h) :=
   ⟨vertical p q h, source_vertical p q h, target_vertical p q h⟩
+
+theorem vertical_left_unit {n : Nat} {G : GlobularSet.{u}} (p : Pasting (n + 1) G) :
+    vertical (identity (source p)) p (target_identity G (source p)) = p := by
+  induction n generalizing G with
+  | zero => rcases p with ⟨a, b, p⟩; rfl
+  | succ n ih =>
+    rcases p with ⟨a, b, p⟩
+    simp only [identity, source, Chain.map_map]
+    exact _root_.congrArg pack (Chain.zipOver_map_left
+      (fun e => target e) (fun e => source e) (fun e f h => vertical e f h)
+      (fun e => identity (source e)) (fun {x y} e => target_identity (G.hom x y) (source e))
+      (fun e => ih e) p)
+
+theorem vertical_right_unit {n : Nat} {G : GlobularSet.{u}} (p : Pasting (n + 1) G) :
+    vertical p (identity (target p)) (source_identity G (target p)).symm = p := by
+  induction n generalizing G with
+  | zero =>
+    rcases p with ⟨a, b, p⟩
+    exact _root_.congrArg pack (Chain.append_nil p)
+  | succ n ih =>
+    rcases p with ⟨a, b, p⟩
+    simp only [identity, target, Chain.map_map]
+    exact _root_.congrArg pack (Chain.zipOver_map_right
+      (fun e => target e) (fun e => source e) (fun e f h => vertical e f h)
+      (fun e => identity (target e)) (fun {x y} e => (source_identity (G.hom x y) (target e)).symm)
+      (fun e => ih e) p)
+
+theorem vertical_assoc {n : Nat} {G : GlobularSet.{u}}
+    (p q r : Pasting (n + 1) G) (h : target p = source q) (k : target q = source r) :
+    vertical (vertical p q h) r ((target_vertical p q h).trans k) =
+      vertical p (vertical q r k) (h.trans (source_vertical q r k).symm) := by
+  induction n generalizing G with
+  | zero =>
+    rcases p with ⟨a, b, p⟩
+    rcases q with ⟨c, d, q⟩
+    rcases r with ⟨e, f, r⟩
+    change b = c at h
+    change d = e at k
+    cases h
+    cases k
+    exact _root_.congrArg pack (Chain.append_assoc p q r)
+  | succ n ih =>
+    rcases p with ⟨a, b, p⟩
+    rcases q with ⟨c, d, q⟩
+    rcases r with ⟨e, f, r⟩
+    have ha : a = c := _root_.congrArg Sigma.fst h
+    have hb : b = d := _root_.congrArg (fun z => z.2.1) h
+    have hc : c = e := _root_.congrArg Sigma.fst k
+    have hd : d = f := _root_.congrArg (fun z => z.2.1) k
+    cases ha
+    cases hb
+    cases hc
+    cases hd
+    have hp : p.map (fun e => target e) = q.map (fun e => source e) :=
+      eq_of_heq (Sigma.mk.inj (eq_of_heq (Sigma.mk.inj h).2)).2
+    have hq : q.map (fun e => target e) = r.map (fun e => source e) :=
+      eq_of_heq (Sigma.mk.inj (eq_of_heq (Sigma.mk.inj k).2)).2
+    exact _root_.congrArg pack (Chain.zipOver_assoc
+      (fun e => target e) (fun e => source e) (fun e f h => vertical e f h)
+      (fun e f h => target_vertical e f h) (fun e f h => source_vertical e f h)
+      (fun e f g h k => ih e f g h k) p q r hp hq)
+
+/-- The adjacent composition with zero endpoints exposed for horizontal
+composition. `pack_verticalFibre` identifies it with `vertical`. -/
+noncomputable def verticalFibre {n : Nat} {G : GlobularSet.{u}} {a b : G.Cell 0}
+    (p q : Horizontal (n + 1) G a b)
+    (h : p.map (fun e => target e) = q.map (fun e => source e)) : Horizontal (n + 1) G a b :=
+  Chain.zipOver (fun e => target e) (fun e => source e) (fun e f h => vertical e f h) p q h
+
+theorem pack_verticalFibre {n : Nat} {G : GlobularSet.{u}} {a b : G.Cell 0}
+    (p q : Horizontal (n + 1) G a b)
+    (h : p.map (fun e => target e) = q.map (fun e => source e)) :
+    pack (verticalFibre p q h) = vertical (pack p) (pack q) (_root_.congrArg pack h) := rfl
+
+/-- Strict interchange between zero-boundary and adjacent-boundary
+composition, in all dimensions at least two. -/
+theorem vertical_horizontal_interchange {n : Nat} {G : GlobularSet.{u}} {a b c : G.Cell 0}
+    (p q : Horizontal (n + 1) G a b) (r s : Horizontal (n + 1) G b c)
+    (h : p.map (fun e => target e) = q.map (fun e => source e))
+    (k : r.map (fun e => target e) = s.map (fun e => source e)) :
+    verticalFibre (horizontal p r) (horizontal q s)
+      ((Chain.map_append _ p r).trans ((_root_.congrArg₂ Chain.append h k).trans
+        (Chain.map_append _ q s).symm)) =
+      horizontal (verticalFibre p q h) (verticalFibre r s k) :=
+  Chain.zipOver_append _ _ _ p q h r s k
 
 end Pasting
 
