@@ -71,3 +71,21 @@ example {G H : GlobularSet} (f : GlobularSet.Map G H) (n : Nat) (c : G.Cell n) :
 #print axioms Pasting.singleton_injective
 #print axioms Pasting.singletonGlobular
 #print axioms Pasting.singleton_natural
+
+example {G : GlobularSet} (n : Nat) {a b c d : G.Cell 0}
+    (p : Pasting.Horizontal n G a b) (q : Pasting.Horizontal n G b c)
+    (r : Pasting.Horizontal n G c d) :
+    Pasting.horizontal (Pasting.horizontal p q) r =
+      Pasting.horizontal p (Pasting.horizontal q r) := Pasting.horizontal_assoc p q r
+
+example {G : GlobularSet} {a b c : G.Cell 0}
+    (p : Pasting.Horizontal 8 G a b) (q : Pasting.Horizontal 8 G b c) :
+    (Pasting.globular G).sourceZero (n := 9) (Pasting.pack (Pasting.horizontal p q)) = a :=
+  Pasting.sourceZero_pack _
+
+#print axioms Pasting.horizontal_assoc
+#print axioms Pasting.source_horizontal
+#print axioms Pasting.target_horizontal
+#print axioms Pasting.identity_horizontal
+#print axioms Pasting.map_horizontal
+#print axioms Pasting.sourceZero_pack

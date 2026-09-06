@@ -98,6 +98,15 @@ Its interpretation by actual computational paths respects substitution
 (`evalPathChain_bind`). These are ingredients for flattening nested diagrams,
 not a substitute for the missing globular monad multiplication.
 
+Horizontal composition along the zero-dimensional boundary is now defined
+for diagrams in every positive dimension (`Pasting.horizontal`). Its exposed
+endpoint fibres are exactly the chains in the existing pasting carrier;
+`sourceZero_pack` and `targetZero_pack` verify their iterated globular endpoints.
+Associativity, left/right units, adjacent-boundary compatibility, identity
+compatibility and compatibility with relabelling are proved. This does not
+yet supply composition along every intermediate-dimensional boundary or the
+interchange laws required for the strict-pasting monad.
+
 ## Semantic audit and completion gates
 
 The current rewrite theory has a totality theorem for `RwEq` on parallel

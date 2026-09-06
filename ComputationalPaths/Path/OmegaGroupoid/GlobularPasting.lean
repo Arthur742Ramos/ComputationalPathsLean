@@ -148,6 +148,14 @@ theorem mapAlong_id {E : O → O → Type u} {x y : O} (p : Chain E x y) :
   | nil => rfl
   | cons t p ih => exact _root_.congrArg (Chain.cons t) ih
 
+theorem mapAlong_append {E : O → O → Type u} {F : P → P → Type v}
+    (f : O → P) (e : {x y : O} → E x y → F (f x) (f y))
+    {x y z : O} (p : Chain E x y) (q : Chain E y z) :
+    (p.append q).mapAlong f e = (p.mapAlong f e).append (q.mapAlong f e) := by
+  induction p with
+  | nil => rfl
+  | cons t p ih => exact _root_.congrArg (Chain.cons (e t)) (ih q)
+
 theorem mapAlong_comp {Q : Type w} {E : O → O → Type u}
     {F : P → P → Type v} {D : Q → Q → Type w}
     (f : O → P) (g : P → Q)
@@ -403,6 +411,77 @@ def identities (G : GlobularSet.{u}) : GlobularSet.Identities (globular G) where
   identity := identity
   source_identity := source_identity G
   target_identity := target_identity G
+
+/-- Positive-dimensional diagrams with their zero endpoints exposed in the
+type. This is exactly the chain fibre of `Pasting (n+1) G`, not a new carrier. -/
+abbrev Horizontal (n : Nat) (G : GlobularSet.{u}) (a b : G.Cell 0) :=
+  Chain (fun x y => Pasting n (G.hom x y)) a b
+
+def pack {n : Nat} {G : GlobularSet.{u}} {a b : G.Cell 0}
+    (p : Horizontal n G a b) : Pasting (n + 1) G := ⟨a, b, p⟩
+
+theorem sourceZero_pack {n : Nat} {G : GlobularSet.{u}} {a b : G.Cell 0}
+    (p : Horizontal n G a b) : (globular G).sourceZero (n := n + 1) (pack p) = a := by
+  induction n with
+  | zero => rfl
+  | succ n ih => exact ih (p.map (fun d => source d))
+
+theorem targetZero_pack {n : Nat} {G : GlobularSet.{u}} {a b : G.Cell 0}
+    (p : Horizontal n G a b) : (globular G).targetZero (n := n + 1) (pack p) = b := by
+  induction n with
+  | zero => rfl
+  | succ n ih => exact ih (p.map (fun d => target d))
+
+/-- Composition along the zero boundary, in every positive dimension. -/
+def horizontal {n : Nat} {G : GlobularSet.{u}} {a b c : G.Cell 0}
+    (p : Horizontal n G a b) (q : Horizontal n G b c) : Horizontal n G a c :=
+  p.append q
+
+theorem horizontal_assoc {n : Nat} {G : GlobularSet.{u}} {a b c d : G.Cell 0}
+    (p : Horizontal n G a b) (q : Horizontal n G b c) (r : Horizontal n G c d) :
+    horizontal (horizontal p q) r = horizontal p (horizontal q r) :=
+  Chain.append_assoc p q r
+
+theorem horizontal_left_unit {n : Nat} {G : GlobularSet.{u}} {a b : G.Cell 0}
+    (p : Horizontal n G a b) : horizontal (.nil a) p = p := rfl
+
+theorem horizontal_right_unit {n : Nat} {G : GlobularSet.{u}} {a b : G.Cell 0}
+    (p : Horizontal n G a b) : horizontal p (.nil b) = p := Chain.append_nil p
+
+theorem source_horizontal {n : Nat} {G : GlobularSet.{u}} {a b c : G.Cell 0}
+    (p : Horizontal (n + 1) G a b) (q : Horizontal (n + 1) G b c) :
+    source (pack (horizontal p q)) =
+      pack (horizontal (p.map (fun d => source d)) (q.map (fun d => source d))) :=
+  _root_.congrArg pack (Chain.map_append (fun d => source d) p q)
+
+theorem target_horizontal {n : Nat} {G : GlobularSet.{u}} {a b c : G.Cell 0}
+    (p : Horizontal (n + 1) G a b) (q : Horizontal (n + 1) G b c) :
+    target (pack (horizontal p q)) =
+      pack (horizontal (p.map (fun d => target d)) (q.map (fun d => target d))) :=
+  _root_.congrArg pack (Chain.map_append (fun d => target d) p q)
+
+theorem identity_horizontal {n : Nat} {G : GlobularSet.{u}} {a b c : G.Cell 0}
+    (p : Horizontal n G a b) (q : Horizontal n G b c) :
+    identity (pack (horizontal p q)) =
+      pack (horizontal (p.map (fun d => identity d)) (q.map (fun d => identity d))) :=
+  _root_.congrArg pack (Chain.map_append (fun d => identity d) p q)
+
+theorem map_horizontal {n : Nat} {G H : GlobularSet.{u}} (f : GlobularSet.Map G H)
+    {a b c : G.Cell 0} (p : Horizontal n G a b) (q : Horizontal n G b c) :
+    map f (pack (horizontal p q)) = pack (horizontal
+      (p.mapAlong f.app (fun {x y} d => map (f.hom x y) d))
+      (q.mapAlong f.app (fun {x y} d => map (f.hom x y) d))) :=
+  _root_.congrArg (pack (G := H))
+    (Chain.mapAlong_append (F := fun x y => Pasting n (H.hom x y)) f.app
+      (fun {x y} d => map (f.hom x y) d) p q)
+
+theorem source_horizontal_one {G : GlobularSet.{u}} {a b c : G.Cell 0}
+    (p : Horizontal 0 G a b) (q : Horizontal 0 G b c) :
+    source (pack (horizontal p q)) = a := rfl
+
+theorem target_horizontal_one {G : GlobularSet.{u}} {a b c : G.Cell 0}
+    (p : Horizontal 0 G a b) (q : Horizontal 0 G b c) :
+    target (pack (horizontal p q)) = c := rfl
 
 end Pasting
 
