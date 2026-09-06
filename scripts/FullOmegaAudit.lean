@@ -55,3 +55,19 @@ example {O : Type} {E F D : O → O → Type}
 
 #print axioms Chain.bind_assoc
 #print axioms evalPathChain_bind
+
+example (G : GlobularSet) (n : Nat) (c d : G.Cell n)
+    (h : Pasting.singleton c = Pasting.singleton d) : c = d :=
+  Pasting.singleton_injective G h
+
+example (G : GlobularSet) (c : G.Cell 8) :
+    Pasting.source (Pasting.singleton c) = Pasting.singleton (G.source c) :=
+  Pasting.source_singleton G c
+
+example {G H : GlobularSet} (f : GlobularSet.Map G H) (n : Nat) (c : G.Cell n) :
+    Pasting.map f (Pasting.singleton c) = Pasting.singleton (f.app c) :=
+  Pasting.map_singleton f c
+
+#print axioms Pasting.singleton_injective
+#print axioms Pasting.singletonGlobular
+#print axioms Pasting.singleton_natural

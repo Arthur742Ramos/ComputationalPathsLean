@@ -167,6 +167,41 @@ def Pasting : Nat → GlobularSet.{u} → Type u
 
 namespace Pasting
 
+/-- A single original cell regarded as a labelled pasting diagram. At every
+successor dimension the lower label lies in the appropriate hom globular set. -/
+def singleton : {n : Nat} → {G : GlobularSet.{u}} → G.Cell n → Pasting n G
+  | 0, _, a => a
+  | n + 1, G, c =>
+      ⟨G.sourceZero c, G.targetZero c,
+        Chain.single (singleton (n := n) (G := G.hom (G.sourceZero c) (G.targetZero c))
+          ⟨c, rfl, rfl⟩)⟩
+
+/-- Recover an original cell only from a recursively singleton diagram.
+Composite and identity diagrams do not pretend to be generating cells. -/
+def atom? : {n : Nat} → {G : GlobularSet.{u}} → Pasting n G → Option (G.Cell n)
+  | 0, _, a => some a
+  | n + 1, G, ⟨a, b, .cons d (.nil _)⟩ =>
+      (atom? (n := n) (G := G.hom a b) d).map Subtype.val
+  | _ + 1, _, ⟨_, _, .nil _⟩ => none
+  | _ + 1, _, ⟨_, _, .cons _ (.cons _ _)⟩ => none
+
+theorem atom_singleton {n : Nat} (G : GlobularSet.{u}) (c : G.Cell n) :
+    atom? (singleton c) = some c := by
+  induction n generalizing G with
+  | zero => rfl
+  | succ n ih =>
+    change (atom? (singleton (G := G.hom (G.sourceZero c) (G.targetZero c))
+      (⟨c, rfl, rfl⟩ : (G.hom (G.sourceZero c) (G.targetZero c)).Cell n))).map Subtype.val = some c
+    exact _root_.congrArg (Option.map Subtype.val)
+      (ih (G.hom (G.sourceZero c) (G.targetZero c)) ⟨c, rfl, rfl⟩)
+
+/-- The proposed unit retains every original cell, in every dimension. -/
+theorem singleton_injective {n : Nat} (G : GlobularSet.{u}) {c d : G.Cell n}
+    (h : singleton c = singleton d) : c = d := by
+  have he := _root_.congrArg (atom? (G := G)) h
+  rw [atom_singleton, atom_singleton] at he
+  exact Option.some.inj he
+
 /-- Dimension-recursive relabelling by a globular map. -/
 def map : {n : Nat} → {G H : GlobularSet.{u}} → GlobularSet.Map G H → Pasting n G → Pasting n H
   | 0, _, _, f, a => f.app a
@@ -207,6 +242,52 @@ def target : {n : Nat} → {G : GlobularSet.{u}} → Pasting (n + 1) G → Pasti
   | 0, _, ⟨_, b, _⟩ => b
   | n + 1, G, ⟨a, b, p⟩ =>
       ⟨a, b, p.map (fun {x y} d => target (n := n) (G := G.hom x y) d)⟩
+
+theorem singleton_of_hom {n : Nat} (G : GlobularSet.{u})
+    {a b : G.Cell 0} (c : (G.hom a b).Cell n) :
+    (⟨a, b, Chain.single (singleton c)⟩ : Pasting (n + 1) G) = singleton c.val := by
+  rcases c with ⟨c, ha, hb⟩
+  cases ha
+  cases hb
+  rfl
+
+theorem map_singleton {n : Nat} {G H : GlobularSet.{u}} (f : GlobularSet.Map G H)
+    (c : G.Cell n) : map f (singleton c) = singleton (f.app c) := by
+  induction n generalizing G H with
+  | zero => rfl
+  | succ n ih =>
+    let d : (G.hom (G.sourceZero c) (G.targetZero c)).Cell n := ⟨c, rfl, rfl⟩
+    change (⟨f.app (G.sourceZero c), f.app (G.targetZero c),
+      Chain.single (map (f.hom _ _) (singleton d))⟩ : Pasting (n + 1) H) = _
+    exact (_root_.congrArg (fun q => (⟨f.app (G.sourceZero c), f.app (G.targetZero c),
+      Chain.single q⟩ : Pasting (n + 1) H)) (ih (f.hom _ _) d)).trans
+        (singleton_of_hom H ((f.hom _ _).app d))
+
+theorem source_singleton {n : Nat} (G : GlobularSet.{u}) (c : G.Cell (n + 1)) :
+    source (singleton c) = singleton (G.source c) := by
+  induction n generalizing G with
+  | zero => rfl
+  | succ n ih =>
+    let H := G.hom (G.sourceZero c) (G.targetZero c)
+    let d : H.Cell (n + 1) := ⟨c, rfl, rfl⟩
+    change (⟨G.sourceZero c, G.targetZero c,
+      Chain.single (source (singleton d))⟩ : Pasting (n + 1) G) = _
+    exact (_root_.congrArg (fun q => (⟨G.sourceZero c, G.targetZero c,
+      Chain.single q⟩ : Pasting (n + 1) G)) (ih H d)).trans
+        (singleton_of_hom G (H.source d))
+
+theorem target_singleton {n : Nat} (G : GlobularSet.{u}) (c : G.Cell (n + 1)) :
+    target (singleton c) = singleton (G.target c) := by
+  induction n generalizing G with
+  | zero => rfl
+  | succ n ih =>
+    let H := G.hom (G.sourceZero c) (G.targetZero c)
+    let d : H.Cell (n + 1) := ⟨c, rfl, rfl⟩
+    change (⟨G.sourceZero c, G.targetZero c,
+      Chain.single (target (singleton d))⟩ : Pasting (n + 1) G) = _
+    exact (_root_.congrArg (fun q => (⟨G.sourceZero c, G.targetZero c,
+      Chain.single q⟩ : Pasting (n + 1) G)) (ih H d)).trans
+        (singleton_of_hom G (H.target d))
 
 theorem source_map {n : Nat} {G H : GlobularSet.{u}} (f : GlobularSet.Map G H)
     (c : Pasting (n + 1) G) : source (map f c) = map f (source c) := by
@@ -263,6 +344,19 @@ def mapGlobular {G H : GlobularSet.{u}} (f : GlobularSet.Map G H) :
   app := map f
   source_app := source_map f
   target_app := target_map f
+
+/-- The generating-cell inclusion is an injective globular map in all dimensions. -/
+def singletonGlobular (G : GlobularSet.{u}) : GlobularSet.Map G (globular G) where
+  app := singleton
+  source_app := source_singleton G
+  target_app := target_singleton G
+
+theorem singleton_natural {G H : GlobularSet.{u}} (f : GlobularSet.Map G H) :
+    GlobularSet.Map.comp (mapGlobular f) (singletonGlobular G) =
+      GlobularSet.Map.comp (singletonGlobular H) f := by
+  apply GlobularSet.Map.ext
+  intro n c
+  exact map_singleton f c
 
 /-- The lawful endofunctor of recursively labelled pasting diagrams.
 Monad unit/multiplication and the universal property are separate obligations. -/

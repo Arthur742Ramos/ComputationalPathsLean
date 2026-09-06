@@ -84,7 +84,12 @@ the original cells with fixed zero-dimensional endpoints and lowers dimension
 at every recursion. This is a candidate carrier for the strict-pasting monad,
 not yet a monad. Relabelling now forms the checked Mathlib endofunctor
 `Pasting.pastingFunctor`, preserving both boundaries and respecting identity
-and composite maps. The monad unit, flattening, monad laws and the free
+and composite maps. The singleton inclusion `Pasting.singletonGlobular` is now
+a boundary-preserving globular map, natural in the original globular set
+(`singleton_natural`) and injective at every dimension (`singleton_injective`).
+The partial extractor `atom?` recovers original cells from these singleton
+diagrams; it rejects empty and composite chains. This provides the candidate
+unit without erasing original cells. Flattening, monad laws and the free
 strict-category universal property remain to be established.
 
 Endpoint-indexed chain substitution now has proved left/right unit and
