@@ -5653,6 +5653,89 @@ theorem identityApplicationOut_natural {G H : GlobularSet.{u}} (f : GlobularSet.
         (identityApplicationOut_inputs G)).symm).trans
       (Pasting.map_singleton f ((identityApplicationOut G).app p)))
 
+/-- Substitution of collections: an outer operation whose inputs are inner
+operations. Its arity is obtained by the verified globular multiplication. -/
+noncomputable def substitute (C D : GlobularCollection.{u}) : GlobularCollection.{u} where
+  operations := C.application D.operations
+  arity := GlobularSet.Map.comp (Pasting.flattenGlobular GlobularSet.terminal)
+    (GlobularSet.Map.comp (Pasting.mapGlobular D.arity) (C.inputs D.operations))
+
+/-- The operation part of a nested labelled operation forgets only the
+inner input labels, not the inner operations or their placement. -/
+def substitutionOperation (C D : GlobularCollection.{u}) (G : GlobularSet.{u}) :
+    GlobularSet.Map (C.application (D.application G)) (C.application D.operations) :=
+  C.map (D.operation G)
+
+noncomputable def substitutionInputs (C D : GlobularCollection.{u}) (G : GlobularSet.{u}) :
+    GlobularSet.Map (C.application (D.application G)) (Pasting.globular G) :=
+  GlobularSet.Map.comp (Pasting.flattenGlobular G)
+    (GlobularSet.Map.comp (Pasting.mapGlobular (D.inputs G)) (C.inputs (D.application G)))
+
+theorem substitution_match (C D : GlobularCollection.{u}) (G : GlobularSet.{u}) :
+    GlobularSet.Map.comp (C.substitute D).arity (C.substitutionOperation D G) =
+      GlobularSet.Map.comp (shape G) (C.substitutionInputs D G) := by
+  apply GlobularSet.Map.ext
+  intro n p
+  change (Pasting.flattenGlobular GlobularSet.terminal).app
+      (Pasting.map D.arity (Pasting.map (D.operation G) p.val.2)) =
+    (shape G).app ((Pasting.flattenGlobular G).app (Pasting.map (D.inputs G) p.val.2))
+  apply Eq.trans (_root_.congrArg (Pasting.flattenGlobular GlobularSet.terminal).app
+    (Pasting.map_comp (D.operation G) D.arity p.val.2))
+  apply Eq.trans (_root_.congrArg (fun k => (Pasting.flattenGlobular GlobularSet.terminal).app
+    (Pasting.map k p.val.2)) (GlobularSet.pullback_condition D.arity (shape G)))
+  exact (_root_.congrArg (Pasting.flattenGlobular GlobularSet.terminal).app
+    (Pasting.map_comp (D.inputs G) (shape G) p.val.2).symm).trans
+      (Pasting.flatten_natural (GlobularSet.terminalMap G) (Pasting.map (D.inputs G) p.val.2)).symm
+
+/-- Flatten the inputs of a nested application, preserving the outer
+operation, every inner operation, and the combined arity. -/
+noncomputable def substitutionComparison (C D : GlobularCollection.{u}) (G : GlobularSet.{u}) :
+    GlobularSet.Map (C.application (D.application G)) ((C.substitute D).application G) :=
+  GlobularSet.pullbackLift (C.substitute D).arity (shape G)
+    (C.substitutionOperation D G) (C.substitutionInputs D G) (C.substitution_match D G)
+
+theorem substitutionComparison_operation (C D : GlobularCollection.{u}) (G : GlobularSet.{u}) :
+    GlobularSet.Map.comp ((C.substitute D).operation G) (C.substitutionComparison D G) =
+      C.substitutionOperation D G := by
+  apply GlobularSet.Map.ext
+  intro n p
+  rfl
+
+theorem substitutionComparison_inputs (C D : GlobularCollection.{u}) (G : GlobularSet.{u}) :
+    GlobularSet.Map.comp ((C.substitute D).inputs G) (C.substitutionComparison D G) =
+      C.substitutionInputs D G := by
+  apply GlobularSet.Map.ext
+  intro n p
+  rfl
+
+/-- The substitution comparison commutes with arbitrary relabelling of
+inputs. Its operation component remains the same nested operation. -/
+theorem substitutionComparison_natural (C D : GlobularCollection.{u})
+    {G H : GlobularSet.{u}} (f : GlobularSet.Map G H) :
+    GlobularSet.Map.comp (C.substitutionComparison D H) (C.map (D.map f)) =
+      GlobularSet.Map.comp ((C.substitute D).map f) (C.substitutionComparison D G) := by
+  have hop : GlobularSet.Map.comp (D.operation H) (D.map f) = D.operation G := by
+    apply GlobularSet.Map.ext
+    intro n p
+    rfl
+  have hin : GlobularSet.Map.comp (D.inputs H) (D.map f) =
+      GlobularSet.Map.comp (Pasting.mapGlobular f) (D.inputs G) := by
+    apply GlobularSet.Map.ext
+    intro n p
+    rfl
+  apply GlobularSet.Map.ext
+  intro n p
+  apply Subtype.ext
+  refine Prod.ext ?_ ?_
+  · apply Subtype.ext
+    exact Prod.ext rfl ((Pasting.map_comp (D.map f) (D.operation H) p.val.2).trans
+      (_root_.congrArg (fun k => Pasting.map k p.val.2) hop))
+  · exact (_root_.congrArg (Pasting.flattenGlobular H).app
+      ((Pasting.map_comp (D.map f) (D.inputs H) p.val.2).trans
+        ((_root_.congrArg (fun k => Pasting.map k p.val.2) hin).trans
+          (Pasting.map_comp (D.inputs G) (Pasting.mapGlobular f) p.val.2).symm))).trans
+        (Pasting.flatten_natural f (Pasting.map (D.inputs G) p.val.2)).symm
+
 end GlobularCollection
 
 /-- Interpretation of composable path-labelled chains keeps the endpoints

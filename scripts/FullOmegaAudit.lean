@@ -93,6 +93,16 @@ completion gate for the full weak omega-groupoid theorem. -/
 #print axioms GlobularCollection.identityApplication_lift
 #print axioms GlobularCollection.identityApplicationIso
 #print axioms GlobularCollection.identityApplicationOut_natural
+#print axioms GlobularCollection.substitution_match
+#print axioms GlobularCollection.substitutionComparison
+#print axioms GlobularCollection.substitutionComparison_operation
+#print axioms GlobularCollection.substitutionComparison_inputs
+#print axioms GlobularCollection.substitutionComparison_natural
+
+example (C D : GlobularCollection.{u}) {G H : GlobularSet.{u}} (f : GlobularSet.Map G H) :
+    GlobularSet.Map.comp (C.substitutionComparison D H) (C.map (D.map f)) =
+      GlobularSet.Map.comp ((C.substitute D).map f) (C.substitutionComparison D G) :=
+  C.substitutionComparison_natural D f
 
 noncomputable example (G : GlobularSet.{u}) :
     CategoryTheory.Iso (GlobularCollection.identity.application G) G :=

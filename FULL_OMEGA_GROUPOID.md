@@ -289,6 +289,16 @@ recover an original cell from an identity-labelled operation.
 Thus the proposed substitution unit acts as the identity on globular sets;
 this does not yet establish either substitution unitor or associativity law.
 
+`GlobularCollection.substitute C D` now has the carrier of outer operations
+labelled by inner operations. Its arity uses the actual pasting monad
+multiplication on the inner arities. `substitution_match` checks the arity
+equation for nested labelled applications, so `substitutionComparison` is a
+globular map into the substituted collection's application. Its two
+projection equations retain the nested operations and flatten only their
+input diagrams; `substitutionComparison_natural` proves compatibility with
+relabelling. The comparison's inverse, substitution unitors and associativity,
+and the eventual operad multiplication remain unproved.
+
 `evaluate` now evaluates labelled diagrams by dimension recursion into a
 target equipped with horizontal operations in all its iterated hom contexts
 (`RecursiveComposition`). The evaluator is implemented, not a field assumed
