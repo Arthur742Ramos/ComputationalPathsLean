@@ -306,6 +306,16 @@ natural isomorphism between composed application functors and application of
 the substituted collection. Substitution unitors, associativity, and the
 eventual operad multiplication remain unproved.
 
+`GlobularCollection.Hom` now requires a globular operation map preserving
+the full arity map. Identity and composition form a lawful category.
+`Hom.application` changes operations while retaining all input labels;
+`Hom.transformation` is its natural transformation between application
+functors. The application construction preserves identities, composition,
+and the input projection. `Hom.application_cartesian` proves unique lifts
+for its naturality squares at every dimension. These maps provide the typed
+interface for the future operad unit and multiplication; neither map nor
+its operad laws are assumed to exist merely from this interface.
+
 `evaluate` now evaluates labelled diagrams by dimension recursion into a
 target equipped with horizontal operations in all its iterated hom contexts
 (`RecursiveComposition`). The evaluator is implemented, not a field assumed

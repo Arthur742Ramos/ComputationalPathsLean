@@ -102,6 +102,18 @@ completion gate for the full weak omega-groupoid theorem. -/
 #print axioms GlobularCollection.substitutionComparisonInverse
 #print axioms GlobularCollection.substitutionComparisonIso
 #print axioms GlobularCollection.substitutionFunctorIso
+#print axioms GlobularCollection.Hom.transformation
+#print axioms GlobularCollection.Hom.application_id
+#print axioms GlobularCollection.Hom.application_comp
+#print axioms GlobularCollection.Hom.application_inputs
+#print axioms GlobularCollection.Hom.application_cartesian
+
+example {C D : GlobularCollection.{u}} (f : GlobularCollection.Hom C D)
+    {G H : GlobularSet.{u}} (g : GlobularSet.Map G H) {n : Nat}
+    (p : (D.application G).Cell n) (q : (C.application H).Cell n)
+    (h : (D.map g).app p = (f.application H).app q) :
+    ∃! r : (C.application G).Cell n, (f.application G).app r = p ∧ (C.map g).app r = q :=
+  f.application_cartesian g p q h
 
 example (C D : GlobularCollection.{u}) (G : GlobularSet.{u}) {n : Nat}
     (p : ((C.substitute D).application G).Cell n) :

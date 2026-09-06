@@ -5808,6 +5808,106 @@ noncomputable def substitutionFunctorIso (C D : GlobularCollection.{u}) :
   CategoryTheory.NatIso.ofComponents (fun G => C.substitutionComparisonIso D G)
     (fun f => C.substitutionComparison_natural D f)
 
+/-- Maps of collections preserve the actual recursive arity, not merely
+the dimension or number of inputs. -/
+structure Hom (C D : GlobularCollection.{u}) where
+  operations : GlobularSet.Map C.operations D.operations
+  arity : GlobularSet.Map.comp D.arity operations = C.arity
+
+namespace Hom
+
+def id (C : GlobularCollection.{u}) : Hom C C where
+  operations := GlobularSet.Map.id C.operations
+  arity := rfl
+
+def comp {C D E : GlobularCollection.{u}} (g : Hom D E) (f : Hom C D) : Hom C E where
+  operations := GlobularSet.Map.comp g.operations f.operations
+  arity := by
+    apply GlobularSet.Map.ext
+    intro n p
+    exact (_root_.congrArg (fun k : GlobularSet.Map D.operations (Pasting.globular GlobularSet.terminal) =>
+      k.app (f.operations.app p)) g.arity).trans
+        (_root_.congrArg (fun k : GlobularSet.Map C.operations (Pasting.globular GlobularSet.terminal) => k.app p) f.arity)
+
+@[ext] theorem ext {C D : GlobularCollection.{u}} {f g : Hom C D}
+    (h : f.operations = g.operations) : f = g := by
+  cases f
+  cases g
+  cases h
+  rfl
+
+/-- Apply a collection map without changing a single input label. -/
+def application {C D : GlobularCollection.{u}} (f : Hom C D) (G : GlobularSet.{u}) :
+    GlobularSet.Map (C.application G) (D.application G) where
+  app p := ⟨⟨f.operations.app p.val.1, p.val.2⟩,
+    (_root_.congrArg (fun k : GlobularSet.Map C.operations (Pasting.globular GlobularSet.terminal) =>
+      k.app p.val.1) f.arity).trans p.property⟩
+  source_app p := Subtype.ext (Prod.ext (f.operations.source_app p.val.1) rfl)
+  target_app p := Subtype.ext (Prod.ext (f.operations.target_app p.val.1) rfl)
+
+theorem application_natural {C D : GlobularCollection.{u}} (f : Hom C D)
+    {G H : GlobularSet.{u}} (g : GlobularSet.Map G H) :
+    GlobularSet.Map.comp (f.application H) (C.map g) =
+      GlobularSet.Map.comp (D.map g) (f.application G) := by
+  apply GlobularSet.Map.ext
+  intro n p
+  rfl
+
+def transformation {C D : GlobularCollection.{u}} (f : Hom C D) :
+    CategoryTheory.NatTrans C.functor D.functor where
+  app := f.application
+  naturality {X Y} g := f.application_natural g
+
+theorem application_id (C : GlobularCollection.{u}) (G : GlobularSet.{u}) :
+    (id C).application G = GlobularSet.Map.id (C.application G) := by
+  apply GlobularSet.Map.ext
+  intro n p
+  rfl
+
+theorem application_comp {C D E : GlobularCollection.{u}} (g : Hom D E) (f : Hom C D)
+    (G : GlobularSet.{u}) :
+    (comp g f).application G = GlobularSet.Map.comp (g.application G) (f.application G) := by
+  apply GlobularSet.Map.ext
+  intro n p
+  rfl
+
+theorem application_inputs {C D : GlobularCollection.{u}} (f : Hom C D) (G : GlobularSet.{u}) :
+    GlobularSet.Map.comp (D.inputs G) (f.application G) = C.inputs G := by
+  apply GlobularSet.Map.ext
+  intro n p
+  rfl
+
+/-- A map of operation collections induces cartesian naturality squares:
+the original operation and all original labels have a unique joint lift. -/
+theorem application_cartesian {C D : GlobularCollection.{u}} (f : Hom C D)
+    {G H : GlobularSet.{u}} (g : GlobularSet.Map G H) {n : Nat}
+    (p : (D.application G).Cell n) (q : (C.application H).Cell n)
+    (h : (D.map g).app p = (f.application H).app q) :
+    ∃! r : (C.application G).Cell n, (f.application G).app r = p ∧ (C.map g).app r = q := by
+  have ho : p.val.1 = f.operations.app q.val.1 :=
+    _root_.congrArg (fun z : (D.application H).Cell n => z.val.1) h
+  have hi : Pasting.map g p.val.2 = q.val.2 :=
+    _root_.congrArg (fun z : (D.application H).Cell n => z.val.2) h
+  let r : (C.application G).Cell n := ⟨⟨q.val.1, p.val.2⟩,
+    (_root_.congrArg (fun k : GlobularSet.Map C.operations (Pasting.globular GlobularSet.terminal) =>
+      k.app q.val.1) f.arity).symm.trans
+        ((_root_.congrArg D.arity.app ho.symm).trans p.property)⟩
+  refine ⟨r, ⟨Subtype.ext (Prod.ext ho.symm rfl), Subtype.ext (Prod.ext rfl hi)⟩, ?_⟩
+  intro s hs
+  exact Subtype.ext (Prod.ext
+    (_root_.congrArg (fun z : (C.application H).Cell n => z.val.1) hs.2)
+    (_root_.congrArg (fun z : (D.application G).Cell n => z.val.2) hs.1))
+
+end Hom
+
+instance : CategoryTheory.Category.{u} GlobularCollection.{u} where
+  Hom := Hom
+  id := Hom.id
+  comp f g := Hom.comp g f
+  id_comp f := Hom.ext rfl
+  comp_id f := Hom.ext rfl
+  assoc f g h := Hom.ext rfl
+
 end GlobularCollection
 
 /-- Interpretation of composable path-labelled chains keeps the endpoints
