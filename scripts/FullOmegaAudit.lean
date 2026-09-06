@@ -8,6 +8,18 @@ open ComputationalPaths.Path.OmegaFoundations
 /-! Incremental audit. This checks the foundations only; it is not yet a
 completion gate for the full weak omega-groupoid theorem. -/
 
+#print axioms NativeTower.InterpretationStage.extend
+#print axioms NativeTower.TwoSkeletonInterpretation.extend
+#print axioms NativeTower.map_ext_twoSkeleton
+#print axioms NativeTower.TwoSkeletonInterpretation.existsUnique_extension
+
+example (A : Type u) :
+    (NativeTower.TwoSkeletonInterpretation.extend
+      (⟨⟨id, id, fun _ => rfl, fun _ => rfl⟩, id, fun _ => rfl, fun _ => rfl⟩ :
+        NativeTower.TwoSkeletonInterpretation (NativeTower.globular A) A)) =
+      GlobularSet.Map.id (NativeTower.globular A) := by
+  apply NativeTower.map_ext_twoSkeleton <;> intro x <;> rfl
+
 #print axioms Pasting.preserves_recovered
 #print axioms Pasting.preserves_ext
 #print axioms Pasting.existsUnique_preserving_extension

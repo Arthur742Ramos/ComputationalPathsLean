@@ -642,6 +642,15 @@ original quotient-path-induction module. The latter still has pre-existing
 build failures in its `MetadataRepair` dependency under the active toolchain;
 the trace-collapse module and native tower are checked independently.
 
+`NativeTower.TwoSkeletonInterpretation.existsUnique_extension` now extends
+any boundary-compatible interpretation of objects, paths, and raw rewrite
+cells uniquely to a globular map into the native tower. The supplied
+two-cell derivations are preserved literally. `map_ext_twoSkeleton` reduces
+equality of maps into this tower to equality in dimensions zero through two;
+the audit checks that extending the identity two-skeleton recovers the
+identity map. This can support future action-law checks but supplies neither
+an operation collection nor substitution compatibility by itself.
+
 Completion requires the mathematical target above to be instantiated, all
 proof dependencies audited, the relevant modules built, and preservation of
 the existing associativity artifact checked. Merely defining interfaces,

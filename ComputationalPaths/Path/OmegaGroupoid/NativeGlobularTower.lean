@@ -163,6 +163,83 @@ noncomputable def fillPositiveBoundary {A : Type u} {n : Nat}
     (fillPositive_boundary b.left b.right hh.1 hh.2).1,
     (fillPositive_boundary b.left b.right hh.1 hh.2).2⟩
 
+/-- Two consecutive levels of an interpretation into the native tower.
+The lower level need not be constant, so object endpoints are retained. -/
+structure InterpretationStage (G : GlobularSet.{v}) (A : Type u) (n : Nat) where
+  lower : G.Cell n → Cell A n
+  upper : G.Cell (n + 1) → Cell A (n + 1)
+  source_upper : ∀ c, source (upper c) = lower (G.source c)
+  target_upper : ∀ c, target (upper c) = lower (G.target c)
+
+/-- Extend an interpretation by one dimension using actual native fillers.
+This constructs a map, not a substitution-compatible algebra structure. -/
+noncomputable def InterpretationStage.next {G : GlobularSet.{v}} {A : Type u}
+    {n : Nat} (F : InterpretationStage G A n) : InterpretationStage G A (n + 1) where
+  lower := F.upper
+  upper c := fillPositive (F.upper (G.source c)) (F.upper (G.target c))
+    ((F.source_upper _).trans ((_root_.congrArg F.lower (G.source_source c)).trans
+      (F.source_upper _).symm))
+    ((F.target_upper _).trans ((_root_.congrArg F.lower (G.target_source c)).trans
+      (F.target_upper _).symm))
+  source_upper c := (fillPositive_boundary _ _ _ _).1
+  target_upper c := (fillPositive_boundary _ _ _ _).2
+
+noncomputable def InterpretationStage.grow {G : GlobularSet.{v}} {A : Type u}
+    (F : InterpretationStage G A 0) : (n : Nat) → InterpretationStage G A n
+  | 0 => F
+  | n + 1 => (F.grow n).next
+
+/-- A chosen interpretation on objects and paths extends to all dimensions.
+In dimension two the extension uses rewrite totality; it does not preserve
+an independently specified two-cell assignment automatically. -/
+noncomputable def InterpretationStage.extend {G : GlobularSet.{v}} {A : Type u}
+    (F : InterpretationStage G A 0) : GlobularSet.Map G (globular A) where
+  app {n} := (F.grow n).lower
+  source_app {n} c := (F.grow n).source_upper c
+  target_app {n} c := (F.grow n).target_upper c
+
+theorem InterpretationStage.extend_objects {G : GlobularSet.{v}} {A : Type u}
+    (F : InterpretationStage G A 0) (x : G.Cell 0) : F.extend.app x = F.lower x := rfl
+
+theorem InterpretationStage.extend_paths {G : GlobularSet.{v}} {A : Type u}
+    (F : InterpretationStage G A 0) (p : G.Cell 1) : F.extend.app p = F.upper p := rfl
+
+/-- A specified interpretation of raw two-cells, with their actual
+derivations retained rather than replaced by the default totality proof. -/
+structure TwoSkeletonInterpretation (G : GlobularSet.{v}) (A : Type u) where
+  one : InterpretationStage G A 0
+  two : G.Cell 2 → Cell A 2
+  source_two : ∀ c, source (two c) = one.upper (G.source c)
+  target_two : ∀ c, target (two c) = one.upper (G.target c)
+
+noncomputable def TwoSkeletonInterpretation.grow {G : GlobularSet.{v}} {A : Type u}
+    (F : TwoSkeletonInterpretation G A) : (n : Nat) → InterpretationStage G A n
+  | 0 => F.one
+  | 1 => ⟨F.one.upper, F.two, F.source_two, F.target_two⟩
+  | n + 2 => (F.grow (n + 1)).next
+
+theorem TwoSkeletonInterpretation.grow_lower {G : GlobularSet.{v}} {A : Type u}
+    (F : TwoSkeletonInterpretation G A) (n : Nat) :
+    (F.grow (n + 1)).lower = (F.grow n).upper := by
+  cases n <;> rfl
+
+/-- Extend the entire raw two-skeleton, including chosen associativity
+derivations, without changing any of those choices. -/
+noncomputable def TwoSkeletonInterpretation.extend {G : GlobularSet.{v}} {A : Type u}
+    (F : TwoSkeletonInterpretation G A) : GlobularSet.Map G (globular A) where
+  app {n} := (F.grow n).lower
+  source_app {n} c := by
+    change source ((F.grow (n + 1)).lower c) = _
+    rw [F.grow_lower]
+    exact (F.grow n).source_upper c
+  target_app {n} c := by
+    change target ((F.grow (n + 1)).lower c) = _
+    rw [F.grow_lower]
+    exact (F.grow n).target_upper c
+
+theorem TwoSkeletonInterpretation.extend_two {G : GlobularSet.{v}} {A : Type u}
+    (F : TwoSkeletonInterpretation G A) (c : G.Cell 2) : F.extend.app c = F.two c := rfl
+
 /-- Semantic limitation: in this chosen extension, cells of dimension at
 least three are uniquely determined by their two boundaries. This is not a
 claim about the native higher-derivation syntax. -/
@@ -174,6 +251,41 @@ theorem higher_ext {A : Type u} {n : Nat} (p q : Cell A (n + 3))
   cases hs
   apply _root_.congrArg (Sigma.mk p)
   exact Subtype.ext ht
+
+/-- Maps into this tower are determined by their raw two-skeleton. This
+does not identify distinct two-dimensional rewrite derivations. -/
+theorem map_ext_twoSkeleton {G : GlobularSet.{v}} {A : Type u}
+    (f g : GlobularSet.Map G (globular A))
+    (h0 : ∀ x : G.Cell 0, f.app x = g.app x)
+    (h1 : ∀ x : G.Cell 1, f.app x = g.app x)
+    (h2 : ∀ x : G.Cell 2, f.app x = g.app x) : f = g := by
+  apply GlobularSet.Map.ext
+  intro n
+  induction n with
+  | zero => exact h0
+  | succ n ih =>
+    cases n with
+    | zero => exact h1
+    | succ n =>
+      cases n with
+      | zero => exact h2
+      | succ n =>
+        intro x
+        apply higher_ext
+        · exact (f.source_app x).trans ((ih (G.source x)).trans (g.source_app x).symm)
+        · exact (f.target_app x).trans ((ih (G.target x)).trans (g.target_app x).symm)
+
+/-- Existence and uniqueness concerns maps with a fixed two-skeleton, not
+uniqueness of raw two-cells or a free weak-category universal property. -/
+theorem TwoSkeletonInterpretation.existsUnique_extension {G : GlobularSet.{v}}
+    {A : Type u} (F : TwoSkeletonInterpretation G A) :
+    ∃! f : GlobularSet.Map G (globular A),
+      (∀ x : G.Cell 0, f.app x = F.one.lower x) ∧
+      (∀ x : G.Cell 1, f.app x = F.one.upper x) ∧
+      (∀ x : G.Cell 2, f.app x = F.two x) := by
+  refine ⟨F.extend, ⟨fun _ => rfl, fun _ => rfl, fun _ => rfl⟩, ?_⟩
+  intro f hf
+  exact map_ext_twoSkeleton f F.extend hf.1 hf.2.1 hf.2.2
 
 noncomputable def identity {A : Type u} : {n : Nat} → Cell A n → Cell A (n + 1)
   | 0, a => ULift.up ⟨a.down, a.down, Path.refl a.down⟩
