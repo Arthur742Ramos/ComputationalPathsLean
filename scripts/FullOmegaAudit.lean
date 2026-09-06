@@ -151,6 +151,31 @@ example (A : Type u) :
 #print axioms Pasting.StrictModel.equivalence
 #print axioms Pasting.StrictModel.freeForgetAdjunction
 #print axioms Pasting.StrictModel.freeForget_monad
+#print axioms NativeOperadic.composeAt_source
+#print axioms NativeOperadic.composeAt_target
+#print axioms NativeAssociativity.horizontalComparison
+#print axioms NativeAssociativity.whiskerRightComparison
+#print axioms NativeAssociativity.whiskerLeftComparison
+
+example {A : Type} {a b c : A} {p p' : Path a b} {q q' : Path b c}
+    (d : OmegaGroupoid.Derivation₂ p p') (e : OmegaGroupoid.Derivation₂ q q') :
+    NativeTower.target (NativeAssociativity.horizontalComparison d e).val =
+      NativeAssociativity.two (OmegaGroupoid.hcomp d e) :=
+  (NativeAssociativity.horizontalComparison d e).property.2
+example {A : Type} {a b c : A} {p p' : Path a b}
+    (d : OmegaGroupoid.Derivation₂ p p') (q : Path b c) :
+    NativeTower.source (NativeAssociativity.whiskerRightComparison d q).val =
+      NativeAssociativity.operadicWhiskerRight d q ∧
+    NativeOperadic.WeaklyInvertible 2 (NativeAssociativity.whiskerRightComparison d q).val :=
+  ⟨(NativeAssociativity.whiskerRightComparison d q).property.1,
+    NativeAssociativity.whiskerRightComparison_invertible d q⟩
+example {A : Type} {a b c : A} (p : Path a b) {q q' : Path b c}
+    (e : OmegaGroupoid.Derivation₂ q q') :
+    NativeTower.source (NativeAssociativity.whiskerLeftComparison p e).val =
+      NativeAssociativity.operadicWhiskerLeft p e ∧
+    NativeOperadic.WeaklyInvertible 2 (NativeAssociativity.whiskerLeftComparison p e).val :=
+  ⟨(NativeAssociativity.whiskerLeftComparison p e).property.1,
+    NativeAssociativity.whiskerLeftComparison_invertible p e⟩
 
 noncomputable example : CategoryTheory.Equivalence Pasting.CutModel Pasting.StrictModel :=
   Pasting.StrictModel.equivalence

@@ -832,3 +832,16 @@ Together with the previous index, boundary, axiom and object-round-trip
 proofs, this discharges the standard strict-presentation/free-monad gate.
 It does not by itself discharge the remaining native/operadic coherence
 comparisons or certify completion of the full weak omega-groupoid objective.
+
+`NativeOperadic.composeAt` now applies the standard operadic instruction to
+the two-singleton diagram at every cut, including non-adjacent horizontal
+composition. `composeAt_source` and `composeAt_target` verify recursive
+boundary compatibility; `composeAt_paths` retains exact `Path.trans` in
+dimension one. `NativeAssociativity.horizontalComparison` compares its
+two-dimensional instance with the original native horizontal derivation.
+The left and right whiskering comparisons use the actual selected operadic
+identity two-cells, not reflexive witnesses substituted for those choices.
+All three comparisons have explicit boundaries and are weakly invertible.
+They live in the declared coskeletal three-cell layer and do not assert
+equality of raw two-cell histories. Comparing the complete selected
+pentagon/interchange coherence operations remains an outstanding gate.

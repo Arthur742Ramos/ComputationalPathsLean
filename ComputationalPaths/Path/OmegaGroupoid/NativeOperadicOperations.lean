@@ -293,6 +293,72 @@ noncomputable def identity {A : Type u} {n : Nat} (p : (carrier A).Cell n) :
     (carrier A).Cell (n + 1) :=
   (standardEvaluation A).app (Pasting.identity (Pasting.singleton p))
 
+/-- The two-singleton input diagram at any lower composition axis. -/
+noncomputable def binaryDiagram {A : Type u} {n : Nat} (c : Pasting.Cut n)
+    (p q : (carrier A).Cell n)
+    (h : Pasting.CutBoundary.target c (carrier A) p = Pasting.CutBoundary.source c (carrier A) q) :
+    Pasting n (carrier A) :=
+  (Pasting.cutOperations (carrier A)).compose c (Pasting.singleton p) (Pasting.singleton q)
+    ((Pasting.CutBoundary.target_map c (Pasting.singletonGlobular (carrier A)) p).trans
+      ((_root_.congrArg (Pasting.singletonGlobular (carrier A)).app h).trans
+        (Pasting.CutBoundary.source_map c (Pasting.singletonGlobular (carrier A)) q).symm))
+
+/-- Standard operadic composition at every axis, not just the adjacent one.
+The complete binary diagram is evaluated by the selected operadic instruction. -/
+noncomputable def composeAt {A : Type u} {n : Nat} (c : Pasting.Cut n)
+    (p q : (carrier A).Cell n)
+    (h : Pasting.CutBoundary.target c (carrier A) p = Pasting.CutBoundary.source c (carrier A) q) :
+    (carrier A).Cell n := (standardEvaluation A).app (binaryDiagram c p q h)
+
+theorem composeAt_congr {A : Type u} {n : Nat} (c : Pasting.Cut n)
+    {p q p' q' : (carrier A).Cell n} (hp : p = p') (hq : q = q') h h' :
+    composeAt c p q h = composeAt c p' q' h' := by
+  cases hp
+  cases hq
+  rfl
+
+theorem binaryDiagram_source {A : Type u} {n : Nat} (c : Pasting.Cut n)
+    (p q : (carrier A).Cell (n + 1)) h h' :
+    (Pasting.globular (carrier A)).source (binaryDiagram c.up p q h) =
+      binaryDiagram c (NativeTower.source p) (NativeTower.source q) h' := by
+  let F := Pasting.CutModel.free (carrier A)
+  have hm := Pasting.CutBoundary.source_matching (Pasting.globular (carrier A)) c
+    (Pasting.singleton p) (Pasting.singleton q)
+    ((Pasting.CutBoundary.target_map c.up (Pasting.singletonGlobular (carrier A)) p).trans
+      ((_root_.congrArg (Pasting.singletonGlobular (carrier A)).app h).trans
+        (Pasting.CutBoundary.source_map c.up (Pasting.singletonGlobular (carrier A)) q).symm))
+  exact (F.compatible.source_compose c.raise_up _ _ _ hm).trans
+    (eq_of_heq (F.compose_heq rfl c c rfl _ _ _ _
+      (heq_of_eq (Pasting.source_singleton _ p)) (heq_of_eq (Pasting.source_singleton _ q)) hm _))
+
+theorem binaryDiagram_target {A : Type u} {n : Nat} (c : Pasting.Cut n)
+    (p q : (carrier A).Cell (n + 1)) h h' :
+    (Pasting.globular (carrier A)).target (binaryDiagram c.up p q h) =
+      binaryDiagram c (NativeTower.target p) (NativeTower.target q) h' := by
+  let F := Pasting.CutModel.free (carrier A)
+  have hm := Pasting.CutBoundary.target_matching (Pasting.globular (carrier A)) c
+    (Pasting.singleton p) (Pasting.singleton q)
+    ((Pasting.CutBoundary.target_map c.up (Pasting.singletonGlobular (carrier A)) p).trans
+      ((_root_.congrArg (Pasting.singletonGlobular (carrier A)).app h).trans
+        (Pasting.CutBoundary.source_map c.up (Pasting.singletonGlobular (carrier A)) q).symm))
+  exact (F.compatible.target_compose c.raise_up _ _ _ hm).trans
+    (eq_of_heq (F.compose_heq rfl c c rfl _ _ _ _
+      (heq_of_eq (Pasting.target_singleton _ p)) (heq_of_eq (Pasting.target_singleton _ q)) hm _))
+
+theorem composeAt_source {A : Type u} {n : Nat} (c : Pasting.Cut n)
+    (p q : (carrier A).Cell (n + 1)) h h' :
+    NativeTower.source (composeAt c.up p q h) =
+      composeAt c (NativeTower.source p) (NativeTower.source q) h' :=
+  ((standardEvaluation A).source_app _).trans
+    (_root_.congrArg (standardEvaluation A).app (binaryDiagram_source c p q h h'))
+
+theorem composeAt_target {A : Type u} {n : Nat} (c : Pasting.Cut n)
+    (p q : (carrier A).Cell (n + 1)) h h' :
+    NativeTower.target (composeAt c.up p q h) =
+      composeAt c (NativeTower.target p) (NativeTower.target q) h' :=
+  ((standardEvaluation A).target_app _).trans
+    (_root_.congrArg (standardEvaluation A).app (binaryDiagram_target c p q h h'))
+
 theorem identity_boundary {A : Type u} {n : Nat} (p : (carrier A).Cell n) :
     NativeTower.source (identity p) = p ∧ NativeTower.target (identity p) = p :=
   ⟨((standardEvaluation A).source_app _).trans
@@ -349,6 +415,14 @@ theorem compose_paths {A : Type u} {a b c : A} (p : Path a b) (q : Path b c) :
     carrier, id, NativeTower.globular, GlobularSet.sourceZero, GlobularSet.targetZero,
     NativeTower.source, NativeTower.target, sourceOne, targetOne, NativeTower.Cell]
   simp only [andRec, andRec']
+
+theorem composeAt_paths {A : Type u} {a b c : A} (p : Path a b) (q : Path b c) :
+    composeAt (A := A) (.bottom : Pasting.Cut 1)
+      (ULift.up (⟨a, b, p⟩ : PathOne A)) (ULift.up (⟨b, c, q⟩ : PathOne A)) rfl =
+        ULift.up (⟨a, c, Path.trans p q⟩ : PathOne A) := by
+  change compose (A := A) (n := 0) (ULift.up (⟨a, b, p⟩ : PathOne A))
+    (ULift.up (⟨b, c, q⟩ : PathOne A)) rfl = _
+  exact compose_paths p q
 
 /-- An explicit comparison with the previous native composite; equality
 of distinct raw rewrite derivations is not asserted. -/

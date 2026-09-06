@@ -49,6 +49,121 @@ theorem operadicAssociator_derivation {A : Type u} {a b c d : A}
 noncomputable def two {A : Type u} {a b : A} {p q : Path a b}
     (d : Derivation₂ p q) : NativeTower.Cell A 2 := ⟨a, b, p, q, d.toRwEq⟩
 
+/-- Horizontal two-cell composition uses the full standard operadic input,
+not a native vertical composite relabelled as horizontal. -/
+noncomputable def horizontal {A : Type u} {a b c : A}
+    {p p' : Path a b} {q q' : Path b c}
+    (d : Derivation₂ p p') (e : Derivation₂ q q') : NativeTower.Cell A 2 :=
+  NativeOperadic.composeAt (.bottom : Pasting.Cut 2) (two d) (two e) rfl
+
+theorem horizontal_boundary {A : Type u} {a b c : A}
+    {p p' : Path a b} {q q' : Path b c}
+    (d : Derivation₂ p p') (e : Derivation₂ q q') :
+    NativeTower.source (horizontal d e) = ULift.up (⟨a, c, Path.trans p q⟩ : PathOne A) ∧
+      NativeTower.target (horizontal d e) = ULift.up (⟨a, c, Path.trans p' q'⟩ : PathOne A) :=
+  ⟨(NativeOperadic.composeAt_source (.bottom : Pasting.Cut 1) (two d) (two e) rfl rfl).trans
+      (NativeOperadic.composeAt_paths p q),
+    (NativeOperadic.composeAt_target (.bottom : Pasting.Cut 1) (two d) (two e) rfl rfl).trans
+      (NativeOperadic.composeAt_paths p' q')⟩
+
+/-- A specified comparison to the original horizontal rewrite derivation.
+This is a three-cell in the declared coskeletal target, not equality of the
+two raw rewrite histories or a replacement for their independent proof. -/
+noncomputable def horizontalComparison {A : Type u} {a b c : A}
+    {p p' : Path a b} {q q' : Path b c}
+    (d : Derivation₂ p p') (e : Derivation₂ q q') :
+    { h : NativeTower.Cell A 3 // NativeTower.source h = horizontal d e ∧
+      NativeTower.target h = two (OmegaGroupoid.hcomp d e) } :=
+  ⟨NativeTower.fillPositive (horizontal d e) (two (OmegaGroupoid.hcomp d e))
+      (horizontal_boundary d e).1 (horizontal_boundary d e).2,
+    NativeTower.fillPositive_boundary _ _ _ _⟩
+
+def onePath {A : Type u} {a b : A} (p : Path a b) : NativeTower.Cell A 1 := ULift.up ⟨a, b, p⟩
+
+/-- Whiskering uses the selected operadic identity two-cell, not a raw
+reflexive witness silently substituted for that choice. -/
+noncomputable def operadicWhiskerRight {A : Type u} {a b c : A}
+    {p p' : Path a b} (d : Derivation₂ p p') (q : Path b c) : NativeTower.Cell A 2 :=
+  NativeOperadic.composeAt (.bottom : Pasting.Cut 2) (two d)
+    (NativeOperadic.identity (onePath q))
+    (_root_.congrArg (NativeTower.source (A := A) (n := 0))
+      (NativeOperadic.identity_boundary (A := A) (n := 1) (onePath q)).1).symm
+
+noncomputable def operadicWhiskerLeft {A : Type u} {a b c : A}
+    (p : Path a b) {q q' : Path b c} (e : Derivation₂ q q') : NativeTower.Cell A 2 :=
+  NativeOperadic.composeAt (.bottom : Pasting.Cut 2)
+    (NativeOperadic.identity (onePath p)) (two e)
+    (_root_.congrArg (NativeTower.target (A := A) (n := 0))
+      (NativeOperadic.identity_boundary (A := A) (n := 1) (onePath p)).2)
+
+theorem operadicWhiskerRight_boundary {A : Type u} {a b c : A}
+    {p p' : Path a b} (d : Derivation₂ p p') (q : Path b c) :
+    NativeTower.source (operadicWhiskerRight d q) = onePath (Path.trans p q) ∧
+      NativeTower.target (operadicWhiskerRight d q) = onePath (Path.trans p' q) := by
+  have hs := (NativeOperadic.identity_boundary (A := A) (n := 1) (onePath q)).1
+  have ht := (NativeOperadic.identity_boundary (A := A) (n := 1) (onePath q)).2
+  constructor
+  · exact (NativeOperadic.composeAt_source (.bottom : Pasting.Cut 1) (two d)
+      (NativeOperadic.identity (onePath q)) _
+      (_root_.congrArg (NativeTower.source (A := A) (n := 0)) hs).symm).trans
+      ((NativeOperadic.composeAt_congr (.bottom : Pasting.Cut 1)
+        (p' := onePath p) (q' := onePath q) rfl hs _ rfl).trans (NativeOperadic.composeAt_paths p q))
+  · exact (NativeOperadic.composeAt_target (.bottom : Pasting.Cut 1) (two d)
+      (NativeOperadic.identity (onePath q)) _
+      (_root_.congrArg (NativeTower.source (A := A) (n := 0)) ht).symm).trans
+      ((NativeOperadic.composeAt_congr (.bottom : Pasting.Cut 1)
+        (p' := onePath p') (q' := onePath q) rfl ht _ rfl).trans (NativeOperadic.composeAt_paths p' q))
+
+theorem operadicWhiskerLeft_boundary {A : Type u} {a b c : A}
+    (p : Path a b) {q q' : Path b c} (e : Derivation₂ q q') :
+    NativeTower.source (operadicWhiskerLeft p e) = onePath (Path.trans p q) ∧
+      NativeTower.target (operadicWhiskerLeft p e) = onePath (Path.trans p q') := by
+  have hs := (NativeOperadic.identity_boundary (A := A) (n := 1) (onePath p)).1
+  have ht := (NativeOperadic.identity_boundary (A := A) (n := 1) (onePath p)).2
+  constructor
+  · exact (NativeOperadic.composeAt_source (.bottom : Pasting.Cut 1)
+      (NativeOperadic.identity (onePath p)) (two e) _
+      (_root_.congrArg (NativeTower.target (A := A) (n := 0)) hs)).trans
+      ((NativeOperadic.composeAt_congr (.bottom : Pasting.Cut 1)
+        (p' := onePath p) (q' := onePath q) hs rfl _ rfl).trans (NativeOperadic.composeAt_paths p q))
+  · exact (NativeOperadic.composeAt_target (.bottom : Pasting.Cut 1)
+      (NativeOperadic.identity (onePath p)) (two e) _
+      (_root_.congrArg (NativeTower.target (A := A) (n := 0)) ht)).trans
+      ((NativeOperadic.composeAt_congr (.bottom : Pasting.Cut 1)
+        (p' := onePath p) (q' := onePath q') ht rfl _ rfl).trans (NativeOperadic.composeAt_paths p q'))
+
+noncomputable def whiskerRightComparison {A : Type u} {a b c : A}
+    {p p' : Path a b} (d : Derivation₂ p p') (q : Path b c) :
+    { h : NativeTower.Cell A 3 // NativeTower.source h = operadicWhiskerRight d q ∧
+      NativeTower.target h = two (OmegaGroupoid.whiskerRight d q) } :=
+  ⟨NativeTower.fillPositive (operadicWhiskerRight d q) (two (OmegaGroupoid.whiskerRight d q))
+      (operadicWhiskerRight_boundary d q).1 (operadicWhiskerRight_boundary d q).2,
+    NativeTower.fillPositive_boundary _ _ _ _⟩
+
+noncomputable def whiskerLeftComparison {A : Type u} {a b c : A}
+    (p : Path a b) {q q' : Path b c} (e : Derivation₂ q q') :
+    { h : NativeTower.Cell A 3 // NativeTower.source h = operadicWhiskerLeft p e ∧
+      NativeTower.target h = two (OmegaGroupoid.whiskerLeft p e) } :=
+  ⟨NativeTower.fillPositive (operadicWhiskerLeft p e) (two (OmegaGroupoid.whiskerLeft p e))
+      (operadicWhiskerLeft_boundary p e).1 (operadicWhiskerLeft_boundary p e).2,
+    NativeTower.fillPositive_boundary _ _ _ _⟩
+
+theorem horizontalComparison_invertible {A : Type u} {a b c : A}
+    {p p' : Path a b} {q q' : Path b c}
+    (d : Derivation₂ p p') (e : Derivation₂ q q') :
+    NativeOperadic.WeaklyInvertible 2 (horizontalComparison d e).val :=
+  NativeOperadic.all_cells_weaklyInvertible _ _
+
+theorem whiskerRightComparison_invertible {A : Type u} {a b c : A}
+    {p p' : Path a b} (d : Derivation₂ p p') (q : Path b c) :
+    NativeOperadic.WeaklyInvertible 2 (whiskerRightComparison d q).val :=
+  NativeOperadic.all_cells_weaklyInvertible _ _
+
+theorem whiskerLeftComparison_invertible {A : Type u} {a b c : A}
+    (p : Path a b) {q q' : Path b c} (e : Derivation₂ q q') :
+    NativeOperadic.WeaklyInvertible 2 (whiskerLeftComparison p e).val :=
+  NativeOperadic.all_cells_weaklyInvertible _ _
+
 /-- Native certificate concatenation and standard operadic two-cell
 composition are related by a specified three-cell. -/
 noncomputable def twoCompositionComparison {A : Type u} {a b : A}
