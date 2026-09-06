@@ -1,4 +1,5 @@
 import ComputationalPaths.Path.OmegaGroupoid.GlobularFoundations
+import ComputationalPaths.Path.Rewrite.TraceCollapse
 
 /-!
 # A recursive globular extension of the raw computational-path two-skeleton
@@ -115,6 +116,52 @@ theorem source_higherCell {A : Type u} {n : Nat} (p q : Cell A (n + 2))
 theorem target_higherCell {A : Type u} {n : Nat} (p q : Cell A (n + 2))
     (hs : source p = source q) (ht : target p = target q) :
     target (higherCell p q hs ht) = q := by cases n <;> rfl
+
+/-- Every parallel pair of positive-dimensional native cells has a chosen
+filler. At dimension two this uses the existing rewrite-totality derivation;
+above it this uses the explicitly adjoined coskeletal cells. This does not
+fill unrelated objects and is not yet an operadic contraction. -/
+noncomputable def fillPositive {A : Type u} : {n : Nat} → (p q : Cell A (n + 1)) →
+    source p = source q → target p = target q → Cell A (n + 2)
+  | 0, p, q, hs, ht => by
+    rcases p with ⟨a, b, p⟩
+    rcases q with ⟨c, d, q⟩
+    have ha : a = c := _root_.congrArg ULift.down hs
+    have hb : b = d := _root_.congrArg ULift.down ht
+    cases ha
+    cases hb
+    exact ⟨a, b, p, q, QuotientPathInduction.rweqAny p q⟩
+  | n + 1, p, q, hs, ht => higherCell p q hs ht
+
+theorem fillPositive_boundary {A : Type u} {n : Nat} (p q : Cell A (n + 1))
+    (hs : source p = source q) (ht : target p = target q) :
+    source (fillPositive p q hs ht) = p ∧ target (fillPositive p q hs ht) = q := by
+  cases n with
+  | zero =>
+    rcases p with ⟨a, b, p⟩
+    rcases q with ⟨c, d, q⟩
+    have ha : a = c := _root_.congrArg ULift.down hs
+    have hb : b = d := _root_.congrArg ULift.down ht
+    cases ha
+    cases hb
+    exact ⟨rfl, rfl⟩
+  | succ n => exact ⟨source_higherCell p q hs ht, target_higherCell p q hs ht⟩
+
+theorem fillPositive_paths {A : Type u} {a b : A} (p q : Path a b) :
+    fillPositive (A := A) (n := 0) (ULift.up (⟨a, b, p⟩ : PathOne A))
+      (ULift.up (⟨a, b, q⟩ : PathOne A)) rfl rfl =
+      (⟨a, b, p, q, QuotientPathInduction.rweqAny p q⟩ : Cell A 2) := rfl
+
+/-- Fill an actual globular boundary above dimension zero. The full
+raw derivations remain in the carrier; only inhabitation is asserted. -/
+noncomputable def fillPositiveBoundary {A : Type u} {n : Nat}
+    (b : (globular A).Boundary (n + 1)) : (globular A).CellOver b := by
+  have hh : source b.left = source b.right ∧ target b.left = target b.right := by
+    cases b.parallel with
+    | cells hs ht => exact ⟨hs, ht⟩
+  exact ⟨fillPositive b.left b.right hh.1 hh.2,
+    (fillPositive_boundary b.left b.right hh.1 hh.2).1,
+    (fillPositive_boundary b.left b.right hh.1 hh.2).2⟩
 
 /-- Semantic limitation: in this chosen extension, cells of dimension at
 least three are uniquely determined by their two boundaries. This is not a

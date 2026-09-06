@@ -629,6 +629,19 @@ paths. A structural weak omega-groupoid theorem does not automatically give a
 model of arbitrary homotopy types or nontrivial fundamental groups. Establish
 the resulting truncations and state this limitation alongside the theorem.
 
+`NativeTower.fillPositiveBoundary` now provides fillers for every parallel
+boundary of positive-dimensional native cells. Its dimension-two case is
+literally the existing `QuotientPathInduction.rweqAny` derivation
+(`fillPositive_paths`); higher cases use the explicitly adjoined coskeletal
+cells. This asserts inhabitation, not equality of raw rewrite derivations,
+and does not fill arbitrary pairs of objects. It is a helper for the pending
+native operation construction, not an operadic contraction by itself.
+The primitive trace-collapse definitions were moved without renaming into
+the dependency-light `Rewrite.TraceCollapse` module and re-exported by the
+original quotient-path-induction module. The latter still has pre-existing
+build failures in its `MetadataRepair` dependency under the active toolchain;
+the trace-collapse module and native tower are checked independently.
+
 Completion requires the mathematical target above to be instantiated, all
 proof dependencies audited, the relevant modules built, and preservation of
 the existing associativity artifact checked. Merely defining interfaces,

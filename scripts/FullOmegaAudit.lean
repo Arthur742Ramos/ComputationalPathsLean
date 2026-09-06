@@ -139,6 +139,13 @@ completion gate for the full weak omega-groupoid theorem. -/
 #print axioms GlobularCollection.operadMul_cartesian
 #print axioms GlobularCollection.operadUnit_globular_pullback
 #print axioms GlobularCollection.operadMul_globular_pullback
+#print axioms QuotientPathInduction.rweqAny
+#print axioms NativeTower.fillPositive
+#print axioms NativeTower.fillPositiveBoundary
+#print axioms NativeTower.fillPositive_paths
+
+noncomputable example {A : Type u} {n : Nat} (b : (NativeTower.globular A).Boundary (n + 1)) :
+    (NativeTower.globular A).CellOver b := NativeTower.fillPositiveBoundary b
 
 example (C : GlobularCollection.{u}) [CategoryTheory.MonObj C] {G H X : GlobularSet.{u}}
     (f : GlobularSet.Map G H) (p : GlobularSet.Map X (C.application G))
