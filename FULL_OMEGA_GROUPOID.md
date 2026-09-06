@@ -199,7 +199,7 @@ pair, recursively: it is a coskeletal extension of the raw two-skeleton. These
 cells are not asserted to be native higher rewrite derivations. The limitation
 is proved by `higher_ext`: cells of dimension at least three are determined by
 their boundaries. Identities and globularity are checked at every dimension.
-This construction does not establish an operadic action or weak invertibility,
+This carrier construction alone does not establish an operadic action,
 and does not replace the independent, presentation-sensitive associativity
 certificate. The action must still be constructed and its algebra laws verified
 before this candidate can support the requested theorem.
@@ -211,9 +211,19 @@ the native `Path.symm` and `RwEq.symm` constructors. `cancelRight` and
 `cancelLeft` supply cancellation cells in every positive dimension. Their
 one-cell witnesses are exactly `Step.trans_symm` and `Step.symm_trans`, as
 checked by the corresponding `_paths` theorems. Higher cancellation uses the
-explicit coskeletal extension. These uniform cancellation witnesses have not
-yet been packaged as the required coinductive weak-invertibility proof, nor
-identified with operations of a proved operadic action.
+explicit coskeletal extension.
+
+`WeaklyInvertible` now defines the greatest postfixed point of the cancellation
+operator on predicates over all positive dimensions. `weaklyInvertible_unfold`
+proves its fixed-point equation, and `weaklyInvertible_coinduction` supplies the
+coinduction principle. `all_cells_weaklyInvertible` proves every positive cell
+invertible by a single postfixed predicate containing the cancellation cells
+at all higher dimensions, without a finite depth bound. This follows
+[Fujii--Hoshino--Maehara, Definition 3.1.1 and Remark 3.1.2](https://higher-structures.math.cas.cz/api/files/issues/Vol8Iss2/FujHosMae),
+whose operator is defined already for omega-precategories. The theorem is
+about the specified native/coskeletal omega-precategory; its operations are
+not yet identified with those of a proved operadic action. That remains a
+required completion gate, not a consequence of invertibility alone.
 
 The current rewrite theory has a totality theorem for `RwEq` on parallel
 paths. A structural weak omega-groupoid theorem does not automatically give a

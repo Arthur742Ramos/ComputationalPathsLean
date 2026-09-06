@@ -296,3 +296,12 @@ example {A : Type} (p : NativeTower.Cell A 9) :
 #print axioms NativeTower.cancelLeft
 #print axioms NativeTower.cancelRight_paths
 #print axioms NativeTower.cancelLeft_paths
+
+example {A : Type} (n : Nat) (p : NativeTower.Cell A (n + 1)) :
+    NativeTower.WeaklyInvertible (n + 1) (NativeTower.cancelRight p).val :=
+  NativeTower.all_cells_weaklyInvertible _ _
+
+#print axioms NativeTower.invertibilityStep_mono
+#print axioms NativeTower.weaklyInvertible_coinduction
+#print axioms NativeTower.weaklyInvertible_unfold
+#print axioms NativeTower.all_cells_weaklyInvertible

@@ -246,7 +246,7 @@ theorem compose_rewrites {A : Type u} {a b : A} {p q r : Path a b} (h : RwEq p q
 
 /-- Cancellation at every positive dimension. At dimension one the witness
 is a native primitive rewrite; higher witnesses belong to the declared
-coskeletal extension. This is not yet a coinductive invertibility theorem. -/
+coskeletal extension. Used below to prove coinductive invertibility. -/
 noncomputable def cancelRight {A : Type u} {n : Nat} (p : Cell A (n + 1)) :
     { c : Cell A (n + 2) // source c = compose p (reverse p) (source_reverse p).symm ∧
       target c = identity (source p) } := by
@@ -286,6 +286,61 @@ theorem cancelRight_paths {A : Type u} {a b : A} (p : Path a b) :
 theorem cancelLeft_paths {A : Type u} {a b : A} (p : Path a b) :
     (cancelLeft (A := A) (n := 0) (ULift.up (⟨a, b, p⟩ : PathOne A))).val.2.2.2.2 =
       RwEq.step (Step.symm_trans p) := rfl
+
+/-- A predicate on all positive-dimensional cells, with no finite depth bound. -/
+def CellPredicate (A : Type u) := ∀ n : Nat, Cell A (n + 1) → Prop
+
+/-- The coinductive invertibility operator: both cancellation witnesses must
+belong to the predicate at the next dimension. The reverse cell itself need
+not belong to it. This is Definition 3.1.1 of Fujii--Hoshino--Maehara,
+specialized to this omega-precategory, not an assertion of an operadic action. -/
+def InvertibilityStep {A : Type u} (S : CellPredicate A)
+    (n : Nat) (p : Cell A (n + 1)) : Prop :=
+  ∃ (q : Cell A (n + 1)) (hs : source q = target p) (ht : target q = source p),
+    ∃ (r l : Cell A (n + 2)),
+      source r = compose p q hs.symm ∧ target r = identity (source p) ∧
+      source l = compose q p ht ∧ target l = identity (target p) ∧
+      S (n + 1) r ∧ S (n + 1) l
+
+theorem invertibilityStep_mono {A : Type u} {S T : CellPredicate A}
+    (h : ∀ n p, S n p → T n p) {n : Nat} {p : Cell A (n + 1)} :
+    InvertibilityStep S n p → InvertibilityStep T n p := by
+  rintro ⟨q, hs, ht, r, l, hr, hrt, hl, hlt, sr, sl⟩
+  exact ⟨q, hs, ht, r, l, hr, hrt, hl, hlt, h _ _ sr, h _ _ sl⟩
+
+/-- Greatest postfixed point, expressed as the union of all postfixed
+predicates. In particular, this is not a finite-fuel approximation. -/
+def WeaklyInvertible {A : Type u} (n : Nat) (p : Cell A (n + 1)) : Prop :=
+  ∃ S : CellPredicate A, (∀ m c, S m c → InvertibilityStep S m c) ∧ S n p
+
+theorem weaklyInvertible_coinduction {A : Type u} (S : CellPredicate A)
+    (closed : ∀ n p, S n p → InvertibilityStep S n p)
+    {n : Nat} {p : Cell A (n + 1)} (hp : S n p) : WeaklyInvertible n p :=
+  ⟨S, closed, hp⟩
+
+theorem weaklyInvertible_unfold {A : Type u} {n : Nat} {p : Cell A (n + 1)} :
+    WeaklyInvertible n p ↔ InvertibilityStep (WeaklyInvertible (A := A)) n p := by
+  constructor
+  · rintro ⟨S, closed, hp⟩
+    exact invertibilityStep_mono (fun m c hc => ⟨S, closed, hc⟩) (closed n p hp)
+  · intro hp
+    let T : CellPredicate A := fun m c => InvertibilityStep (WeaklyInvertible (A := A)) m c
+    have inclusion : ∀ m c, WeaklyInvertible m c → T m c := by
+      rintro m c ⟨S, closed, hc⟩
+      exact invertibilityStep_mono (fun k d hd => ⟨S, closed, hd⟩) (closed m c hc)
+    exact ⟨T, fun m c hc => invertibilityStep_mono inclusion hc, hp⟩
+
+/-- Every positive cell of the specified native/coskeletal omega-precategory
+is weakly invertible. The same postfixed predicate contains the cancellation
+witnesses, their witnesses, and so on at arbitrarily high dimensions. -/
+theorem all_cells_weaklyInvertible {A : Type u} (n : Nat) (p : Cell A (n + 1)) :
+    WeaklyInvertible n p := by
+  apply weaklyInvertible_coinduction (fun _ _ => True) ?_ trivial
+  intro m c _
+  exact ⟨reverse c, source_reverse c, target_reverse c,
+    (cancelRight c).val, (cancelLeft c).val,
+    (cancelRight c).property.1, (cancelRight c).property.2,
+    (cancelLeft c).property.1, (cancelLeft c).property.2, trivial, trivial⟩
 
 /-- The existing primitive associator lands in the exact native second level. -/
 noncomputable def associator {A : Type u} {a b c d : A}
