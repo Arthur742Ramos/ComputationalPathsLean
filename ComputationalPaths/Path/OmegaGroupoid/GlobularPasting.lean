@@ -5398,6 +5398,146 @@ noncomputable def cutOperationsAlgebra {H : GlobularSet.{u}} (C : CutOperations 
     intro n p
     exact evaluate_multiplication C L U A I J V p
 
+/-- Bundled models of the explicitly verified cut laws. This name deliberately
+does not identify them with an external presentation of strict omega-categories. -/
+structure CutModel where
+  carrier : GlobularSet.{u}
+  operations : CutOperations carrier
+  compatible : operations.Compatible
+  leftUnital : operations.LeftUnital
+  rightUnital : operations.RightUnital
+  associative : operations.Associative
+  interchange : operations.Interchange
+  unitIdempotent : operations.UnitIdempotent
+  unitCompatible : operations.UnitCompatible
+
+namespace CutModel
+
+structure Hom (C D : CutModel.{u}) where
+  map : GlobularSet.Map C.carrier D.carrier
+  preserves : CutOperations.Preserves C.operations D.operations map
+
+@[ext] theorem Hom.ext {C D : CutModel.{u}} (f g : Hom C D)
+    (h : f.map = g.map) : f = g := by
+  cases f
+  cases g
+  cases h
+  rfl
+
+def Hom.id (C : CutModel.{u}) : Hom C C where
+  map := GlobularSet.Map.id C.carrier
+  preserves := ⟨fun _ _ _ _ _ => rfl, fun _ _ => rfl⟩
+
+def Hom.comp {C D E : CutModel.{u}} (f : Hom C D) (g : Hom D E) : Hom C E where
+  map := GlobularSet.Map.comp g.map f.map
+  preserves := by
+    constructor
+    · intro n c p q h h'
+      have hm := (CutBoundary.target_map c f.map p).trans
+        ((_root_.congrArg f.map.app h).trans (CutBoundary.source_map c f.map q).symm)
+      exact (_root_.congrArg g.map.app (f.preserves.compose c p q h hm)).trans
+        (g.preserves.compose c (f.map.app p) (f.map.app q) hm h')
+    · intro n c p
+      exact (_root_.congrArg g.map.app (f.preserves.unit c p)).trans
+        (g.preserves.unit c (f.map.app p))
+
+instance : CategoryTheory.Category CutModel.{u} where
+  Hom := Hom
+  id := Hom.id
+  comp := Hom.comp
+  id_comp f := Hom.ext _ _ rfl
+  comp_id f := Hom.ext _ _ rfl
+  assoc f g h := Hom.ext _ _ rfl
+
+noncomputable def algebra (C : CutModel.{u}) : CategoryTheory.Monad.Algebra pastingMonad :=
+  cutOperationsAlgebra C.operations C.compatible C.leftUnital C.rightUnital
+    C.associative C.interchange C.unitIdempotent C.unitCompatible
+
+/-- The cut-law bridge acts on actual algebra homomorphisms, not merely on
+objects or unrelated cellwise functions. -/
+noncomputable def algebraMap {C D : CutModel.{u}} (f : Hom C D) :
+    CategoryTheory.Monad.Algebra.Hom C.algebra D.algebra where
+  f := f.map
+  h := by
+    apply GlobularSet.Map.ext
+    intro n p
+    exact (preserves_evaluation C.operations D.operations C.compatible D.compatible
+      f.map f.preserves p).symm
+
+noncomputable def algebraFunctor :
+    CategoryTheory.Functor CutModel.{u} (CategoryTheory.Monad.Algebra pastingMonad) where
+  obj := algebra
+  map := algebraMap
+  map_id C := CategoryTheory.Monad.Algebra.Hom.ext rfl
+  map_comp f g := CategoryTheory.Monad.Algebra.Hom.ext rfl
+
+instance : algebraFunctor.{u}.Faithful where
+  map_injective h := Hom.ext _ _ (_root_.congrArg CategoryTheory.Monad.Algebra.Hom.f h)
+
+theorem algebra_singleton (C : CutModel.{u}) {n : Nat} (p : C.carrier.Cell n) :
+    C.algebra.a.app (singleton p) = p :=
+  _root_.congrArg (fun k => k.app p) C.algebra.unit
+
+theorem algebra_preserves (C : CutModel.{u}) :
+    CutOperations.Preserves (cutOperations C.carrier) C.operations C.algebra.a :=
+  evaluateGlobular_preserves C.operations C.compatible C.leftUnital C.associative
+    C.interchange C.unitIdempotent C.unitCompatible (GlobularSet.Map.id C.carrier)
+
+set_option backward.isDefEq.respectTransparency false in
+/-- Algebra homomorphisms recover every cut operation by testing on pastings
+of singleton generators, including cuts arbitrarily far below the top. -/
+theorem algebraHom_preserves {C D : CutModel.{u}}
+    (f : CategoryTheory.Monad.Algebra.Hom C.algebra D.algebra) :
+    CutOperations.Preserves C.operations D.operations f.f := by
+  have comm {n : Nat} (p : Pasting n C.carrier) :
+      f.f.app (C.algebra.a.app p) = D.algebra.a.app (map f.f p) :=
+    (_root_.congrArg (fun k => k.app p) f.h).symm
+  constructor
+  · intro n c p q h h'
+    let s := singletonGlobular C.carrier
+    have hs := (CutBoundary.target_map c s p).trans
+      ((_root_.congrArg s.app h).trans (CutBoundary.source_map c s q).symm)
+    have hs' := (canonical_target_eq_cutTarget c (s.app p)).symm.trans
+      (hs.trans (canonical_source_eq_cutSource c (s.app q)))
+    have he := comm (cutCompose c (s.app p) (s.app q) hs')
+    have hc := C.algebra_preserves.compose c (s.app p) (s.app q) hs
+      (by simpa only [s, singletonGlobular, algebra_singleton] using h)
+    have hm := map_cut_composable (mapGlobular f.f) c (s.app p) (s.app q) hs'
+    have hm' := (canonical_target_eq_cutTarget c (map f.f (s.app p))).symm.trans
+      (hm.trans (canonical_source_eq_cutSource c (map f.f (s.app q))))
+    rw [map_cutCompose c f.f _ _ hs' hm'] at he
+    have hd := D.algebra_preserves.compose c (map f.f (s.app p)) (map f.f (s.app q)) hm
+      (by simpa only [s, singletonGlobular, map_singleton, algebra_singleton] using h')
+    change C.algebra.a.app (cutCompose c (s.app p) (s.app q) hs') = _ at hc
+    change D.algebra.a.app (cutCompose c _ _ hm') = _ at hd
+    rw [hc, hd] at he
+    simpa only [s, singletonGlobular, map_singleton, algebra_singleton] using he
+  · intro n c p
+    have he := comm (cutUnit c (singleton p))
+    rw [map_cutUnit] at he
+    have hc := C.algebra_preserves.unit c (singleton p)
+    have hd := D.algebra_preserves.unit c (map f.f (singleton p))
+    change C.algebra.a.app (cutUnit c _) = _ at hc
+    change D.algebra.a.app (cutUnit c _) = _ at hd
+    rw [hc, hd] at he
+    simpa only [map_singleton, algebra_singleton] using he
+
+instance : algebraFunctor.{u}.Full where
+  map_surjective f := ⟨⟨f.f, algebraHom_preserves f⟩,
+    CategoryTheory.Monad.Algebra.Hom.ext rfl⟩
+
+/-- No morphism-level information is lost or added by the evaluation bridge.
+An equivalence on all algebra objects and a comparison with a standard
+strict-category presentation remain separate obligations. -/
+noncomputable def algebraHomEquiv (C D : CutModel.{u}) :
+    Hom C D ≃ CategoryTheory.Monad.Algebra.Hom C.algebra D.algebra where
+  toFun := algebraMap
+  invFun f := ⟨f.f, algebraHom_preserves f⟩
+  left_inv f := Hom.ext _ _ rfl
+  right_inv f := CategoryTheory.Monad.Algebra.Hom.ext rfl
+
+end CutModel
+
 end Pasting
 
 namespace GlobularSet

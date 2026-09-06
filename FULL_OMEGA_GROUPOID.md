@@ -746,3 +746,13 @@ proof dependencies audited, the relevant modules built, and preservation of
 the existing associativity artifact checked. Merely defining interfaces,
 declaring filler constructors, or obtaining a green build of the foundations
 does not establish completion. External submission is a separate action.
+
+The strict cut-law comparison now includes a bundled category `CutModel`
+and a fully faithful functor into the actual pasting-monad algebras.
+`algebraHom_preserves` recovers preservation of every cut composition and
+identity from the algebra-homomorphism equation, by evaluating diagrams
+of singleton generators. `algebraHomEquiv` gives the explicit two-sided
+morphism correspondence. This closes the morphism-level comparison for
+the implemented cut laws; it does not yet identify all algebra objects or
+identify that cut-law presentation with the standard strict omega-category
+definition. No extra higher filler assumption is used in this comparison.

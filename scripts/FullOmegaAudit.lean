@@ -133,6 +133,15 @@ example (A : Type u) :
 #print axioms Pasting.evaluate_multiplication
 #print axioms Pasting.preserves_evaluation
 #print axioms Pasting.cutOperationsAlgebra
+#print axioms Pasting.CutModel.algebraHom_preserves
+#print axioms Pasting.CutModel.algebraHomEquiv
+
+example : Pasting.CutModel.algebraFunctor.Full := inferInstance
+example : Pasting.CutModel.algebraFunctor.Faithful := inferInstance
+noncomputable example (C D : Pasting.CutModel) :
+    Pasting.CutModel.Hom C D ≃
+      CategoryTheory.Monad.Algebra.Hom C.algebra D.algebra :=
+  Pasting.CutModel.algebraHomEquiv C D
 #print axioms Pasting.atom_map
 #print axioms Pasting.singleton_of_atom
 #print axioms Pasting.singleton_cartesian
