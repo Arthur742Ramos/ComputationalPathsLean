@@ -102,6 +102,78 @@ instance : CategoryTheory.Category.{u} GlobularSet.{u} where
   comp_id f := by cases f; rfl
   assoc f g h := rfl
 
+/-- The pointwise pullback retains both original cells and their matching
+equation. It introduces no new cells or identifications. -/
+def pullback {G H K : GlobularSet.{u}} (f : Map G K) (g : Map H K) : GlobularSet.{u} where
+  Cell n := { p : G.Cell n × H.Cell n // f.app p.1 = g.app p.2 }
+  source p := ⟨⟨G.source p.val.1, H.source p.val.2⟩,
+    (f.source_app p.val.1).symm.trans
+      ((_root_.congrArg K.source p.property).trans (g.source_app p.val.2))⟩
+  target p := ⟨⟨G.target p.val.1, H.target p.val.2⟩,
+    (f.target_app p.val.1).symm.trans
+      ((_root_.congrArg K.target p.property).trans (g.target_app p.val.2))⟩
+  source_source p := Subtype.ext (Prod.ext (G.source_source p.val.1) (H.source_source p.val.2))
+  target_source p := Subtype.ext (Prod.ext (G.target_source p.val.1) (H.target_source p.val.2))
+
+def pullbackFst {G H K : GlobularSet.{u}} (f : Map G K) (g : Map H K) :
+    Map (pullback f g) G where
+  app p := p.val.1
+  source_app _ := rfl
+  target_app _ := rfl
+
+def pullbackSnd {G H K : GlobularSet.{u}} (f : Map G K) (g : Map H K) :
+    Map (pullback f g) H where
+  app p := p.val.2
+  source_app _ := rfl
+  target_app _ := rfl
+
+theorem pullback_condition {G H K : GlobularSet.{u}} (f : Map G K) (g : Map H K) :
+    Map.comp f (pullbackFst f g) = Map.comp g (pullbackSnd f g) := by
+  apply Map.ext
+  intro n p
+  exact p.property
+
+/-- Lift a commuting globular cone without making any choices. -/
+def pullbackLift {G H K X : GlobularSet.{u}} (f : Map G K) (g : Map H K)
+    (p : Map X G) (q : Map X H) (h : Map.comp f p = Map.comp g q) :
+    Map X (pullback f g) where
+  app x := ⟨⟨p.app x, q.app x⟩, _root_.congrArg (fun k : Map X K => k.app x) h⟩
+  source_app x := Subtype.ext (Prod.ext (p.source_app x) (q.source_app x))
+  target_app x := Subtype.ext (Prod.ext (p.target_app x) (q.target_app x))
+
+theorem pullbackLift_fst {G H K X : GlobularSet.{u}} (f : Map G K) (g : Map H K)
+    (p : Map X G) (q : Map X H) (h : Map.comp f p = Map.comp g q) :
+    Map.comp (pullbackFst f g) (pullbackLift f g p q h) = p := by
+  apply Map.ext
+  intro n x
+  rfl
+
+theorem pullbackLift_snd {G H K X : GlobularSet.{u}} (f : Map G K) (g : Map H K)
+    (p : Map X G) (q : Map X H) (h : Map.comp f p = Map.comp g q) :
+    Map.comp (pullbackSnd f g) (pullbackLift f g p q h) = q := by
+  apply Map.ext
+  intro n x
+  rfl
+
+theorem pullback_ext {G H K X : GlobularSet.{u}} (f : Map G K) (g : Map H K)
+    (p q : Map X (pullback f g))
+    (h₁ : Map.comp (pullbackFst f g) p = Map.comp (pullbackFst f g) q)
+    (h₂ : Map.comp (pullbackSnd f g) p = Map.comp (pullbackSnd f g) q) : p = q := by
+  apply Map.ext
+  intro n x
+  apply Subtype.ext
+  exact Prod.ext (_root_.congrArg (fun k : Map X G => k.app x) h₁)
+    (_root_.congrArg (fun k : Map X H => k.app x) h₂)
+
+theorem pullback_universal {G H K X : GlobularSet.{u}} (f : Map G K) (g : Map H K)
+    (p : Map X G) (q : Map X H) (h : Map.comp f p = Map.comp g q) :
+    ∃! d : Map X (pullback f g),
+      Map.comp (pullbackFst f g) d = p ∧ Map.comp (pullbackSnd f g) d = q := by
+  refine ⟨pullbackLift f g p q h, ⟨pullbackLift_fst f g p q h, pullbackLift_snd f g p q h⟩, ?_⟩
+  intro d hd
+  exact pullback_ext f g d _ (hd.1.trans (pullbackLift_fst f g p q h).symm)
+    (hd.2.trans (pullbackLift_snd f g p q h).symm)
+
 theorem Map.parallel {G : GlobularSet.{u}} {H : GlobularSet.{v}} (f : Map G H)
     {n : Nat} {x y : G.Cell n} (h : Parallel G n x y) : Parallel H n (f.app x) (f.app y) := by
   cases h with

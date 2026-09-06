@@ -109,6 +109,15 @@ arbitrary globular cones. This establishes the actual universal property of
 the unit squares. Preservation of pullbacks by the pasting functor and
 cartesianness of multiplication remain separate, unproved obligations.
 
+`GlobularSet.pullback` now constructs matched pairs of original cells with
+componentwise boundaries, both globularity laws, and no added fillers.
+Its projections, choice-free cone lift, and `pullback_universal` establish
+the unique globular lifting property. `Pasting.pullbackComparison` is the
+canonical map from pastings of matched labels to matched pastings; its two
+projection equations and exact action on singleton labels are checked.
+The comparison has not yet been proved invertible. In particular, its
+existence and these equations alone do not prove functor pullback preservation.
+
 `evaluate` now evaluates labelled diagrams by dimension recursion into a
 target equipped with horizontal operations in all its iterated hom contexts
 (`RecursiveComposition`). The evaluator is implemented, not a field assumed

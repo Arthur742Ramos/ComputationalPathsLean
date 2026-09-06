@@ -895,6 +895,46 @@ def pastingFunctor : CategoryTheory.Functor GlobularSet.{u} GlobularSet.{u} wher
     intro n c
     exact (map_comp f g c).symm
 
+/-- The canonical comparison from pastings of matched labels to matched
+pastings. Invertibility of this map is the remaining pullback-preservation
+obligation; merely constructing it is not a proof of preservation. -/
+def pullbackComparison {G H K : GlobularSet.{u}}
+    (f : GlobularSet.Map G K) (g : GlobularSet.Map H K) :
+    GlobularSet.Map (globular (GlobularSet.pullback f g))
+      (GlobularSet.pullback (mapGlobular f) (mapGlobular g)) :=
+  GlobularSet.pullbackLift (mapGlobular f) (mapGlobular g)
+    (mapGlobular (GlobularSet.pullbackFst f g)) (mapGlobular (GlobularSet.pullbackSnd f g)) (by
+      apply GlobularSet.Map.ext
+      intro n p
+      exact (map_comp (GlobularSet.pullbackFst f g) f p).trans
+        ((_root_.congrArg (fun k => map k p) (GlobularSet.pullback_condition f g)).trans
+          (map_comp (GlobularSet.pullbackSnd f g) g p).symm))
+
+theorem pullbackComparison_fst {G H K : GlobularSet.{u}}
+    (f : GlobularSet.Map G K) (g : GlobularSet.Map H K) :
+    GlobularSet.Map.comp (GlobularSet.pullbackFst (mapGlobular f) (mapGlobular g))
+      (pullbackComparison f g) = mapGlobular (GlobularSet.pullbackFst f g) := by
+  apply GlobularSet.Map.ext
+  intro n p
+  rfl
+
+theorem pullbackComparison_snd {G H K : GlobularSet.{u}}
+    (f : GlobularSet.Map G K) (g : GlobularSet.Map H K) :
+    GlobularSet.Map.comp (GlobularSet.pullbackSnd (mapGlobular f) (mapGlobular g))
+      (pullbackComparison f g) = mapGlobular (GlobularSet.pullbackSnd f g) := by
+  apply GlobularSet.Map.ext
+  intro n p
+  rfl
+
+/-- The comparison retains the original pair of labels on every generator. -/
+theorem pullbackComparison_singleton {G H K : GlobularSet.{u}}
+    (f : GlobularSet.Map G K) (g : GlobularSet.Map H K) {n : Nat}
+    (p : (GlobularSet.pullback f g).Cell n) :
+    ((pullbackComparison f g).app (singleton p)).val =
+      (singleton p.val.1, singleton p.val.2) :=
+  Prod.ext (map_singleton (GlobularSet.pullbackFst f g) p)
+    (map_singleton (GlobularSet.pullbackSnd f g) p)
+
 /-- Identity pastings in every dimension: the empty chain on an object,
 and recursively the identity on each label in higher dimensions. -/
 def identity : {n : Nat} → {G : GlobularSet.{u}} → Pasting n G → Pasting (n + 1) G

@@ -18,6 +18,24 @@ completion gate for the full weak omega-groupoid theorem. -/
 #print axioms Pasting.singleton_of_atom
 #print axioms Pasting.singleton_cartesian
 #print axioms Pasting.singleton_globular_pullback
+#print axioms GlobularSet.pullback
+#print axioms GlobularSet.pullback_universal
+#print axioms Pasting.pullbackComparison
+#print axioms Pasting.pullbackComparison_singleton
+
+example {G H K X : GlobularSet.{u}} (f : GlobularSet.Map G K) (g : GlobularSet.Map H K)
+    (p : GlobularSet.Map X G) (q : GlobularSet.Map X H)
+    (h : GlobularSet.Map.comp f p = GlobularSet.Map.comp g q) :
+    ∃! d : GlobularSet.Map X (GlobularSet.pullback f g),
+      GlobularSet.Map.comp (GlobularSet.pullbackFst f g) d = p ∧
+      GlobularSet.Map.comp (GlobularSet.pullbackSnd f g) d = q :=
+  GlobularSet.pullback_universal f g p q h
+
+example {G H K : GlobularSet.{u}} (f : GlobularSet.Map G K) (g : GlobularSet.Map H K)
+    {n : Nat} (p : (GlobularSet.pullback f g).Cell n) :
+    ((Pasting.pullbackComparison f g).app (Pasting.singleton p)).val =
+      (Pasting.singleton p.val.1, Pasting.singleton p.val.2) :=
+  Pasting.pullbackComparison_singleton f g p
 
 example {G H X : GlobularSet.{u}} (f : GlobularSet.Map G H)
     (p : GlobularSet.Map X (Pasting.globular G)) (q : GlobularSet.Map X H)
