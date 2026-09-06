@@ -156,6 +156,29 @@ example (A : Type u) :
 #print axioms NativeAssociativity.horizontalComparison
 #print axioms NativeAssociativity.whiskerRightComparison
 #print axioms NativeAssociativity.whiskerLeftComparison
+#print axioms NativeOperadic.coherenceCell_boundary
+#print axioms NativeOperadic.sameArityCoherence
+#print axioms NativeOperadic.substitutionCoherence
+#print axioms NativeOperadic.oneSubstitutionCoherence
+
+noncomputable example {A : Type} {n : Nat}
+    (o r : (NativeOperadic.collection A).operations.Cell n)
+    (hp : (NativeOperadic.collection A).operations.Parallel n o r)
+    (d : Pasting n (NativeOperadic.carrier A)) ho hr :
+    { c : NativeTower.Cell A (n + 1) //
+      NativeTower.source c = NativeOperadic.applyOperation o d ho ∧
+      NativeTower.target c = NativeOperadic.applyOperation r d hr } :=
+  NativeOperadic.sameArityCoherence o r hp d ho hr
+
+example {A : Type}
+    (x : ((NativeOperadic.collection A).application
+      ((NativeOperadic.collection A).application (NativeOperadic.carrier A))).Cell 1) :
+    NativeTower.source (NativeOperadic.oneSubstitutionCoherence x).val =
+      (Endomorphism.evaluation (NativeOperadic.carrier A)).app
+        (((NativeOperadic.collection A).map (Endomorphism.evaluation (NativeOperadic.carrier A))).app x) ∧
+    NativeTower.target (NativeOperadic.oneSubstitutionCoherence x).val =
+      (NativeOperadic.standardEvaluation A).app (NativeOperadic.substitutedInput x).val.2 :=
+  (NativeOperadic.oneSubstitutionCoherence x).property
 
 example {A : Type} {a b c : A} {p p' : Path a b} {q q' : Path b c}
     (d : OmegaGroupoid.Derivation₂ p p') (e : OmegaGroupoid.Derivation₂ q q') :

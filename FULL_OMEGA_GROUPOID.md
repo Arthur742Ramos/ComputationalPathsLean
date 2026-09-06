@@ -845,3 +845,20 @@ All three comparisons have explicit boundaries and are weakly invertible.
 They live in the declared coskeletal three-cell layer and do not assert
 equality of raw two-cell histories. Comparing the complete selected
 pentagon/interchange coherence operations remains an outstanding gate.
+
+`NativeOperadic.coherenceProblem` now forms lifting problems between actual
+parallel operad operations over a specified arity. `coherenceLift` uses the
+operad's contraction, and `coherenceCell_boundary` verifies the action on
+that lift with its exact labelled boundary inputs. `sameArityCoherence`
+specializes this to the identity of a common input diagram and proves weak
+invertibility of the resulting cell. Higher-dimensional operation
+parallelism is explicit, not inferred from carrier parallelism.
+
+`substitutionCoherence` connects this construction to actual operadic
+multiplication: its source is nested algebra evaluation and its target is
+the standard instruction on the very same flattened input. This uses the
+proved algebra multiplication law. `oneSubstitutionCoherence` discharges
+operation parallelism automatically in dimension one, because the operad
+is normalized at dimension zero. These are the verified operation-level
+tools for the remaining bracketed coherence comparisons; they do not yet
+instantiate every pentagon/interchange expression or close that gate.

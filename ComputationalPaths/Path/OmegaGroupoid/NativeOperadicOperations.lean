@@ -535,6 +535,151 @@ theorem all_cells_weaklyInvertible {A : Type u} (n : Nat) (p : NativeTower.Cell 
     (cancelRight c).property.1, (cancelRight c).property.2,
     (cancelLeft c).property.1, (cancelLeft c).property.2, trivial, trivial⟩
 
+/-- Apply an actual endomorphism-operad operation to a complete labelled
+diagram, retaining its arity equation. -/
+noncomputable def applyOperation {A : Type u} {n : Nat}
+    (o : (collection A).operations.Cell n) (d : Pasting n (carrier A))
+    (h : (collection A).arity.app o = (GlobularCollection.shape (carrier A)).app d) :
+    NativeTower.Cell A n := (Endomorphism.evaluation (carrier A)).app ⟨⟨o, d⟩, h⟩
+
+theorem applyOperation_congr {A : Type u} {n : Nat}
+    {o o' : (collection A).operations.Cell n} {d d' : Pasting n (carrier A)}
+    (ho : o = o') (hd : d = d') h h' : applyOperation o d h = applyOperation o' d' h' := by
+  cases ho
+  cases hd
+  rfl
+
+/-- A coherence lifting problem has operation boundaries and a specified
+pasting arity. It is not a request to fill arbitrary carrier cells. -/
+def coherenceProblem {A : Type u} {n : Nat}
+    (o r : (collection A).operations.Cell n)
+    (hp : (collection A).operations.Parallel n o r) (d : Pasting (n + 1) (carrier A))
+    (hs : (collection A).arity.app o = (GlobularCollection.shape (carrier A)).app (Pasting.source d))
+    (ht : (collection A).arity.app r = (GlobularCollection.shape (carrier A)).app (Pasting.target d)) :
+    GlobularSet.LiftingProblem (collection A).arity n :=
+  ⟨⟨o, r, hp⟩, (GlobularCollection.shape (carrier A)).app d,
+    hs.trans ((GlobularCollection.shape (carrier A)).source_app d).symm,
+    ht.trans ((GlobularCollection.shape (carrier A)).target_app d).symm⟩
+
+noncomputable def coherenceLift {A : Type u} {n : Nat}
+    (o r : (collection A).operations.Cell n)
+    (hp : (collection A).operations.Parallel n o r) (d : Pasting (n + 1) (carrier A)) hs ht :
+    GlobularSet.Lift (coherenceProblem o r hp d hs ht) :=
+  (Endomorphism.nativeContraction A).lift (coherenceProblem o r hp d hs ht)
+
+noncomputable def coherenceInput {A : Type u} {n : Nat}
+    (o r : (collection A).operations.Cell n)
+    (hp : (collection A).operations.Parallel n o r) (d : Pasting (n + 1) (carrier A))
+    (hs : (collection A).arity.app o = (GlobularCollection.shape (carrier A)).app (Pasting.source d))
+    (ht : (collection A).arity.app r = (GlobularCollection.shape (carrier A)).app (Pasting.target d)) :
+    ((collection A).application (carrier A)).Cell (n + 1) :=
+  ⟨⟨(coherenceLift o r hp d hs ht).cell, d⟩, (coherenceLift o r hp d hs ht).arity_cell⟩
+
+/-- Evaluate the operad's chosen contraction, through its verified action. -/
+noncomputable def coherenceCell {A : Type u} {n : Nat}
+    (o r : (collection A).operations.Cell n)
+    (hp : (collection A).operations.Parallel n o r) (d : Pasting (n + 1) (carrier A))
+    (hs : (collection A).arity.app o = (GlobularCollection.shape (carrier A)).app (Pasting.source d))
+    (ht : (collection A).arity.app r = (GlobularCollection.shape (carrier A)).app (Pasting.target d)) :
+    NativeTower.Cell A (n + 1) :=
+  (Endomorphism.evaluation (carrier A)).app (coherenceInput o r hp d hs ht)
+
+theorem coherenceCell_boundary {A : Type u} {n : Nat}
+    (o r : (collection A).operations.Cell n)
+    (hp : (collection A).operations.Parallel n o r) (d : Pasting (n + 1) (carrier A)) hs ht :
+    NativeTower.source (coherenceCell o r hp d hs ht) = applyOperation o (Pasting.source d) hs ∧
+      NativeTower.target (coherenceCell o r hp d hs ht) = applyOperation r (Pasting.target d) ht := by
+  have hsource : ((collection A).application (carrier A)).source (coherenceInput o r hp d hs ht) =
+      ⟨⟨o, Pasting.source d⟩, hs⟩ :=
+    Subtype.ext (Prod.ext (coherenceLift o r hp d hs ht).source_cell rfl)
+  have htarget : ((collection A).application (carrier A)).target (coherenceInput o r hp d hs ht) =
+      ⟨⟨r, Pasting.target d⟩, ht⟩ :=
+    Subtype.ext (Prod.ext (coherenceLift o r hp d hs ht).target_cell rfl)
+  exact ⟨((Endomorphism.evaluation (carrier A)).source_app _).trans
+      (_root_.congrArg (Endomorphism.evaluation (carrier A)).app hsource),
+    ((Endomorphism.evaluation (carrier A)).target_app _).trans
+      (_root_.congrArg (Endomorphism.evaluation (carrier A)).app htarget)⟩
+
+/-- Parallel operations of the same arity are compared over the identity
+of their common labelled diagram by the actual operadic contraction. -/
+noncomputable def sameArityCoherence {A : Type u} {n : Nat}
+    (o r : (collection A).operations.Cell n)
+    (hp : (collection A).operations.Parallel n o r) (d : Pasting n (carrier A))
+    (ho : (collection A).arity.app o = (GlobularCollection.shape (carrier A)).app d)
+    (hr : (collection A).arity.app r = (GlobularCollection.shape (carrier A)).app d) :
+    { c : NativeTower.Cell A (n + 1) // NativeTower.source c = applyOperation o d ho ∧
+      NativeTower.target c = applyOperation r d hr } := by
+  let hs := ho.trans (_root_.congrArg (GlobularCollection.shape (carrier A)).app
+    (Pasting.source_identity (carrier A) d)).symm
+  let ht := hr.trans (_root_.congrArg (GlobularCollection.shape (carrier A)).app
+    (Pasting.target_identity (carrier A) d)).symm
+  refine ⟨coherenceCell o r hp (Pasting.identity d) hs ht, ?_, ?_⟩
+  · exact (coherenceCell_boundary o r hp _ hs ht).1.trans
+      (applyOperation_congr rfl (Pasting.source_identity (carrier A) d) _ ho)
+  · exact (coherenceCell_boundary o r hp _ hs ht).2.trans
+      (applyOperation_congr rfl (Pasting.target_identity (carrier A) d) _ hr)
+
+theorem sameArityCoherence_invertible {A : Type u} {n : Nat}
+    (o r : (collection A).operations.Cell n)
+    (hp : (collection A).operations.Parallel n o r) (d : Pasting n (carrier A)) ho hr :
+    WeaklyInvertible n (sameArityCoherence o r hp d ho hr).val := all_cells_weaklyInvertible _ _
+
+/-- Compare any parallel operation of the appropriate arity with the
+selected standard instruction on that very same labelled diagram. -/
+noncomputable def instructionComparison {A : Type u} {n : Nat}
+    (o : (collection A).operations.Cell n) (d : Pasting n (carrier A))
+    (ho : (collection A).arity.app o = (GlobularCollection.shape (carrier A)).app d)
+    (hp : (collection A).operations.Parallel n o
+      (instruction A n ((GlobularCollection.shape (carrier A)).app d)).val) :
+    { c : NativeTower.Cell A (n + 1) // NativeTower.source c = applyOperation o d ho ∧
+      NativeTower.target c = (standardEvaluation A).app d } :=
+  sameArityCoherence o (instruction A n ((GlobularCollection.shape (carrier A)).app d)).val hp d ho
+    (instruction A n ((GlobularCollection.shape (carrier A)).app d)).property
+
+/-- Substitute a labelled diagram of operations by the actual operadic
+multiplication, retaining its resulting operation and complete input diagram. -/
+noncomputable def substitutedInput {A : Type u} {n : Nat}
+    (x : ((collection A).application ((collection A).application (carrier A))).Cell n) :
+    ((collection A).application (carrier A)).Cell n :=
+  ((Endomorphism.multiplication (carrier A)).application (carrier A)).app
+    (((collection A).substitutionComparison (collection A) (carrier A)).app x)
+
+/-- The source evaluates the inner operations first and then the outer
+operation; this is the actual algebra multiplication equation. -/
+theorem substitutedInput_evaluation {A : Type u} {n : Nat}
+    (x : ((collection A).application ((collection A).application (carrier A))).Cell n) :
+    (Endomorphism.evaluation (carrier A)).app (substitutedInput x) =
+      (Endomorphism.evaluation (carrier A)).app
+        (((collection A).map (Endomorphism.evaluation (carrier A))).app x) :=
+  Endomorphism.evaluation_multiplication_nested (carrier A) x
+
+/-- A contraction-selected comparison from an actual substituted operation
+to the standard instruction on the same flattened labelled input. Parallel
+operation boundaries remain an explicit requirement in higher dimensions. -/
+noncomputable def substitutionCoherence {A : Type u} {n : Nat}
+    (x : ((collection A).application ((collection A).application (carrier A))).Cell n)
+    (hp : (collection A).operations.Parallel n (substitutedInput x).val.1
+      (instruction A n ((GlobularCollection.shape (carrier A)).app (substitutedInput x).val.2)).val) :
+    { c : NativeTower.Cell A (n + 1) //
+      NativeTower.source c = (Endomorphism.evaluation (carrier A)).app
+        (((collection A).map (Endomorphism.evaluation (carrier A))).app x) ∧
+      NativeTower.target c = (standardEvaluation A).app (substitutedInput x).val.2 } := by
+  let h := instructionComparison (substitutedInput x).val.1 (substitutedInput x).val.2
+    (substitutedInput x).property hp
+  exact ⟨h.val, h.property.1.trans (substitutedInput_evaluation x), h.property.2⟩
+
+theorem substitutionCoherence_invertible {A : Type u} {n : Nat}
+    (x : ((collection A).application ((collection A).application (carrier A))).Cell n) hp :
+    WeaklyInvertible n (substitutionCoherence x hp).val := all_cells_weaklyInvertible _ _
+
+/-- In dimension one, normalized operation boundaries are necessarily
+parallel. Thus every nested one-dimensional operation gets this comparison,
+without imposing an extra condition on the original path labels. -/
+noncomputable def oneSubstitutionCoherence {A : Type u}
+    (x : ((collection A).application ((collection A).application (carrier A))).Cell 1) :=
+  substitutionCoherence x (GlobularSet.Parallel.cells
+    (@Subsingleton.elim PUnit _ _ _) (@Subsingleton.elim PUnit _ _ _))
+
 end NativeOperadic
 
 end ComputationalPaths.Path.OmegaFoundations
