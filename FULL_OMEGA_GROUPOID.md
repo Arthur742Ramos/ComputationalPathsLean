@@ -358,9 +358,12 @@ and the verified substitution comparison. `operadUnitTransformation` and
 `operadMulTransformation` prove naturality under every input relabelling.
 `operadUnit_arity` and `operadMul_arity` identify their input projections
 with the singleton and flattening maps of the concrete pasting monad.
-The application-level monad laws still need verification before this is
-packaged as a monad or monad morphism. No concrete contractible monoid or
-native action is asserted by this conditional construction.
+`operad_left_unit` and `operad_right_unit` now prove the two application-level
+unit laws. Each checks operation equality using the actual `MonObj` unit law
+and input equality using the corresponding singleton/flattening law, so no
+input labels are discarded. Application-level associativity still needs
+verification before this is packaged as a monad or monad morphism. No concrete
+contractible monoid or native action is asserted by this conditional construction.
 
 `evaluate` now evaluates labelled diagrams by dimension recursion into a
 target equipped with horizontal operations in all its iterated hom contexts

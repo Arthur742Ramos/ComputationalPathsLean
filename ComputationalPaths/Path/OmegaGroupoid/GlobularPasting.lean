@@ -6298,6 +6298,58 @@ theorem operadMul_arity (C : GlobularCollection.{u}) [MonObj C] (G : GlobularSet
   intro n p
   rfl
 
+/-- The outer labelled unit law follows from the monoid's actual left
+unit equation and the singleton law for complete input diagrams. -/
+theorem operad_left_unit (C : GlobularCollection.{u}) [MonObj C] (G : GlobularSet.{u}) :
+    GlobularSet.Map.comp (C.operadMul G) (C.operadUnit (C.application G)) =
+      GlobularSet.Map.id (C.application G) := by
+  apply GlobularSet.Map.ext
+  intro n p
+  have h := _root_.congrArg (fun k : Hom (identity.substitute C) C =>
+    k.operations.app ((identityApplicationIn C.operations).app p.val.1)) (MonObj.one_mul C)
+  have hp := _root_.congrArg (fun k : GlobularSet.Map C.operations C.operations => k.app p.val.1)
+    (identityApplicationIso C.operations).inv_hom_id
+  have hc : (C.substitutionOperation C G).app ((C.operadUnit (C.application G)).app p) =
+      (Hom.substitute (MonObj.one (X := C)) (Hom.id C)).operations.app
+        ((identityApplicationIn C.operations).app p.val.1) := by
+    apply Subtype.ext
+    exact Prod.ext rfl ((Pasting.map_singleton (C.operation G) p).trans
+      (Pasting.map_id C.operations (Pasting.singleton p.val.1)).symm)
+  apply Subtype.ext
+  refine Prod.ext ?_ ?_
+  · exact (_root_.congrArg (MonObj.mul (X := C)).operations.app hc).trans (h.trans hp)
+  · exact (_root_.congrArg (Pasting.flattenGlobular G).app (Pasting.map_singleton (C.inputs G) p)).trans
+      (Pasting.flatten_singleton p.val.2)
+
+/-- Replacing every input by its labelled unit is neutral. This is the
+monoid's right unit law, with every original input label recovered. -/
+theorem operad_right_unit (C : GlobularCollection.{u}) [MonObj C] (G : GlobularSet.{u}) :
+    GlobularSet.Map.comp (C.operadMul G) (C.map (C.operadUnit G)) =
+      GlobularSet.Map.id (C.application G) := by
+  apply GlobularSet.Map.ext
+  intro n p
+  have h := _root_.congrArg (fun k : Hom (C.substitute identity) C =>
+    k.operations.app ((C.map (GlobularSet.terminalMap G)).app p)) (MonObj.mul_one C)
+  have ho : GlobularSet.Map.comp (C.operation G) (C.operadUnit G) =
+      GlobularSet.Map.comp (MonObj.one (X := C)).operations (GlobularSet.terminalMap G) := by
+    apply GlobularSet.Map.ext
+    intro n p
+    rfl
+  have hc : (C.substitutionOperation C G).app ((C.map (C.operadUnit G)).app p) =
+      (Hom.substitute (Hom.id C) (MonObj.one (X := C))).operations.app
+        ((C.map (GlobularSet.terminalMap G)).app p) := by
+    apply Subtype.ext
+    exact Prod.ext rfl ((Pasting.map_comp (C.operadUnit G) (C.operation G) p.val.2).trans
+      ((_root_.congrArg (fun k => Pasting.map k p.val.2) ho).trans
+        (Pasting.map_comp (GlobularSet.terminalMap G) (MonObj.one (X := C)).operations p.val.2).symm))
+  apply Subtype.ext
+  refine Prod.ext ?_ ?_
+  · exact (_root_.congrArg (MonObj.mul (X := C)).operations.app hc).trans h
+  · exact (_root_.congrArg (Pasting.flattenGlobular G).app
+      ((Pasting.map_comp (C.operadUnit G) (C.inputs G) p.val.2).trans
+        (_root_.congrArg (fun k => Pasting.map k p.val.2) (C.operadUnit_arity G)))).trans
+          (Pasting.flatten_map_singleton p.val.2)
+
 end GlobularCollection
 
 /-- Interpretation of composable path-labelled chains keeps the endpoints
