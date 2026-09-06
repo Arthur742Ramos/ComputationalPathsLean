@@ -220,3 +220,27 @@ example {G : GlobularSet} (p : Pasting 7 G) : HEq (Pasting.identityAt 7 0 p) (Pa
 #print axioms Pasting.identityAt_step
 #print axioms Pasting.pack_composeAtFibre
 #print axioms Pasting.composeAt_horizontal_interchange
+
+example : Pasting.Cut.Below (Pasting.Cut.at 2 6) (Pasting.Cut.at 5 3) :=
+  (Pasting.Cut.below_iff_height _ _).mpr (by decide)
+
+example {G : GlobularSet} {n : Nat} (c d : Pasting.Cut n) (hc : Pasting.Cut.Below c d)
+    (p q r s : Pasting n G)
+    (hpq : Pasting.cutTarget c p = Pasting.cutSource c q)
+    (hrs : Pasting.cutTarget c r = Pasting.cutSource c s)
+    (hpr : Pasting.cutTarget d p = Pasting.cutSource d r)
+    (hqs : Pasting.cutTarget d q = Pasting.cutSource d s)
+    (hrow : Pasting.cutTarget d (Pasting.cutCompose c p q hpq) =
+      Pasting.cutSource d (Pasting.cutCompose c r s hrs))
+    (hcol : Pasting.cutTarget c (Pasting.cutCompose d p r hpr) =
+      Pasting.cutSource c (Pasting.cutCompose d q s hqs)) :
+    Pasting.cutCompose d (Pasting.cutCompose c p q hpq) (Pasting.cutCompose c r s hrs) hrow =
+      Pasting.cutCompose c (Pasting.cutCompose d p r hpr) (Pasting.cutCompose d q s hqs) hcol :=
+  Pasting.cutCompose_interchange hc p q r s hpq hrs hpr hqs hrow hcol
+
+#print axioms Chain.zipOver_interchange
+#print axioms Pasting.Cut.below_iff_height
+#print axioms Pasting.cutSource_at
+#print axioms Pasting.cutTarget_at
+#print axioms Pasting.cutCompose_at_eq
+#print axioms Pasting.cutCompose_interchange

@@ -168,8 +168,16 @@ with its composability proof derived from the general one, and
 iterates of the existing identity operation. `composeAt_horizontal_interchange`
 extends interchange with the zero boundary to every higher boundary; its fibre
 operation packs to the same general composition (`pack_composeAtFibre`).
-Interchange between two positive boundary dimensions, monad construction,
-and the eventual weak-groupoid action and invertibility remain incomplete.
+Interchange now also holds between arbitrary positive boundaries:
+`cutCompose_interchange` covers every strictly ordered pair of dimension-indexed
+cuts, and `Cut.below_iff_height` identifies this order with numerical boundary
+order. Cuts only index the same existing `Pasting` carrier. `cutSource_at`,
+`cutTarget_at` and `cutCompose_at_eq` identify their operations with the existing
+arbitrary-boundary API, deriving the translated composability proof.
+The interchange theorem currently takes six explicit grid-composability
+witnesses (four inner and two outer). Deriving the outer witnesses from the
+inner ones, constructing the monad, and supplying the eventual weak-groupoid
+action and invertibility remain incomplete.
 
 ## Semantic audit and completion gates
 

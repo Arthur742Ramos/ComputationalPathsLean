@@ -305,6 +305,78 @@ theorem zipOver_congr {O : Type u} {E D B : O → O → Type v}
   have hm := map_zipOver s t s' t' op op' (fun e => e) law p q h hj
   simpa only [map_id] using hm
 
+/-- Interchange of two partial label compositions lifts through four aligned
+chains. All six composability conditions are retained explicitly. -/
+theorem zipOver_interchange {O : Type u} {E D B : O → O → Type v}
+    (s t : {x y : O} → E x y → D x y)
+    (s' t' : {x y : O} → E x y → B x y)
+    (op : {x y : O} → (e d : E x y) → s e = t d → E x y)
+    (op' : {x y : O} → (e d : E x y) → s' e = t' d → E x y)
+    (law : ∀ {x y} (e f g d : E x y)
+      (hef : s e = t f) (hgd : s g = t d) (heg : s' e = t' g) (hfd : s' f = t' d)
+      (hrow : s' (op e f hef) = t' (op g d hgd))
+      (hcol : s (op' e g heg) = t (op' f d hfd)),
+      op' (op e f hef) (op g d hgd) hrow = op (op' e g heg) (op' f d hfd) hcol)
+    {x y : O} (p q r u : Chain E x y)
+    (hpq : p.map s = q.map t) (hru : r.map s = u.map t)
+    (hpr : p.map s' = r.map t') (hqu : q.map s' = u.map t')
+    (hrow : (zipOver s t op p q hpq).map s' = (zipOver s t op r u hru).map t')
+    (hcol : (zipOver s' t' op' p r hpr).map s = (zipOver s' t' op' q u hqu).map t) :
+    zipOver s' t' op' (zipOver s t op p q hpq) (zipOver s t op r u hru) hrow =
+      zipOver s t op (zipOver s' t' op' p r hpr) (zipOver s' t' op' q u hqu) hcol := by
+  induction p with
+  | nil x =>
+    cases q with
+    | cons f q => cases hpq
+    | nil =>
+      cases r with
+      | cons g r => cases hpr
+      | nil =>
+        cases u with
+        | cons d u => cases hru
+        | nil => rfl
+  | @cons x z y e p ih =>
+    cases q with
+    | nil => cases hpq
+    | @cons _ zq _ f q =>
+      have h := hpq
+      simp only [map] at h
+      injection h with hx hz hy he hf
+      cases hz
+      have hef := eq_of_heq he
+      have hpq' := eq_of_heq hf
+      cases r with
+      | nil => cases hpr
+      | @cons _ zr _ g r =>
+        have h := hpr
+        simp only [map] at h
+        injection h with hx hz hy he hf
+        cases hz
+        have heg := eq_of_heq he
+        have hpr' := eq_of_heq hf
+        cases u with
+        | nil => cases hru
+        | @cons _ zu _ d u =>
+          have h := hru
+          simp only [map] at h
+          injection h with hx hz hy he hf
+          cases hz
+          have hgd := eq_of_heq he
+          have hru' := eq_of_heq hf
+          have h := hqu
+          simp only [map] at h
+          injection h with hx hz hy hfd hqu'
+          have hr := hrow
+          change Chain.cons (s' (op e f hef)) ((zipOver s t op p q hpq').map s') =
+            Chain.cons (t' (op g d hgd)) ((zipOver s t op r u hru').map t') at hr
+          injection hr with hx hz hy hrh hrt
+          have hc := hcol
+          change Chain.cons (s (op' e g heg)) ((zipOver s' t' op' p r hpr').map s) =
+            Chain.cons (t (op' f d hfd)) ((zipOver s' t' op' q u hqu').map t) at hc
+          injection hc with hx hz hy hch hct
+          exact _root_.congrArg₂ Chain.cons (law e f g d hef hgd heg hfd hrh hch)
+            (ih q r u hpq' hru' hpr' hqu' hrt hct)
+
 variable {O : Type u} {E : O → O → Type v} {F : O → O → Type w}
 
 def single {x y : O} (e : E x y) : Chain E x y := .cons e (.nil y)
@@ -1595,6 +1667,201 @@ theorem composeAt_horizontal_interchange (k n : Nat) {G : GlobularSet.{u}} {a b 
         (Chain.map_append _ q s).symm)) =
       horizontal (composeAtFibre k n p q h) (composeAtFibre k n r s j) :=
   Chain.zipOver_append _ _ _ p q h r s j
+
+/-- A lower boundary of a positive dimension, indexed without arithmetic
+casts. This is an index for the existing pasting carrier, not a new tower. -/
+inductive Cut : Nat → Type where
+  | bottom {n : Nat} : Cut (n + 1)
+  | lift {n : Nat} : Cut n → Cut (n + 1)
+
+def Cut.height : {n : Nat} → Cut n → Nat
+  | _, .bottom => 0
+  | _, .lift c => c.height + 1
+
+def Cut.at : (k n : Nat) → Cut (n + k + 1)
+  | 0, _ => .bottom
+  | k + 1, n => .lift (Cut.at k n)
+
+theorem Cut.height_at (k n : Nat) : (Cut.at k n).height = k := by
+  induction k with
+  | zero => rfl
+  | succ k ih => exact _root_.congrArg Nat.succ ih
+
+def cutSource : {n : Nat} → (c : Cut n) → {G : GlobularSet.{u}} → Pasting n G → Pasting c.height G
+  | _, .bottom, _, ⟨a, _, _⟩ => a
+  | _, .lift c, G, ⟨a, b, p⟩ => ⟨a, b, p.map (fun {x y} e => cutSource c (G := G.hom x y) e)⟩
+
+def cutTarget : {n : Nat} → (c : Cut n) → {G : GlobularSet.{u}} → Pasting n G → Pasting c.height G
+  | _, .bottom, _, ⟨_, b, _⟩ => b
+  | _, .lift c, G, ⟨a, b, p⟩ => ⟨a, b, p.map (fun {x y} e => cutTarget c (G := G.hom x y) e)⟩
+
+noncomputable def cutCompose {n : Nat} (c : Cut n) {G : GlobularSet.{u}}
+    (p q : Pasting n G) (h : cutTarget c p = cutSource c q) : Pasting n G := by
+  induction c generalizing G with
+  | bottom =>
+    rcases p with ⟨a, b, p⟩
+    rcases q with ⟨c, d, q⟩
+    change b = c at h
+    cases h
+    exact pack (horizontal p q)
+  | lift c ih =>
+    rcases p with ⟨a, b, p⟩
+    rcases q with ⟨d, e, q⟩
+    have ha : a = d := _root_.congrArg Sigma.fst h
+    have hb : b = e := _root_.congrArg (fun z => z.2.1) h
+    cases ha
+    cases hb
+    have hp : p.map (fun e => cutTarget c e) = q.map (fun e => cutSource c e) :=
+      eq_of_heq (Sigma.mk.inj (eq_of_heq (Sigma.mk.inj h).2)).2
+    exact pack (Chain.zipOver (fun e => cutTarget c e) (fun e => cutSource c e)
+      (fun {x y} e d h => ih (G := G.hom x y) e d h) p q hp)
+
+theorem cutSource_at (k n : Nat) {G : GlobularSet.{u}} (p : Pasting (n + k + 1) G) :
+    HEq (cutSource (Cut.at k n) p) (sourceAt k n p) := by
+  induction k generalizing G with
+  | zero => rcases p with ⟨a, b, p⟩; rfl
+  | succ k ih =>
+    rcases p with ⟨a, b, p⟩
+    exact pack_heq (Cut.height_at k n) _ _
+      (Chain.map_heq (by rw [Cut.height_at]) _ _ (fun e => ih e) p)
+
+theorem cutTarget_at (k n : Nat) {G : GlobularSet.{u}} (p : Pasting (n + k + 1) G) :
+    HEq (cutTarget (Cut.at k n) p) (targetAt k n p) := by
+  induction k generalizing G with
+  | zero => rcases p with ⟨a, b, p⟩; rfl
+  | succ k ih =>
+    rcases p with ⟨a, b, p⟩
+    exact pack_heq (Cut.height_at k n) _ _
+      (Chain.map_heq (by rw [Cut.height_at]) _ _ (fun e => ih e) p)
+
+theorem cutCompose_at (k n : Nat) {G : GlobularSet.{u}} (p q : Pasting (n + k + 1) G)
+    (h : cutTarget (Cut.at k n) p = cutSource (Cut.at k n) q)
+    (h' : targetAt k n p = sourceAt k n q) :
+    cutCompose (Cut.at k n) p q h = composeAt k n p q h' := by
+  induction k generalizing G with
+  | zero =>
+    rcases p with ⟨a, b, p⟩
+    rcases q with ⟨c, d, q⟩
+    change b = c at h
+    cases h
+    rfl
+  | succ k ih =>
+    rcases p with ⟨a, b, p⟩
+    rcases q with ⟨c, d, q⟩
+    have ha : a = c := _root_.congrArg Sigma.fst h
+    have hb : b = d := _root_.congrArg (fun z => z.2.1) h
+    cases ha
+    cases hb
+    have hp : p.map (fun e => cutTarget (Cut.at k n) e) = q.map (fun e => cutSource (Cut.at k n) e) :=
+      eq_of_heq (Sigma.mk.inj (eq_of_heq (Sigma.mk.inj h).2)).2
+    have hp' : p.map (fun e => targetAt k n e) = q.map (fun e => sourceAt k n e) :=
+      eq_of_heq (Sigma.mk.inj (eq_of_heq (Sigma.mk.inj h').2)).2
+    exact _root_.congrArg pack (Chain.zipOver_congr _ _ _ _ _ _ (fun e d h j => ih e d h j) p q hp hp')
+
+theorem cutCompose_at_eq (k n : Nat) {G : GlobularSet.{u}} (p q : Pasting (n + k + 1) G)
+    (h : cutTarget (Cut.at k n) p = cutSource (Cut.at k n) q) :
+    cutCompose (Cut.at k n) p q h = composeAt k n p q
+      (eq_of_heq ((cutTarget_at k n p).symm.trans ((heq_of_eq h).trans (cutSource_at k n q)))) :=
+  cutCompose_at k n p q h _
+
+/-- Strict order of two lower boundaries of the same dimension. -/
+inductive Cut.Below : {n : Nat} → Cut n → Cut n → Prop where
+  | bottom {n : Nat} (c : Cut n) : Below .bottom (.lift c)
+  | lift {n : Nat} {c d : Cut n} : Below c d → Below (.lift c) (.lift d)
+
+theorem Cut.height_lt {n : Nat} (c : Cut n) : c.height < n := by
+  induction c with
+  | bottom => exact Nat.zero_lt_succ _
+  | lift c ih => exact Nat.succ_lt_succ ih
+
+theorem Cut.below_iff_height {n : Nat} (c d : Cut n) : Below c d ↔ c.height < d.height := by
+  constructor
+  · intro h
+    induction h with
+    | bottom => exact Nat.zero_lt_succ _
+    | lift h ih => exact Nat.succ_lt_succ ih
+  · intro h
+    induction c with
+    | bottom =>
+      cases d with
+      | bottom => exact False.elim (Nat.lt_irrefl 0 h)
+      | lift d => exact .bottom d
+    | lift c ih =>
+      cases d with
+      | bottom => exact False.elim (Nat.not_lt_zero _ h)
+      | lift d => exact .lift (ih d (Nat.lt_of_succ_lt_succ h))
+
+/-- All-dimensional interchange, for any strictly ordered pair of cuts.
+The six equalities specify the four inner and two outer composites. -/
+theorem cutCompose_interchange {n : Nat} {c d : Cut n} (below : Cut.Below c d)
+    {G : GlobularSet.{u}} (p q r s : Pasting n G)
+    (hpq : cutTarget c p = cutSource c q) (hrs : cutTarget c r = cutSource c s)
+    (hpr : cutTarget d p = cutSource d r) (hqs : cutTarget d q = cutSource d s)
+    (hrow : cutTarget d (cutCompose c p q hpq) = cutSource d (cutCompose c r s hrs))
+    (hcol : cutTarget c (cutCompose d p r hpr) = cutSource c (cutCompose d q s hqs)) :
+    cutCompose d (cutCompose c p q hpq) (cutCompose c r s hrs) hrow =
+      cutCompose c (cutCompose d p r hpr) (cutCompose d q s hqs) hcol := by
+  induction below generalizing G with
+  | bottom d =>
+    rcases p with ⟨a, b, p⟩
+    rcases q with ⟨c, e, q⟩
+    rcases r with ⟨f, g, r⟩
+    rcases s with ⟨i, j, s⟩
+    change b = c at hpq
+    change g = i at hrs
+    cases hpq
+    cases hrs
+    have ha : a = f := _root_.congrArg Sigma.fst hpr
+    have hb : b = g := _root_.congrArg (fun z => z.2.1) hpr
+    cases ha
+    cases hb
+    have he : e = j := _root_.congrArg (fun z => z.2.1) hqs
+    cases he
+    have hp : p.map (fun e => cutTarget d e) = r.map (fun e => cutSource d e) :=
+      eq_of_heq (Sigma.mk.inj (eq_of_heq (Sigma.mk.inj hpr).2)).2
+    have hq : q.map (fun e => cutTarget d e) = s.map (fun e => cutSource d e) :=
+      eq_of_heq (Sigma.mk.inj (eq_of_heq (Sigma.mk.inj hqs).2)).2
+    exact _root_.congrArg pack (Chain.zipOver_append _ _ _ p r hp q s hq)
+  | @lift n c d below ih =>
+    rcases p with ⟨a, b, p⟩
+    rcases q with ⟨e, f, q⟩
+    rcases r with ⟨g, i, r⟩
+    rcases s with ⟨j, k, s⟩
+    have ha : a = e := _root_.congrArg Sigma.fst hpq
+    have hb : b = f := _root_.congrArg (fun z => z.2.1) hpq
+    have hc : a = g := _root_.congrArg Sigma.fst hpr
+    have hd : b = i := _root_.congrArg (fun z => z.2.1) hpr
+    have he : g = j := _root_.congrArg Sigma.fst hrs
+    have hf : i = k := _root_.congrArg (fun z => z.2.1) hrs
+    cases ha
+    cases hb
+    cases hc
+    cases hd
+    cases he
+    cases hf
+    have hpq' : p.map (fun e => cutTarget c e) = q.map (fun e => cutSource c e) :=
+      eq_of_heq (Sigma.mk.inj (eq_of_heq (Sigma.mk.inj hpq).2)).2
+    have hrs' : r.map (fun e => cutTarget c e) = s.map (fun e => cutSource c e) :=
+      eq_of_heq (Sigma.mk.inj (eq_of_heq (Sigma.mk.inj hrs).2)).2
+    have hpr' : p.map (fun e => cutTarget d e) = r.map (fun e => cutSource d e) :=
+      eq_of_heq (Sigma.mk.inj (eq_of_heq (Sigma.mk.inj hpr).2)).2
+    have hqs' : q.map (fun e => cutTarget d e) = s.map (fun e => cutSource d e) :=
+      eq_of_heq (Sigma.mk.inj (eq_of_heq (Sigma.mk.inj hqs).2)).2
+    have hrow' : (Chain.zipOver (fun e => cutTarget c e) (fun e => cutSource c e)
+        (fun e f h => cutCompose c e f h) p q hpq').map (fun e => cutTarget d e) =
+      (Chain.zipOver (fun e => cutTarget c e) (fun e => cutSource c e)
+        (fun e f h => cutCompose c e f h) r s hrs').map (fun e => cutSource d e) :=
+      eq_of_heq (Sigma.mk.inj (eq_of_heq (Sigma.mk.inj hrow).2)).2
+    have hcol' : (Chain.zipOver (fun e => cutTarget d e) (fun e => cutSource d e)
+        (fun e f h => cutCompose d e f h) p r hpr').map (fun e => cutTarget c e) =
+      (Chain.zipOver (fun e => cutTarget d e) (fun e => cutSource d e)
+        (fun e f h => cutCompose d e f h) q s hqs').map (fun e => cutSource c e) :=
+      eq_of_heq (Sigma.mk.inj (eq_of_heq (Sigma.mk.inj hcol).2)).2
+    exact _root_.congrArg pack (Chain.zipOver_interchange
+      (fun e => cutTarget c e) (fun e => cutSource c e)
+      (fun e => cutTarget d e) (fun e => cutSource d e)
+      (fun e f h => cutCompose c e f h) (fun e f h => cutCompose d e f h)
+      (fun e f g h a b c d r s => ih e f g h a b c d r s) p q r s hpq' hrs' hpr' hqs' hrow' hcol')
 
 end Pasting
 
