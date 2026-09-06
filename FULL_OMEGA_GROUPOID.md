@@ -5,9 +5,10 @@ Status: in progress. The completed associativity certificate remains in
 
 Current milestone: the normalized native endomorphism operad now has a
 verified contraction and an actual algebra action on the native tower.
-The comparisons with the selected native compositions, invertibility and
-associativity certificate, and the standard free-category definition bridge,
-remain completion gates.
+Contraction-selected adjacent operations now have coinductive invertibility
+and explicit comparison cells to the earlier native operations. The full
+associativity/pentagon/interchange certificate comparisons and the standard
+free-category definition bridge remain completion gates.
 
 ## Mathematical target
 
@@ -71,8 +72,9 @@ proved. A finite-dimensional package does not complete this objective.
 These definitions and lemmas build without proof holes. The candidate native
 carrier described below now instantiates the correspondence interface and
 has coinductive invertibility for its specified adjacent operations. The
-endomorphism operad action is now proved below; compatibility with those
-specified operations remains unproved.
+endomorphism operad action is now proved below, along with selected adjacent
+operations, invertibility for them, and comparison cells to those specified
+native operations. Full coherence compatibility remains unproved.
 
 ```sh
 lake build ComputationalPaths.Path.OmegaGroupoid.GlobularPasting
@@ -617,8 +619,8 @@ at all higher dimensions, without a finite depth bound. This follows
 [Fujii--Hoshino--Maehara, Definition 3.1.1 and Remark 3.1.2](https://higher-structures.math.cas.cz/api/files/issues/Vol8Iss2/FujHosMae),
 whose operator is defined already for omega-precategories. The theorem is
 about the specified native/coskeletal omega-precategory; its operations are
-not yet identified with those of a proved operadic action. That remains a
-required completion gate, not a consequence of invertibility alone.
+not asserted to be identical to the contraction-selected operadic operations.
+The latter now have their own invertibility proof and comparison cells below.
 
 `composeAssociator`, `leftUnitor`, and `rightUnitor` supply correctly bounded
 coherence cells for adjacent composition in every positive dimension.
@@ -685,10 +687,28 @@ native higher fillers to replace an operadic equality.
 Together with `nativeContraction`, these give a normalized contractible
 endomorphism operad over the implemented pasting monad acting on the native
 tower. The audit instantiates both structures on that tower.
-This is not yet the full weak omega-groupoid theorem: comparison with the
-standard free strict-category monad, the specified native compositions and
-coinductive invertibility, and the independent associativity/pentagon and
-interchange certificates still require verification.
+`NativeOperadicOperations.lean` now selects operations by lifting arities
+with unit-operation boundaries through the actual contraction, then labels
+and evaluates them using the actual algebra. Adjacent binary inputs are
+vertical composites of singleton diagrams; identity inputs are identity
+diagrams over singletons. `input_boundary` and the exact unit action prove
+the required cell boundaries in all dimensions.
+`NativeOperadic.WeaklyInvertible` uses these operations in the greatest
+postfixed-point definition; `weaklyInvertible_unfold` and
+`all_cells_weaklyInvertible` verify its fixed-point equation and all-cell
+invertibility. This follows the adjacent-operation/coinduction formulation
+in [Fujii--Hoshino--Maehara, Definitions 2.5.2 and 3.1.1 and Remark 3.1.2](https://higher-structures.math.cas.cz/api/files/issues/Vol8Iss2/FujHosMae).
+It no longer relies solely on invertibility for the independent native
+omega-precategory. `compareCompose` and `compareIdentity` provide explicit
+comparison cells, not equality of raw `RwEq` witnesses. Their invertibility,
+and that of the retained primitive native associator, is checked by the audit.
+
+This is not yet the full weak omega-groupoid theorem: the standard free
+strict-category monad comparison, a complete identification with the chosen
+standard pasting-instruction convention, and the independent
+associativity/pentagon and interchange certificate comparisons still require
+verification. The adjacent contraction lifts alone do not prove that final
+instruction-convention comparison.
 
 Completion requires the mathematical target above to be instantiated, all
 proof dependencies audited, the relevant modules built, and preservation of

@@ -1,6 +1,7 @@
 import ComputationalPaths.Path.OmegaGroupoid.GlobularPasting
 import ComputationalPaths.Path.OmegaGroupoid.NativeGlobularTower
 import ComputationalPaths.Path.OmegaGroupoid.GlobularEndomorphism
+import ComputationalPaths.Path.OmegaGroupoid.NativeOperadicOperations
 
 open ComputationalPaths
 open ComputationalPaths.Path
@@ -8,6 +9,27 @@ open ComputationalPaths.Path.OmegaFoundations
 
 /-! Incremental audit. This checks the foundations only; it is not yet a
 completion gate for the full weak omega-groupoid theorem. -/
+
+#print axioms NativeOperadic.operation
+#print axioms NativeOperadic.input_boundary
+#print axioms NativeOperadic.compose
+#print axioms NativeOperadic.compose_boundary
+#print axioms NativeOperadic.identity_boundary
+#print axioms NativeOperadic.compareCompose_three_paths_target
+#print axioms NativeOperadic.weaklyInvertible_unfold
+#print axioms NativeOperadic.all_cells_weaklyInvertible
+
+example (A : Type u) (n : Nat) (p : NativeTower.Cell A (n + 1)) :
+    NativeOperadic.WeaklyInvertible n p := NativeOperadic.all_cells_weaklyInvertible n p
+
+example (A : Type u) (n : Nat) (p q : NativeTower.Cell A (n + 1))
+    (h : NativeTower.target p = NativeTower.source q) :
+    NativeOperadic.WeaklyInvertible (n + 1) (NativeOperadic.compareCompose p q h) :=
+  NativeOperadic.all_cells_weaklyInvertible _ _
+
+example {A : Type u} {a b c d : A} (p : Path a b) (q : Path b c) (r : Path c d) :
+    NativeOperadic.WeaklyInvertible 1 (NativeTower.associator p q r) :=
+  NativeOperadic.all_cells_weaklyInvertible _ _
 
 #print axioms Endomorphism.operations
 #print axioms Endomorphism.evaluation
