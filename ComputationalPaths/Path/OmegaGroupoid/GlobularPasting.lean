@@ -68,6 +68,51 @@ end Chain
 
 namespace Chain
 
+variable {O : Type u} {E : O → O → Type v} {F : O → O → Type w}
+
+def single {x y : O} (e : E x y) : Chain E x y := .cons e (.nil y)
+
+theorem append_nil {x y : O} (p : Chain E x y) : p.append (.nil y) = p := by
+  induction p with
+  | nil => rfl
+  | cons e p ih => exact _root_.congrArg (Chain.cons e) ih
+
+/-- Endpoint-preserving substitution of a chain for each edge. -/
+def bind (f : {x y : O} → E x y → Chain F x y) {x y : O} :
+    Chain E x y → Chain F x y
+  | .nil x => .nil x
+  | .cons e p => (f e).append (bind f p)
+
+theorem bind_append (f : {x y : O} → E x y → Chain F x y)
+    {x y z : O} (p : Chain E x y) (q : Chain E y z) :
+    (p.append q).bind f = (p.bind f).append (q.bind f) := by
+  induction p with
+  | nil => rfl
+  | cons e p ih =>
+    exact (_root_.congrArg (Chain.append (f e)) (ih q)).trans (Chain.append_assoc _ _ _).symm
+
+theorem bind_single (f : {x y : O} → E x y → Chain F x y)
+    {x y : O} (e : E x y) : (single e).bind f = f e := append_nil (f e)
+
+theorem bind_id {x y : O} (p : Chain E x y) : p.bind (fun e => single e) = p := by
+  induction p with
+  | nil => rfl
+  | cons e p ih => exact _root_.congrArg (Chain.cons e) ih
+
+theorem bind_assoc {D : O → O → Type u}
+    (f : {x y : O} → E x y → Chain F x y)
+    (g : {x y : O} → F x y → Chain D x y) {x y : O} (p : Chain E x y) :
+    (p.bind f).bind g = p.bind (fun e => (f e).bind g) := by
+  induction p with
+  | nil => rfl
+  | cons e p ih =>
+    exact (bind_append g (f e) (p.bind f)).trans
+      (_root_.congrArg (Chain.append ((f e).bind g)) ih)
+
+end Chain
+
+namespace Chain
+
 variable {O : Type u} {P : Type v}
 
 /-- Relabel both vertices and edges of a composable chain. -/
@@ -273,6 +318,28 @@ noncomputable def evalPathChain {A : Type u} {a b : A} :
     Chain (fun a b : A => Path a b) a b → Path a b
   | .nil a => Path.refl a
   | .cons p ps => Path.trans p (evalPathChain ps)
+
+theorem evalPathChain_append {A : Type u} {a b c : A}
+    (p : Chain (fun a b : A => Path a b) a b)
+    (q : Chain (fun a b : A => Path a b) b c) :
+    evalPathChain (p.append q) = Path.trans (evalPathChain p) (evalPathChain q) := by
+  induction p with
+  | nil => exact (Path.trans_refl_left _).symm
+  | cons e p ih =>
+    exact (_root_.congrArg (Path.trans e) (ih q)).trans
+      (Path.trans_assoc e (evalPathChain p) (evalPathChain q)).symm
+
+/-- Substitution of actual computational-path chains agrees with composing
+the substituted traces, including their stored rewrite-step lists. -/
+theorem evalPathChain_bind {A : Type u}
+    (f : {a b : A} → Path a b → Chain (fun a b : A => Path a b) a b)
+    {a b : A} (p : Chain (fun a b : A => Path a b) a b) :
+    evalPathChain (p.bind f) = evalPathChain (p.map (fun e => evalPathChain (f e))) := by
+  induction p with
+  | nil => rfl
+  | cons e p ih =>
+    exact (evalPathChain_append (f e) (p.bind f)).trans
+      (_root_.congrArg (Path.trans (evalPathChain (f e))) ih)
 
 noncomputable def pathChainAssoc {A : Type u} {a b c d : A}
     (p : Path a b) (q : Path b c) (r : Path c d) :

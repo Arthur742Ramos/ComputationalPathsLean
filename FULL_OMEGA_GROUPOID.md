@@ -87,6 +87,12 @@ not yet a monad. Relabelling now forms the checked Mathlib endofunctor
 and composite maps. The monad unit, flattening, monad laws and the free
 strict-category universal property remain to be established.
 
+Endpoint-indexed chain substitution now has proved left/right unit and
+associativity laws (`Chain.bind_single`, `Chain.bind_id`, `Chain.bind_assoc`).
+Its interpretation by actual computational paths respects substitution
+(`evalPathChain_bind`). These are ingredients for flattening nested diagrams,
+not a substitute for the missing globular monad multiplication.
+
 ## Semantic audit and completion gates
 
 The current rewrite theory has a totality theorem for `RwEq` on parallel

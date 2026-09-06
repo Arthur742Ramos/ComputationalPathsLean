@@ -47,3 +47,11 @@ example {G H K : GlobularSet} (f : GlobularSet.Map G H) (g : GlobularSet.Map H K
   Pasting.map_comp f g c
 
 #print axioms Pasting.pastingFunctor
+
+example {O : Type} {E F D : O → O → Type}
+    (f : {a b : O} → E a b → Chain F a b)
+    (g : {a b : O} → F a b → Chain D a b) {a b : O} (p : Chain E a b) :
+    (p.bind f).bind g = p.bind (fun e => (f e).bind g) := Chain.bind_assoc f g p
+
+#print axioms Chain.bind_assoc
+#print axioms evalPathChain_bind
