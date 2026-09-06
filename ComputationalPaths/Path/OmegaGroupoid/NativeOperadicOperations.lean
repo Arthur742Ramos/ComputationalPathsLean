@@ -880,6 +880,161 @@ theorem selectedAssociator_invertible {A : Type u} {a b c d : A}
     (p : Path a b) (q : Path b c) (r : Path c d) :
     WeaklyInvertible 1 (selectedAssociator p q r).val := all_cells_weaklyInvertible _ _
 
+/-- Evaluate a diagram of operad operations by selected instructions and
+actual operadic multiplication. This acts on operations, not carrier cells. -/
+noncomputable def operationEvaluation (A : Type u) :
+    GlobularSet.Map (Pasting.globular (collection A).operations) (collection A).operations :=
+  GlobularSet.Map.comp (Endomorphism.multiplication (carrier A)).operations
+    (labelledInstructionsOn A (collection A).operations)
+
+theorem operationEvaluation_singleton {A : Type u} {n : Nat}
+    (o : (collection A).operations.Cell n) :
+    (operationEvaluation A).app (Pasting.singleton o) = o := by
+  let C := collection A
+  let i := (GlobularCollection.identityApplicationIn C.operations).app o
+  have hp : (instruction A n ((GlobularCollection.shape C.operations).app (Pasting.singleton o))).val =
+      one A n :=
+    (_root_.congrArg (fun a => (instruction A n a).val)
+      (Pasting.map_singleton (GlobularSet.terminalMap C.operations) o)).trans (instruction_singleton A n)
+  have hl : (labelledInstructionsOn A C.operations).app (Pasting.singleton o) =
+      (GlobularCollection.Hom.substitute (Endomorphism.unit (carrier A))
+        (GlobularCollection.Hom.id C)).operations.app i :=
+    Subtype.ext (Prod.ext hp (Pasting.map_id C.operations (Pasting.singleton o)).symm)
+  have hm := _root_.congrArg (fun k : GlobularCollection.Hom (GlobularCollection.identity.substitute C) C =>
+    k.operations.app i) (Endomorphism.one_mul (carrier A))
+  have hi := _root_.congrArg (fun k : GlobularSet.Map C.operations C.operations => k.app o)
+    (GlobularCollection.identityApplicationIso C.operations).inv_hom_id
+  exact (_root_.congrArg (Endomorphism.multiplication (carrier A)).operations.app hl).trans (hm.trans hi)
+
+/-- The operation produced by multiplication has the flattened diagram of
+the original arities, retaining their full globular pasting structure. -/
+theorem operationEvaluation_arity {A : Type u} {n : Nat}
+    (d : Pasting n (collection A).operations) :
+    (collection A).arity.app ((operationEvaluation A).app d) =
+      (Pasting.flattenGlobular GlobularSet.terminal).app (Pasting.map (collection A).arity d) :=
+  _root_.congrArg (fun k => k.app ((labelledInstructionsOn A (collection A).operations).app d))
+    (Endomorphism.multiplication (carrier A)).arity
+
+noncomputable def operationIdentity {A : Type u} {n : Nat}
+    (o : (collection A).operations.Cell n) : (collection A).operations.Cell (n + 1) :=
+  (operationEvaluation A).app (Pasting.identity (Pasting.singleton o))
+
+theorem operationIdentity_boundary {A : Type u} {n : Nat}
+    (o : (collection A).operations.Cell n) :
+    (collection A).operations.source (operationIdentity o) = o ∧
+      (collection A).operations.target (operationIdentity o) = o :=
+  ⟨((operationEvaluation A).source_app _).trans
+      ((_root_.congrArg (operationEvaluation A).app (Pasting.source_identity _ _)).trans
+        (operationEvaluation_singleton o)),
+    ((operationEvaluation A).target_app _).trans
+      ((_root_.congrArg (operationEvaluation A).app (Pasting.target_identity _ _)).trans
+        (operationEvaluation_singleton o))⟩
+
+/-- Adjacent composition of operations by the operad's own multiplication.
+Its exact endpoints can be reused when forming higher coherence diagrams. -/
+noncomputable def operationCompose {A : Type u} {n : Nat}
+    (o r : (collection A).operations.Cell (n + 1))
+    (h : (collection A).operations.target o = (collection A).operations.source r) :
+    (collection A).operations.Cell (n + 1) :=
+  (operationEvaluation A).app (Pasting.vertical (Pasting.singleton o) (Pasting.singleton r)
+    ((Pasting.target_singleton _ o).trans
+      ((_root_.congrArg Pasting.singleton h).trans (Pasting.source_singleton _ r).symm)))
+
+theorem operationCompose_boundary {A : Type u} {n : Nat}
+    (o r : (collection A).operations.Cell (n + 1))
+    (h : (collection A).operations.target o = (collection A).operations.source r) :
+    (collection A).operations.source (operationCompose o r h) = (collection A).operations.source o ∧
+      (collection A).operations.target (operationCompose o r h) = (collection A).operations.target r :=
+  ⟨((operationEvaluation A).source_app _).trans
+      ((_root_.congrArg (operationEvaluation A).app
+        ((Pasting.source_vertical _ _ _).trans (Pasting.source_singleton _ o))).trans
+          (operationEvaluation_singleton _)),
+    ((operationEvaluation A).target_app _).trans
+      ((_root_.congrArg (operationEvaluation A).app
+        ((Pasting.target_vertical _ _ _).trans (Pasting.target_singleton _ r))).trans
+          (operationEvaluation_singleton _))⟩
+
+/-- Composition of actual operad operations along any lower axis. -/
+noncomputable def operationComposeAt {A : Type u} {n : Nat} (c : Pasting.Cut n)
+    (o r : (collection A).operations.Cell n)
+    (h : Pasting.CutBoundary.target c (collection A).operations o =
+      Pasting.CutBoundary.source c (collection A).operations r) :
+    (collection A).operations.Cell n :=
+  (operationEvaluation A).app (binaryDiagramOn (collection A).operations c o r h)
+
+/-- Multiplication retains the cut composite of the original operation arities. -/
+theorem operationComposeAt_arity {A : Type u} {n : Nat} (c : Pasting.Cut n)
+    (o r : (collection A).operations.Cell n) h h' :
+    (collection A).arity.app (operationComposeAt c o r h) =
+      (Pasting.cutOperations GlobularSet.terminal).compose c
+        ((collection A).arity.app o) ((collection A).arity.app r) h' := by
+  let f := (collection A).arity
+  have hi := (Pasting.CutBoundary.target_map c f o).trans
+    ((_root_.congrArg f.app h).trans (Pasting.CutBoundary.source_map c f r).symm)
+  have hm := binaryDiagramOn_map f c o r h hi
+  unfold operationComposeAt
+  rw [operationEvaluation_arity, hm]
+  have hx := Pasting.flatten_singleton (f.app o)
+  have hy := Pasting.flatten_singleton (f.app r)
+  have hf := (Pasting.flatten_preserves GlobularSet.terminal).compose c
+    (Pasting.singleton (f.app o)) (Pasting.singleton (f.app r))
+    ((Pasting.CutBoundary.target_map c
+      (Pasting.singletonGlobular (Pasting.globular GlobularSet.terminal)) (f.app o)).trans
+      ((_root_.congrArg (Pasting.singletonGlobular (Pasting.globular GlobularSet.terminal)).app hi).trans
+        (Pasting.CutBoundary.source_map c
+          (Pasting.singletonGlobular (Pasting.globular GlobularSet.terminal)) (f.app r)).symm))
+    ((_root_.congrArg (Pasting.CutBoundary.target c (Pasting.globular GlobularSet.terminal)) hx).trans
+      (h'.trans (_root_.congrArg
+        (Pasting.CutBoundary.source c (Pasting.globular GlobularSet.terminal)) hy).symm))
+  exact hf.trans (eq_of_heq ((Pasting.CutModel.free GlobularSet.terminal).compose_heq
+    rfl c c rfl _ _ _ _ (heq_of_eq hx) (heq_of_eq hy) _ h'))
+
+theorem binaryDiagramOn_source (G : GlobularSet.{u + 1}) {n : Nat} (c : Pasting.Cut n)
+    (p q : G.Cell (n + 1)) h h' :
+    (Pasting.globular G).source (binaryDiagramOn G c.up p q h) =
+      binaryDiagramOn G c (G.source p) (G.source q) h' := by
+  let F := Pasting.CutModel.free G
+  have hm := Pasting.CutBoundary.source_matching (Pasting.globular G) c
+    (Pasting.singleton p) (Pasting.singleton q)
+    ((Pasting.CutBoundary.target_map c.up (Pasting.singletonGlobular G) p).trans
+      ((_root_.congrArg (Pasting.singletonGlobular G).app h).trans
+        (Pasting.CutBoundary.source_map c.up (Pasting.singletonGlobular G) q).symm))
+  exact (F.compatible.source_compose c.raise_up _ _ _ hm).trans
+    (eq_of_heq (F.compose_heq rfl c c rfl _ _ _ _
+      (heq_of_eq (Pasting.source_singleton _ p)) (heq_of_eq (Pasting.source_singleton _ q)) hm _))
+
+theorem binaryDiagramOn_target (G : GlobularSet.{u + 1}) {n : Nat} (c : Pasting.Cut n)
+    (p q : G.Cell (n + 1)) h h' :
+    (Pasting.globular G).target (binaryDiagramOn G c.up p q h) =
+      binaryDiagramOn G c (G.target p) (G.target q) h' := by
+  let F := Pasting.CutModel.free G
+  have hm := Pasting.CutBoundary.target_matching (Pasting.globular G) c
+    (Pasting.singleton p) (Pasting.singleton q)
+    ((Pasting.CutBoundary.target_map c.up (Pasting.singletonGlobular G) p).trans
+      ((_root_.congrArg (Pasting.singletonGlobular G).app h).trans
+        (Pasting.CutBoundary.source_map c.up (Pasting.singletonGlobular G) q).symm))
+  exact (F.compatible.target_compose c.raise_up _ _ _ hm).trans
+    (eq_of_heq (F.compose_heq rfl c c rfl _ _ _ _
+      (heq_of_eq (Pasting.target_singleton _ p)) (heq_of_eq (Pasting.target_singleton _ q)) hm _))
+
+theorem operationComposeAt_source {A : Type u} {n : Nat} (c : Pasting.Cut n)
+    (p q : (collection A).operations.Cell (n + 1)) h h' :
+    (collection A).operations.source (operationComposeAt c.up p q h) =
+      operationComposeAt c ((collection A).operations.source p)
+        ((collection A).operations.source q) h' :=
+  ((operationEvaluation A).source_app _).trans
+    (_root_.congrArg (operationEvaluation A).app
+      (binaryDiagramOn_source (collection A).operations c p q h h'))
+
+theorem operationComposeAt_target {A : Type u} {n : Nat} (c : Pasting.Cut n)
+    (p q : (collection A).operations.Cell (n + 1)) h h' :
+    (collection A).operations.target (operationComposeAt c.up p q h) =
+      operationComposeAt c ((collection A).operations.target p)
+        ((collection A).operations.target q) h' :=
+  ((operationEvaluation A).target_app _).trans
+    (_root_.congrArg (operationEvaluation A).app
+      (binaryDiagramOn_target (collection A).operations c p q h h'))
+
 end NativeOperadic
 
 end ComputationalPaths.Path.OmegaFoundations

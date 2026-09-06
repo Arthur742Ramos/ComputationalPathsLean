@@ -875,3 +875,15 @@ operations over that common input. `selectedAssociatorComparison` is an
 invertible comparison to the unchanged primitive `Step.trans_assoc` witness,
 whose exact raw target is checked by the audit. This closes the selected
 associator comparison, not the selected pentagon/interchange comparisons.
+
+`operationEvaluation` evaluates diagrams of operations using selected
+instructions followed by the operad's actual multiplication. It preserves
+singleton operations and has exactly the flattened diagram of original
+arities. `operationIdentity` and `operationCompose` have verified exact
+adjacent boundaries. `operationComposeAt` extends this to every lower axis:
+its arity is the strict cut composite of the original arities, and its
+source and target recursively compose the original operation boundaries.
+These statements concern operations themselves, not merely the carrier
+cells on which they act. They provide the boundary and arity infrastructure
+for the remaining selected pentagon construction; that comparison remains
+open.

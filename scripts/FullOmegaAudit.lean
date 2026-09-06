@@ -4,6 +4,14 @@ import ComputationalPaths.Path.OmegaGroupoid.GlobularEndomorphism
 import ComputationalPaths.Path.OmegaGroupoid.NativeOperadicOperations
 import ComputationalPaths.Path.OmegaGroupoid.NativeAssociativityBridge
 
+#print axioms ComputationalPaths.Path.OmegaFoundations.NativeOperadic.operationEvaluation_singleton
+#print axioms ComputationalPaths.Path.OmegaFoundations.NativeOperadic.operationEvaluation_arity
+#print axioms ComputationalPaths.Path.OmegaFoundations.NativeOperadic.operationIdentity_boundary
+#print axioms ComputationalPaths.Path.OmegaFoundations.NativeOperadic.operationCompose_boundary
+#print axioms ComputationalPaths.Path.OmegaFoundations.NativeOperadic.operationComposeAt_arity
+#print axioms ComputationalPaths.Path.OmegaFoundations.NativeOperadic.operationComposeAt_source
+#print axioms ComputationalPaths.Path.OmegaFoundations.NativeOperadic.operationComposeAt_target
+
 open ComputationalPaths
 open ComputationalPaths.Path
 open ComputationalPaths.Path.OmegaFoundations
