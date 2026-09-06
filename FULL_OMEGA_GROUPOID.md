@@ -330,7 +330,12 @@ pasting multiplication unit laws. `Hom.leftUnit_natural` and
 equation uses `flatten_natural` and the actual `flatten_assoc` theorem.
 `Hom.application_faithful` proves that terminal-labelled applications detect
 equality of collection maps, providing a faithful check for future coherence
-proofs. Associator naturality and triangle/pentagon coherence remain unproved.
+proofs. `Hom.associateInv_natural` now proves naturality in all three
+collections by the comparison's naturality in operations and inputs.
+`Hom.triangle_inv` proves triangle coherence in inverse-associator form,
+using the actual singleton-input flattening law. Pentagon coherence remains
+unproved; these structural laws alone still do not construct the requested
+contractible operad or its native computational-path action.
 
 `evaluate` now evaluates labelled diagrams by dimension recursion into a
 target equipped with horizontal operations in all its iterated hom contexts

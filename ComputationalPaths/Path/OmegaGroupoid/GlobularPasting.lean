@@ -6047,6 +6047,47 @@ noncomputable def associate (C D E : GlobularCollection.{u}) :
     exact h.symm.trans (_root_.congrArg ((C.substitute D).substitute E).arity.app
       ((C.substitutionComparison_unique_lift D E.operations p).choose_spec.1))
 
+/-- Reassociation is natural in all three operation collections. -/
+theorem associateInv_natural {C D E F J K : GlobularCollection.{u}}
+    (f : Hom C F) (g : Hom D J) (h : Hom E K) :
+    comp (substitute (substitute f g) h) (associateInv C D E) =
+      comp (associateInv F J K) (substitute f (substitute g h)) := by
+  apply ext
+  apply GlobularSet.Map.ext
+  intro n p
+  have hn := _root_.congrArg (fun k : GlobularSet.Map (C.application (D.application E.operations))
+    ((C.substitute D).application K.operations) => k.app p)
+      (C.substitutionComparison_natural D h.operations)
+  have hm := _root_.congrArg (fun k : GlobularSet.Map (C.application (D.application K.operations))
+    ((F.substitute J).application K.operations) =>
+      k.app ((C.map (D.map h.operations)).app p)) (substitute_comparison f g K.operations)
+  refine (_root_.congrArg ((substitute f g).application K.operations).app hn.symm).trans ?_
+  refine hm.trans ?_
+  apply _root_.congrArg (F.substitutionComparison J K.operations).app
+  apply _root_.congrArg (f.application (J.application K.operations)).app
+  apply Subtype.ext
+  exact Prod.ext rfl (Pasting.map_comp (D.map h.operations) (g.application K.operations) p.val.2)
+
+/-- Triangle coherence, written with the inverse associator so that the
+equation directly exposes the implemented flattening of singleton inputs. -/
+theorem triangle_inv (C D : GlobularCollection.{u}) :
+    comp (substitute (rightUnit C) (id D)) (associateInv C identity D) =
+      substitute (id C) (leftUnit D) := by
+  apply ext
+  apply GlobularSet.Map.ext
+  intro n p
+  apply Subtype.ext
+  refine Prod.ext rfl ?_
+  change Pasting.map (GlobularSet.Map.id D.operations) ((Pasting.flattenGlobular D.operations).app
+      (Pasting.map (identity.inputs D.operations) p.val.2)) =
+    Pasting.map (identityApplicationOut D.operations) p.val.2
+  refine (Pasting.map_id D.operations _).trans ?_
+  exact (_root_.congrArg (fun k => (Pasting.flattenGlobular D.operations).app (Pasting.map k p.val.2))
+    (identityApplicationOut_inputs D.operations).symm).trans
+      ((_root_.congrArg (Pasting.flattenGlobular D.operations).app
+        (Pasting.map_comp (identityApplicationOut D.operations) (Pasting.singletonGlobular D.operations) p.val.2).symm).trans
+          (Pasting.flatten_map_singleton (Pasting.map (identityApplicationOut D.operations) p.val.2)))
+
 end Hom
 
 instance : CategoryTheory.Category.{u} GlobularCollection.{u} where
