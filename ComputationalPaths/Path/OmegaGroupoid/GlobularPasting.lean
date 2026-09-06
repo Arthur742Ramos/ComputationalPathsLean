@@ -890,6 +890,38 @@ theorem map_retract_of_mapAlong {O P : Type u}
       have hc := cons_heq_components (e p) (ps.mapAlong f e) (j q) (qs.map j) hx hy h
       exact _root_.congrArg₂ Chain.cons (law p q hx hc.1 hc.2.1) (ih qs hc.1 hy hc.2.2)
 
+/-- Assemble labelwise lifts into a chain lift, retaining the original
+source vertices and the prescribed target labels. -/
+theorem lift_mapAlong_square {O P : Type u}
+    {E R : O → O → Type u} {F D : P → P → Type u}
+    (f : O → P) (e : {x y : O} → E x y → F (f x) (f y))
+    (j : {x y : P} → D x y → F x y)
+    (left : {x y : O} → R x y → E x y)
+    (right : {x y : O} → R x y → D (f x) (f y))
+    (lift : ∀ {x y : O} {a b : P} (p : E x y) (q : D a b),
+      f x = a → f y = b → HEq (e p) (j q) →
+      ∃ r : R x y, left r = p ∧ HEq (right r) q)
+    {x y : O} {a b : P} (p : Chain E x y) (q : Chain D a b)
+    (hx : f x = a) (hy : f y = b) (h : HEq (p.mapAlong f e) (q.map j)) :
+    ∃ r : Chain R x y, r.map left = p ∧ HEq (r.mapAlong f right) q := by
+  induction p generalizing a b with
+  | nil x =>
+    cases q with
+    | nil =>
+      refine ⟨.nil x, rfl, ?_⟩
+      exact packed_eq_heq _ _
+        (_root_.congrArg (fun a => (⟨a, a, Chain.nil a⟩ : Σ x y, Chain D x y)) hx)
+    | cons q qs => exact False.elim (nil_not_heq_cons (j q) (qs.map j) hx hy h)
+  | @cons x z y p ps ih =>
+    cases q with
+    | nil => exact False.elim (nil_not_heq_cons (e p) (ps.mapAlong f e) hx.symm hy.symm (HEq.symm h))
+    | @cons a c b q qs =>
+      have hc := cons_heq_components (e p) (ps.mapAlong f e) (j q) (qs.map j) hx hy h
+      obtain ⟨r, hr, hs⟩ := lift p q hx hc.1 hc.2.1
+      obtain ⟨rs, hrl, hrs⟩ := ih qs hc.1 hy hc.2.2
+      exact ⟨.cons r rs, _root_.congrArg₂ Chain.cons hr hrl,
+        cons_heq_of_components (right r) (rs.mapAlong f right) q qs hx hc.1 hy hs hrs⟩
+
 end Chain
 
 /-- The dimension-recursive labelled pasting carrier. -/
@@ -3185,6 +3217,71 @@ theorem cutSource_map {n : Nat} (c : Cut n) {G H : GlobularSet.{u}}
   (canonical_source_eq_cutSource c (map f p)).symm.trans
     ((CutBoundary.source_map c (mapGlobular f) p).trans
       (_root_.congrArg (map f) (canonical_source_eq_cutSource c p)))
+
+theorem cutTarget_map {n : Nat} (c : Cut n) {G H : GlobularSet.{u}}
+    (f : GlobularSet.Map G H) (p : Pasting n G) :
+    cutTarget c (map f p) = map f (cutTarget c p) :=
+  (canonical_target_eq_cutTarget c (map f p)).symm.trans
+    ((CutBoundary.target_map c (mapGlobular f) p).trans
+      (_root_.congrArg (map f) (canonical_target_eq_cutTarget c p)))
+
+/-- Relabel both factors without discarding their cut-matching equation. -/
+def cutPairMap {n : Nat} (c : Cut n) {G H : GlobularSet.{u}}
+    (f : GlobularSet.Map G H) (p : CutPair c G) : CutPair c H :=
+  ⟨(map f p.val.1, map f p.val.2), (cutTarget_map c f p.val.1).trans
+    ((_root_.congrArg (map f) p.property).trans (cutSource_map c f p.val.2).symm)⟩
+
+noncomputable def cutPairCompose {n : Nat} (c : Cut n) {G : GlobularSet.{u}}
+    (p : CutPair c G) : Pasting n G := cutCompose c p.val.1 p.val.2 p.property
+
+theorem cutPairMap_compose {n : Nat} (c : Cut n) {G H : GlobularSet.{u}}
+    (f : GlobularSet.Map G H) (p : CutPair c G) :
+    map f (cutPairCompose c p) = cutPairCompose c (cutPairMap c f p) :=
+  map_cutCompose c f p.val.1 p.val.2 _ _
+
+/-- Prescribed composition lifts keep both target factors, not just their
+composite. This is the induction interface for arbitrary cut dimensions. -/
+def CutCompositionCartesian {n : Nat} (c : Cut n) {G H : GlobularSet.{u}}
+    (f : GlobularSet.Map G H) : Prop :=
+  ∀ (p : Pasting n G) (q : CutPair c H), map f p = cutPairCompose c q →
+    ∃! r : CutPair c G, cutPairCompose c r = p ∧ cutPairMap c f r = q
+
+/-- The arbitrary-cut composition interface holds for the horizontal
+cut in every positive dimension, using the actual factor-pair map. -/
+theorem cutCompositionCartesian_bottom {G H : GlobularSet.{u}}
+    (f : GlobularSet.Map G H) (n : Nat) : CutCompositionCartesian (.bottom : Cut (n + 1)) f := by
+  intro p q h
+  rcases p with ⟨a, b, p⟩
+  rcases q with ⟨⟨⟨c, d, q⟩, ⟨e, k, r⟩⟩, hq⟩
+  change d = e at hq
+  cases hq
+  have ha : f.app a = c := _root_.congrArg Sigma.fst h
+  have hb : f.app b = k := _root_.congrArg (fun z => z.2.1) h
+  cases ha
+  cases hb
+  obtain ⟨⟨y, p₁, p₂⟩, ⟨hy, hp, h₁, h₂⟩, hu⟩ := horizontal_cut_cartesian f p d q r h
+  let s : CutPair (.bottom : Cut (n + 1)) G := ⟨(pack p₁, pack p₂), rfl⟩
+  refine ⟨s, ⟨_root_.congrArg pack hp, Subtype.ext (Prod.ext h₁ h₂)⟩, ?_⟩
+  rintro ⟨⟨⟨a', y', s₁⟩, ⟨z', b', s₂⟩⟩, hs⟩ ⟨hscomp, hsmap⟩
+  change y' = z' at hs
+  cases hs
+  have haa : a' = a := _root_.congrArg Sigma.fst hscomp
+  have hbb : b' = b := _root_.congrArg (fun z => z.2.1) hscomp
+  cases haa
+  cases hbb
+  have hl : map f (pack s₁) = pack q := _root_.congrArg (fun z => z.val.1) hsmap
+  have hr : map f (pack s₂) = pack r := _root_.congrArg (fun z => z.val.2) hsmap
+  have hm : f.app y' = d := _root_.congrArg (fun z => z.2.1) hl
+  have happ : s₁.append s₂ = p := eq_of_heq (Chain.packed_eq_heq _ _ hscomp)
+  have he := hu ⟨y', s₁, s₂⟩ ⟨hm, happ, hl, hr⟩
+  have hv := _root_.congrArg Sigma.fst he
+  cases hv
+  have he' : (s₁, s₂) = (p₁, p₂) := eq_of_heq (Sigma.mk.inj he).2
+  have hl' := _root_.congrArg Prod.fst he'
+  have hr' := _root_.congrArg Prod.snd he'
+  cases hl'
+  cases hr'
+  rfl
 
 theorem cutUnit_hom_heq {n : Nat} (c : Cut n) {H : GlobularSet.{u}}
     {a b a' b' : H.Cell 0} (p : Pasting n (H.hom a b))

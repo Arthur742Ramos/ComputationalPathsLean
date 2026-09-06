@@ -196,6 +196,16 @@ the chainwise composition of these retained pairs. This supplies the precise
 representation for a recursive lifting proof, but does not yet prove that
 the factor pairs themselves lift through arbitrary relabelling.
 
+`cutPairMap` now relabels both factors and their matching witness, and
+`cutPairMap_compose` verifies compatibility with their actual composition.
+`CutCompositionCartesian` states the uniform unique-lifting obligation for
+a prescribed output and target factor pair. `cutCompositionCartesian_bottom`
+proves this exact interface for every horizontal dimension.
+`Chain.lift_mapAlong_square` assembles lifts of labels into a chain while
+retaining its original vertices and prescribed relabelled labels. Applying
+that assembly to the lower-cut induction hypothesis, and proving uniqueness
+for the lifted cut, remain to be completed.
+
 `evaluate` now evaluates labelled diagrams by dimension recursion into a
 target equipped with horizontal operations in all its iterated hom contexts
 (`RecursiveComposition`). The evaluator is implemented, not a field assumed
