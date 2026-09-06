@@ -323,3 +323,16 @@ example {A : Type} {n : Nat} (p : NativeTower.Cell A (n + 1)) :
 #print axioms NativeTower.composeAssociator_paths
 #print axioms NativeTower.leftUnitor_paths
 #print axioms NativeTower.rightUnitor_paths
+
+#print axioms Pasting.evaluateGlobular
+#print axioms Pasting.evaluate_singleton
+#print axioms Pasting.pack_unpackFibre
+#print axioms Pasting.unpack_packFibre
+#print axioms Pasting.horizontalComposition
+#print axioms Pasting.horizontalComposition_right_unit
+#print axioms Pasting.horizontalComposition_fold
+
+example (G : GlobularSet) {n : Nat} {a b : G.Cell 0}
+    (p : Chain (fun x y => Pasting.Horizontal n G x y) a b) :
+    (Pasting.horizontalComposition G).fold (p.map (fun e => Pasting.packFibre e)) =
+      Pasting.packFibre (p.bind (fun e => e)) := Pasting.horizontalComposition_fold p

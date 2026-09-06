@@ -95,6 +95,19 @@ diagrams; it rejects empty and composite chains. This provides the candidate
 unit without erasing original cells. Flattening, monad laws and the free
 strict-category universal property remain to be established.
 
+`evaluate` now evaluates labelled diagrams by dimension recursion into a
+target equipped with horizontal operations in all its iterated hom contexts
+(`RecursiveComposition`). The evaluator is implemented, not a field assumed
+in that interface: `evaluateGlobular` proves both boundary laws, and
+`evaluate_singleton` recovers the original labels exactly under the explicit
+right-unit law. No associativity or algebra law is inferred from this alone.
+The actual pasting carrier has `horizontalComposition` at its root context;
+`packFibre`/`unpackFibre` identify its horizontal chains with its genuine hom
+cells in both directions. `horizontalComposition_fold` proves that this
+concrete fold is precisely chain substitution in every dimension. Extending
+these operations through every nested hom context using higher cuts, then
+proving the resulting multiplication's monad laws, remains unfinished.
+
 Endpoint-indexed chain substitution now has proved left/right unit and
 associativity laws (`Chain.bind_single`, `Chain.bind_id`, `Chain.bind_assoc`).
 Its interpretation by actual computational paths respects substitution

@@ -1999,6 +1999,202 @@ theorem cutCompose_interchange_grid {n : Nat} {c d : Cut n} (below : Cut.Below c
       (cutGrid_composable below p q r s hpq hrs hpr hqs).2 :=
   cutCompose_interchange below p q r s hpq hrs hpr hqs _ _
 
+/-- Horizontal operations used to evaluate chains. Boundary preservation is
+part of the data; associativity is not silently assumed by the evaluator. -/
+structure HorizontalComposition (H : GlobularSet.{u}) where
+  unit : (n : Nat) → (a : H.Cell 0) → (H.hom a a).Cell n
+  mul : {n : Nat} → {a b c : H.Cell 0} →
+    (H.hom a b).Cell n → (H.hom b c).Cell n → (H.hom a c).Cell n
+  source_unit : ∀ n a, (H.hom a a).source (unit (n + 1) a) = unit n a
+  target_unit : ∀ n a, (H.hom a a).target (unit (n + 1) a) = unit n a
+  source_mul : ∀ {n a b c} (p : (H.hom a b).Cell (n + 1)) (q : (H.hom b c).Cell (n + 1)),
+    (H.hom a c).source (mul p q) = mul ((H.hom a b).source p) ((H.hom b c).source q)
+  target_mul : ∀ {n a b c} (p : (H.hom a b).Cell (n + 1)) (q : (H.hom b c).Cell (n + 1)),
+    (H.hom a c).target (mul p q) = mul ((H.hom a b).target p) ((H.hom b c).target q)
+
+/-- All finite iterated hom contexts of a fixed globular set. This allows a
+single evaluation recursion to descend into the actual target hom sets. -/
+inductive HomContext (H : GlobularSet.{u}) : GlobularSet.{u} → Type (u + 1) where
+  | root : HomContext H H
+  | hom {K : GlobularSet.{u}} : HomContext H K → (a b : K.Cell 0) → HomContext H (K.hom a b)
+
+abbrev RecursiveComposition (H : GlobularSet.{u}) :=
+  ∀ {K : GlobularSet.{u}}, HomContext H K → HorizontalComposition K
+
+namespace HorizontalComposition
+
+def fold {H : GlobularSet.{u}} (C : HorizontalComposition H) {n : Nat} {a b : H.Cell 0} :
+    Chain (fun x y => (H.hom x y).Cell n) a b → (H.hom a b).Cell n
+  | .nil a => C.unit n a
+  | .cons e p => C.mul e (C.fold p)
+
+theorem source_fold {H : GlobularSet.{u}} (C : HorizontalComposition H)
+    {n : Nat} {a b : H.Cell 0} (p : Chain (fun x y => (H.hom x y).Cell (n + 1)) a b) :
+    (H.hom a b).source (C.fold p) = C.fold (p.map (fun {x y} e => (H.hom x y).source e)) := by
+  induction p with
+  | nil a => exact C.source_unit n a
+  | cons e p ih => exact (C.source_mul e (C.fold p)).trans (_root_.congrArg (C.mul _) ih)
+
+theorem target_fold {H : GlobularSet.{u}} (C : HorizontalComposition H)
+    {n : Nat} {a b : H.Cell 0} (p : Chain (fun x y => (H.hom x y).Cell (n + 1)) a b) :
+    (H.hom a b).target (C.fold p) = C.fold (p.map (fun {x y} e => (H.hom x y).target e)) := by
+  induction p with
+  | nil a => exact C.target_unit n a
+  | cons e p ih => exact (C.target_mul e (C.fold p)).trans (_root_.congrArg (C.mul _) ih)
+
+end HorizontalComposition
+
+/-- Evaluate every labelled pasting cell by dimension recursion, using the
+target's operations in its actual iterated hom sets. A later instantiation
+with the strict pasting target supplies the candidate multiplication. -/
+def evaluate {H : GlobularSet.{u}} (C : RecursiveComposition H) :
+    {n : Nat} → {G K : GlobularSet.{u}} → HomContext H K →
+      GlobularSet.Map G K → Pasting n G → K.Cell n
+  | 0, _, _, _, f, a => f.app a
+  | n + 1, _, _, h, f, ⟨a, b, p⟩ =>
+      ((C h).fold (p.mapAlong f.app (fun {x y} e =>
+        evaluate C (n := n) (h.hom (f.app x) (f.app y)) (f.hom x y) e))).val
+
+theorem source_evaluate {H : GlobularSet.{u}} (C : RecursiveComposition H)
+    {n : Nat} {G K : GlobularSet.{u}} (h : HomContext H K) (f : GlobularSet.Map G K)
+    (p : Pasting (n + 1) G) :
+    K.source (evaluate C h f p) = evaluate C h f (source p) := by
+  induction n generalizing G K with
+  | zero =>
+    rcases p with ⟨a, b, p⟩
+    exact ((C h).fold (p.mapAlong f.app (fun {x y} e =>
+      evaluate C (h.hom (f.app x) (f.app y)) (f.hom x y) e))).property.1
+  | succ n ih =>
+    rcases p with ⟨a, b, p⟩
+    change ((K.hom (f.app a) (f.app b)).source ((C h).fold _)).val = _
+    rw [HorizontalComposition.source_fold]
+    apply _root_.congrArg (fun q => ((C h).fold q).val)
+    exact Chain.mapAlong_natural _ _ _ _ _ (fun {x y} e =>
+      ih (h.hom (f.app x) (f.app y)) (f.hom x y) e) p
+
+theorem target_evaluate {H : GlobularSet.{u}} (C : RecursiveComposition H)
+    {n : Nat} {G K : GlobularSet.{u}} (h : HomContext H K) (f : GlobularSet.Map G K)
+    (p : Pasting (n + 1) G) :
+    K.target (evaluate C h f p) = evaluate C h f (target p) := by
+  induction n generalizing G K with
+  | zero =>
+    rcases p with ⟨a, b, p⟩
+    exact ((C h).fold (p.mapAlong f.app (fun {x y} e =>
+      evaluate C (h.hom (f.app x) (f.app y)) (f.hom x y) e))).property.2
+  | succ n ih =>
+    rcases p with ⟨a, b, p⟩
+    change ((K.hom (f.app a) (f.app b)).target ((C h).fold _)).val = _
+    rw [HorizontalComposition.target_fold]
+    apply _root_.congrArg (fun q => ((C h).fold q).val)
+    exact Chain.mapAlong_natural _ _ _ _ _ (fun {x y} e =>
+      ih (h.hom (f.app x) (f.app y)) (f.hom x y) e) p
+
+def evaluateGlobular {H : GlobularSet.{u}} (C : RecursiveComposition H)
+    {G K : GlobularSet.{u}} (h : HomContext H K) (f : GlobularSet.Map G K) :
+    GlobularSet.Map (globular G) K where
+  app := evaluate C h f
+  source_app := source_evaluate C h f
+  target_app := target_evaluate C h f
+
+/-- Evaluation extends the original labelling whenever each target hom
+context has a right unit. The labels are recovered exactly, not quotiented. -/
+theorem evaluate_singleton {H : GlobularSet.{u}} (C : RecursiveComposition H)
+    (unitLaw : ∀ {K : GlobularSet.{u}} (h : HomContext H K) {n a b}
+      (p : (K.hom a b).Cell n), (C h).mul p ((C h).unit n b) = p)
+    {n : Nat} {G K : GlobularSet.{u}} (h : HomContext H K) (f : GlobularSet.Map G K)
+    (c : G.Cell n) : evaluate C h f (singleton c) = f.app c := by
+  induction n generalizing G K with
+  | zero => rfl
+  | succ n ih =>
+    let d : (G.hom (G.sourceZero c) (G.targetZero c)).Cell n := ⟨c, rfl, rfl⟩
+    change ((C h).mul
+      (evaluate C (h.hom (f.app (G.sourceZero c)) (f.app (G.targetZero c)))
+        (f.hom _ _) (singleton d)) ((C h).unit n (f.app (G.targetZero c)))).val = _
+    rw [ih, unitLaw]
+    rfl
+
+/-- Expose the existing horizontal chain as a cell of the genuine hom
+globular set of pasting diagrams. -/
+def packFibre {G : GlobularSet.{u}} {n : Nat} {a b : G.Cell 0}
+    (p : Horizontal n G a b) : ((globular G).hom a b).Cell n :=
+  ⟨pack p, sourceZero_pack p, targetZero_pack p⟩
+
+def unpackFibre {G : GlobularSet.{u}} {n : Nat} {a b : G.Cell 0}
+    (p : ((globular G).hom a b).Cell n) : Horizontal n G a b := by
+  rcases p with ⟨⟨c, d, p⟩, hc, hd⟩
+  have ha : c = a := (sourceZero_pack p).symm.trans hc
+  have hb : d = b := (targetZero_pack p).symm.trans hd
+  cases ha
+  cases hb
+  exact p
+
+theorem pack_unpackFibre {G : GlobularSet.{u}} {n : Nat} {a b : G.Cell 0}
+    (p : ((globular G).hom a b).Cell n) : packFibre (unpackFibre p) = p := by
+  rcases p with ⟨⟨c, d, p⟩, hc, hd⟩
+  have ha : c = a := (sourceZero_pack p).symm.trans hc
+  have hb : d = b := (targetZero_pack p).symm.trans hd
+  cases ha
+  cases hb
+  rfl
+
+theorem unpack_packFibre {G : GlobularSet.{u}} {n : Nat} {a b : G.Cell 0}
+    (p : Horizontal n G a b) : unpackFibre (packFibre p) = p := by
+  have h := _root_.congrArg Subtype.val (pack_unpackFibre (packFibre p))
+  exact eq_of_heq (Sigma.mk.inj (eq_of_heq (Sigma.mk.inj h).2)).2
+
+theorem source_packFibre {G : GlobularSet.{u}} {n : Nat} {a b : G.Cell 0}
+    (p : Horizontal (n + 1) G a b) :
+    ((globular G).hom a b).source (packFibre p) = packFibre (p.map (fun e => source e)) :=
+  Subtype.ext rfl
+
+theorem target_packFibre {G : GlobularSet.{u}} {n : Nat} {a b : G.Cell 0}
+    (p : Horizontal (n + 1) G a b) :
+    ((globular G).hom a b).target (packFibre p) = packFibre (p.map (fun e => target e)) :=
+  Subtype.ext rfl
+
+/-- The evaluator's horizontal operations instantiated on the actual pasting
+carrier. Nested hom contexts still require the higher-cut operations. -/
+def horizontalComposition (G : GlobularSet.{u}) : HorizontalComposition (globular G) where
+  unit n a := packFibre (n := n) (.nil a)
+  mul p q := packFibre ((unpackFibre p).append (unpackFibre q))
+  source_unit _ _ := Subtype.ext rfl
+  target_unit _ _ := Subtype.ext rfl
+  source_mul {n a b c} p q := by
+    change G.Cell 0 at a b c
+    obtain ⟨p, rfl⟩ : ∃ p', packFibre p' = p := ⟨unpackFibre p, pack_unpackFibre p⟩
+    obtain ⟨q, rfl⟩ : ∃ q', packFibre q' = q := ⟨unpackFibre q, pack_unpackFibre q⟩
+    simp only [unpack_packFibre, source_packFibre]
+    exact _root_.congrArg packFibre (Chain.map_append _ p q)
+  target_mul {n a b c} p q := by
+    change G.Cell 0 at a b c
+    obtain ⟨p, rfl⟩ : ∃ p', packFibre p' = p := ⟨unpackFibre p, pack_unpackFibre p⟩
+    obtain ⟨q, rfl⟩ : ∃ q', packFibre q' = q := ⟨unpackFibre q, pack_unpackFibre q⟩
+    simp only [unpack_packFibre, target_packFibre]
+    exact _root_.congrArg packFibre (Chain.map_append _ p q)
+
+theorem horizontalComposition_right_unit {G : GlobularSet.{u}} {n : Nat} {a b : G.Cell 0}
+    (p : ((globular G).hom a b).Cell n) :
+    (horizontalComposition G).mul p ((horizontalComposition G).unit n b) = p := by
+  change packFibre ((unpackFibre p).append (unpackFibre (packFibre (.nil b)))) = p
+  rw [unpack_packFibre, Chain.append_nil, pack_unpackFibre]
+
+/-- On actual chains of pasting diagrams the evaluator's fold is precisely
+endpoint-preserving chain substitution, at every dimension. -/
+theorem horizontalComposition_fold {G : GlobularSet.{u}} {n : Nat} {a b : G.Cell 0}
+    (p : Chain (fun x y => Horizontal n G x y) a b) :
+    (horizontalComposition G).fold (p.map (fun e => packFibre e)) =
+      packFibre (p.bind (fun e => e)) := by
+  induction p with
+  | nil => rfl
+  | cons e p ih =>
+    change (horizontalComposition G).mul (packFibre e)
+      ((horizontalComposition G).fold (p.map (fun e => packFibre e))) = _
+    rw [ih]
+    change packFibre ((unpackFibre (packFibre e)).append
+      (unpackFibre (packFibre (p.bind (fun e => e))))) = _
+    rw [unpack_packFibre, unpack_packFibre]
+    rfl
+
 end Pasting
 
 /-- Interpretation of composable path-labelled chains keeps the endpoints
