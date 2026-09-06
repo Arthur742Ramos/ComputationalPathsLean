@@ -1,4 +1,4 @@
-import ComputationalPaths.Path.OmegaGroupoid.GlobularFoundations
+import ComputationalPaths.Path.OmegaGroupoid.GlobularPasting
 
 open ComputationalPaths
 open ComputationalPaths.Path
@@ -29,3 +29,21 @@ noncomputable example {A : Type} {a b c d : A}
 #print axioms GlobularSet.compositeBoundary
 #print axioms GlobularSet.Contraction.comp
 #print axioms associatorCell
+
+example (G : GlobularSet) (n : Nat) (c : Pasting n G) :
+    Pasting.source (Pasting.identity c) = c := Pasting.source_identity G c
+
+example (G : GlobularSet) (c : Pasting 7 G) :
+    Pasting.target (Pasting.identity c) = c := Pasting.target_identity G c
+
+#print axioms GlobularSet.hom
+#print axioms GlobularSet.Map.hom
+#print axioms Pasting.globular
+#print axioms Pasting.identities
+
+example {G H K : GlobularSet} (f : GlobularSet.Map G H) (g : GlobularSet.Map H K)
+    (n : Nat) (c : Pasting n G) :
+    Pasting.map g (Pasting.map f c) = Pasting.map (GlobularSet.Map.comp g f) c :=
+  Pasting.map_comp f g c
+
+#print axioms Pasting.pastingFunctor

@@ -66,7 +66,7 @@ These definitions and lemmas build without proof holes. They do **not** yet
 instantiate the full carrier or prove an operadic action or invertibility.
 
 ```sh
-lake build ComputationalPaths.Path.OmegaGroupoid.GlobularFoundations
+lake build ComputationalPaths.Path.OmegaGroupoid.GlobularPasting
 lake env lean scripts/FullOmegaAudit.lean
 ```
 
@@ -75,6 +75,17 @@ in Raftogianis, Definition 4.5 (pp. 35–36). It requires a specified arity cell
 and both commuting-boundary equations; it is not a general filler for domain
 parallel pairs. The strict-pasting monad, globular operad and algebra action
 are still unconstructed. The audit above checks only the current foundations.
+
+The subsequent `GlobularPasting.lean` constructs a genuinely recursive labelled
+pasting carrier: objects at dimension zero, then composable chains of smaller
+diagrams in hom globular sets. Its adjacent boundaries, both globularity laws,
+and identities in every dimension are checked. The hom construction preserves
+the original cells with fixed zero-dimensional endpoints and lowers dimension
+at every recursion. This is a candidate carrier for the strict-pasting monad,
+not yet a monad. Relabelling now forms the checked Mathlib endofunctor
+`Pasting.pastingFunctor`, preserving both boundaries and respecting identity
+and composite maps. The monad unit, flattening, monad laws and the free
+strict-category universal property remain to be established.
 
 ## Semantic audit and completion gates
 

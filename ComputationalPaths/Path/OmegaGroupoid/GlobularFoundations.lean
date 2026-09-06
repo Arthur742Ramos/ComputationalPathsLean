@@ -221,6 +221,69 @@ def Contraction.comp {G : GlobularSet.{u}} {H : GlobularSet.{v}} {K : GlobularSe
     exact ⟨x.cell, x.source_cell, x.target_cell,
       (_root_.congrArg g.app x.arity_cell).trans y.arity_cell⟩
 
+def sourceZero (G : GlobularSet.{u}) : {n : Nat} → G.Cell n → G.Cell 0
+  | 0, c => c
+  | n + 1, c => sourceZero G (G.source c)
+
+def targetZero (G : GlobularSet.{u}) : {n : Nat} → G.Cell n → G.Cell 0
+  | 0, c => c
+  | n + 1, c => targetZero G (G.target c)
+
+theorem sourceZero_globular (G : GlobularSet.{u}) {n : Nat} (c : G.Cell (n + 2)) :
+    G.sourceZero (G.source c) = G.sourceZero (G.target c) :=
+  _root_.congrArg (G.sourceZero (n := n)) (G.source_source c)
+
+theorem targetZero_globular (G : GlobularSet.{u}) {n : Nat} (c : G.Cell (n + 2)) :
+    G.targetZero (G.source c) = G.targetZero (G.target c) :=
+  _root_.congrArg (G.targetZero (n := n)) (G.target_source c)
+
+theorem Map.sourceZero {G : GlobularSet.{u}} {H : GlobularSet.{v}} (f : Map G H)
+    {n : Nat} (c : G.Cell n) : H.sourceZero (f.app c) = f.app (G.sourceZero c) := by
+  induction n with
+  | zero => rfl
+  | succ n ih => exact (_root_.congrArg H.sourceZero (f.source_app c)).trans (ih (G.source c))
+
+theorem Map.targetZero {G : GlobularSet.{u}} {H : GlobularSet.{v}} (f : Map G H)
+    {n : Nat} (c : G.Cell n) : H.targetZero (f.app c) = f.app (G.targetZero c) := by
+  induction n with
+  | zero => rfl
+  | succ n ih => exact (_root_.congrArg H.targetZero (f.target_app c)).trans (ih (G.target c))
+
+/-- The hom globular set between two objects. Its `n`-cells are genuine
+`(n+1)`-cells of `G` with the specified iterated zero-dimensional endpoints.
+This dimension shift is the basis of recursively labelled pasting diagrams. -/
+def hom (G : GlobularSet.{u}) (a b : G.Cell 0) : GlobularSet.{u} where
+  Cell n := { c : G.Cell (n + 1) // G.sourceZero c = a ∧ G.targetZero c = b }
+  source {n} c := ⟨G.source c.val,
+    c.property.1, (G.targetZero_globular c.val).trans c.property.2⟩
+  target {n} c := ⟨G.target c.val,
+    (G.sourceZero_globular c.val).symm.trans c.property.1, c.property.2⟩
+  source_source c := Subtype.ext (G.source_source c.val)
+  target_source c := Subtype.ext (G.target_source c.val)
+
+/-- A globular map induces maps on all its hom globular sets, retaining the
+underlying cell and both endpoint equations. -/
+def Map.hom {G : GlobularSet.{u}} {H : GlobularSet.{v}} (f : Map G H)
+    (a b : G.Cell 0) : Map (G.hom a b) (H.hom (f.app a) (f.app b)) where
+  app {n} c := ⟨f.app c.val,
+    (f.sourceZero c.val).trans (_root_.congrArg f.app c.property.1),
+    (f.targetZero c.val).trans (_root_.congrArg f.app c.property.2)⟩
+  source_app c := Subtype.ext (f.source_app c.val)
+  target_app c := Subtype.ext (f.target_app c.val)
+
+theorem Map.hom_id (G : GlobularSet.{u}) (a b : G.Cell 0) :
+    (Map.id G).hom a b = Map.id (G.hom a b) := by
+  apply Map.ext
+  intro n c
+  exact Subtype.ext rfl
+
+theorem Map.hom_comp {G : GlobularSet.{u}} {H : GlobularSet.{v}} {K : GlobularSet.{w}}
+    (f : Map G H) (g : Map H K) (a b : G.Cell 0) :
+    (Map.comp g f).hom a b = Map.comp (g.hom (f.app a) (f.app b)) (f.hom a b) := by
+  apply Map.ext
+  intro n c
+  exact Subtype.ext rfl
+
 end GlobularSet
 
 /-- Raw one-cells, including their original rewrite-step lists. -/
