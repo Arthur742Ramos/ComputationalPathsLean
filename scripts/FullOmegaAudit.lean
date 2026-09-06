@@ -119,6 +119,16 @@ completion gate for the full weak omega-groupoid theorem. -/
 #print axioms GlobularCollection.associatorIso
 #print axioms GlobularCollection.Hom.associateInv_natural
 #print axioms GlobularCollection.Hom.triangle_inv
+#print axioms GlobularCollection.Hom.pentagon_inv
+
+example (A B C D : GlobularCollection.{u}) :
+    GlobularCollection.Hom.comp (GlobularCollection.Hom.associateInv (A.substitute B) C D)
+      (GlobularCollection.Hom.associateInv A B (C.substitute D)) =
+    GlobularCollection.Hom.comp
+      (GlobularCollection.Hom.substitute (GlobularCollection.Hom.associateInv A B C) (GlobularCollection.Hom.id D))
+      (GlobularCollection.Hom.comp (GlobularCollection.Hom.associateInv A (B.substitute C) D)
+        (GlobularCollection.Hom.substitute (GlobularCollection.Hom.id A) (GlobularCollection.Hom.associateInv B C D))) :=
+  GlobularCollection.Hom.pentagon_inv A B C D
 
 example (C D : GlobularCollection.{u}) :
     GlobularCollection.Hom.comp

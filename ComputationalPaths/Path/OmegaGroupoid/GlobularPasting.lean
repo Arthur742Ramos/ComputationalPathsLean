@@ -6088,6 +6088,62 @@ theorem triangle_inv (C D : GlobularCollection.{u}) :
         (Pasting.map_comp (identityApplicationOut D.operations) (Pasting.singletonGlobular D.operations) p.val.2).symm).trans
           (Pasting.flatten_map_singleton (Pasting.map (identityApplicationOut D.operations) p.val.2)))
 
+/-- Pentagon coherence for substitution, oriented along inverse associators. -/
+theorem pentagon_inv (A B C D : GlobularCollection.{u}) :
+    comp (associateInv (A.substitute B) C D) (associateInv A B (C.substitute D)) =
+      comp (substitute (associateInv A B C) (id D))
+        (comp (associateInv A (B.substitute C) D) (substitute (id A) (associateInv B C D))) := by
+  apply ext
+  apply GlobularSet.Map.ext
+  intro n p
+  apply Subtype.ext
+  refine Prod.ext ?_ ?_
+  · apply Subtype.ext
+    refine Prod.ext ?_ ?_
+    · apply Subtype.ext
+      refine Prod.ext rfl ?_
+      change Pasting.map (B.operation (C.application D.operations)) p.val.2 =
+        Pasting.map (B.operation C.operations) (Pasting.map ((B.substitute C).operation D.operations)
+          (Pasting.map (B.substitutionComparison C D.operations) p.val.2))
+      exact ((Pasting.map_comp ((B.substitute C).operation D.operations) (B.operation C.operations)
+        (Pasting.map (B.substitutionComparison C D.operations) p.val.2)).trans
+          (Pasting.map_comp (B.substitutionComparison C D.operations)
+            (GlobularSet.Map.comp (B.operation C.operations) ((B.substitute C).operation D.operations)) p.val.2)).symm
+    · change Pasting.map (C.operation D.operations)
+        ((Pasting.flattenGlobular (C.application D.operations)).app
+          (Pasting.map (B.inputs (C.application D.operations)) p.val.2)) =
+        (Pasting.flattenGlobular C.operations).app
+          (Pasting.map (B.inputs C.operations) (Pasting.map ((B.substitute C).operation D.operations)
+            (Pasting.map (B.substitutionComparison C D.operations) p.val.2)))
+      refine (Pasting.flatten_natural (C.operation D.operations)
+        (Pasting.map (B.inputs (C.application D.operations)) p.val.2)).trans ?_
+      apply _root_.congrArg (Pasting.flattenGlobular C.operations).app
+      exact (Pasting.map_comp (B.inputs (C.application D.operations))
+        (Pasting.mapGlobular (C.operation D.operations)) p.val.2).trans
+          ((Pasting.map_comp ((B.substitute C).operation D.operations) (B.inputs C.operations)
+            (Pasting.map (B.substitutionComparison C D.operations) p.val.2)).trans
+              (Pasting.map_comp (B.substitutionComparison C D.operations)
+                (GlobularSet.Map.comp (B.inputs C.operations) ((B.substitute C).operation D.operations)) p.val.2)).symm
+  · change (Pasting.flattenGlobular D.operations).app
+        (Pasting.map (C.inputs D.operations) ((Pasting.flattenGlobular (C.application D.operations)).app
+          (Pasting.map (B.inputs (C.application D.operations)) p.val.2))) =
+      Pasting.map (GlobularSet.Map.id D.operations) ((Pasting.flattenGlobular D.operations).app
+        (Pasting.map ((B.substitute C).inputs D.operations)
+          (Pasting.map (B.substitutionComparison C D.operations) p.val.2)))
+    refine Eq.trans ?_ (Pasting.map_id D.operations _).symm
+    refine (_root_.congrArg (Pasting.flattenGlobular D.operations).app
+      (Pasting.flatten_natural (C.inputs D.operations)
+        (Pasting.map (B.inputs (C.application D.operations)) p.val.2))).trans ?_
+    refine (Pasting.flatten_assoc D.operations
+      (Pasting.map (Pasting.mapGlobular (C.inputs D.operations))
+        (Pasting.map (B.inputs (C.application D.operations)) p.val.2))).trans ?_
+    apply _root_.congrArg (Pasting.flattenGlobular D.operations).app
+    exact ((Pasting.map_comp (Pasting.mapGlobular (C.inputs D.operations)) (Pasting.flattenGlobular D.operations)
+      (Pasting.map (B.inputs (C.application D.operations)) p.val.2)).trans
+        (Pasting.map_comp (B.inputs (C.application D.operations))
+          (GlobularSet.Map.comp (Pasting.flattenGlobular D.operations) (Pasting.mapGlobular (C.inputs D.operations))) p.val.2)).trans
+            (Pasting.map_comp (B.substitutionComparison C D.operations) ((B.substitute C).inputs D.operations) p.val.2).symm
+
 end Hom
 
 instance : CategoryTheory.Category.{u} GlobularCollection.{u} where

@@ -333,9 +333,14 @@ equality of collection maps, providing a faithful check for future coherence
 proofs. `Hom.associateInv_natural` now proves naturality in all three
 collections by the comparison's naturality in operations and inputs.
 `Hom.triangle_inv` proves triangle coherence in inverse-associator form,
-using the actual singleton-input flattening law. Pentagon coherence remains
-unproved; these structural laws alone still do not construct the requested
-contractible operad or its native computational-path action.
+using the actual singleton-input flattening law. `Hom.pentagon_inv` now proves
+pentagon coherence for four collections in the same inverse-associator
+orientation. Its proof separately preserves both operation layers and the
+flattened inputs using relabelling composition, flattening naturality, and
+flattening associativity. These verified structural equations alone still
+do not construct the requested contractible operad or its native
+computational-path action; formal packaging and the operad/algebra bridge
+remain required.
 
 `evaluate` now evaluates labelled diagrams by dimension recursion into a
 target equipped with horizontal operations in all its iterated hom contexts
