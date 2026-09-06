@@ -583,6 +583,125 @@ theorem mapAlong_comp {Q : Type w} {E : O → O → Type u}
 
 end Chain
 
+namespace Chain
+
+theorem packed_eq_heq {Q : Type u} {D : Q → Q → Type u}
+    {a b c d : Q} (p : Chain D a b) (q : Chain D c d)
+    (h : (⟨a, b, p⟩ : Σ x y, Chain D x y) = ⟨c, d, q⟩) : HEq p q := by
+  injection h with hac hpq
+  cases hac
+  have hh := eq_of_heq hpq
+  injection hh with hbd hpq
+
+theorem cons_heq_components {Q : Type u} {D : Q → Q → Type u}
+    {x y z x' y' z' : Q} (a : D x y) (p : Chain D y z)
+    (b : D x' y') (q : Chain D y' z') (hx : x = x') (hz : z = z')
+    (h : HEq (Chain.cons a p) (Chain.cons b q)) :
+    y = y' ∧ HEq a b ∧ HEq p q := by
+  cases hx
+  cases hz
+  have he := eq_of_heq h
+  injection he with _ hy _ hab hpq
+  exact ⟨hy, hab, hpq⟩
+
+theorem nil_not_heq_cons {Q : Type u} {D : Q → Q → Type u}
+    {x x' y' z' : Q} (b : D x' y') (q : Chain D y' z')
+    (hx : x = x') (hz : x = z') : ¬ HEq (Chain.nil x : Chain D x x) (Chain.cons b q) := by
+  cases hx
+  cases hz
+  intro h
+  have he := eq_of_heq h
+  cases he
+
+/-- Match chains whose vertex sets differ. Internal matching vertices are
+derived from the equality of relabelled chains, not supplied separately. -/
+noncomputable def zipAlong {O P Q : Type u}
+    {E : O → O → Type u} {F : P → P → Type u} {D : Q → Q → Type u}
+    (s : O → Q) (t : P → Q)
+    (se : {x y : O} → E x y → D (s x) (s y))
+    (te : {x y : P} → F x y → D (t x) (t y))
+    (R : {p : O × P // s p.1 = t p.2} → {p : O × P // s p.1 = t p.2} → Type u)
+    (op : ∀ {a b : {p : O × P // s p.1 = t p.2}},
+      (e : E a.val.1 b.val.1) → (f : F a.val.2 b.val.2) → HEq (se e) (te f) → R a b)
+    {x y : O} {x' y' : P} (p : Chain E x y) (q : Chain F x' y')
+    (hx : s x = t x') (hy : s y = t y')
+    (h : HEq (p.mapAlong s se) (q.mapAlong t te)) :
+    Chain R ⟨(x, x'), hx⟩ ⟨(y, y'), hy⟩ := by
+  induction p generalizing x' y' with
+  | nil x =>
+    cases q with
+    | nil => exact .nil _
+    | cons f q => exact False.elim (nil_not_heq_cons (te f) (q.mapAlong t te) hx hy h)
+  | @cons x z y e p ih =>
+    cases q with
+    | nil => exact False.elim (nil_not_heq_cons (se e) (p.mapAlong s se) hx.symm hy.symm (HEq.symm h))
+    | @cons x' z' y' f q =>
+      have hc := cons_heq_components (se e) (p.mapAlong s se) (te f) (q.mapAlong t te) hx hy h
+      exact .cons (op (a := ⟨(x, x'), hx⟩) (b := ⟨(z, z'), hc.1⟩) e f hc.2.1)
+        (ih q hc.1 hy hc.2.2)
+
+theorem zipAlong_left {O P Q : Type u}
+    {E : O → O → Type u} {F : P → P → Type u} {D : Q → Q → Type u}
+    (s : O → Q) (t : P → Q)
+    (se : {x y : O} → E x y → D (s x) (s y))
+    (te : {x y : P} → F x y → D (t x) (t y))
+    (R : {p : O × P // s p.1 = t p.2} → {p : O × P // s p.1 = t p.2} → Type u)
+    (op : ∀ {a b : {p : O × P // s p.1 = t p.2}},
+      (e : E a.val.1 b.val.1) → (f : F a.val.2 b.val.2) → HEq (se e) (te f) → R a b)
+    (left : ∀ {a b}, R a b → E a.val.1 b.val.1)
+    (law : ∀ {a b} (e : E a.val.1 b.val.1) (f : F a.val.2 b.val.2) h,
+      left (op (a := a) (b := b) e f h) = e)
+    {x y : O} {x' y' : P} (p : Chain E x y) (q : Chain F x' y')
+    (hx : s x = t x') (hy : s y = t y')
+    (h : HEq (p.mapAlong s se) (q.mapAlong t te)) :
+    (zipAlong s t se te R op p q hx hy h).mapAlong (fun a => a.val.1) left = p := by
+  induction p generalizing x' y' with
+  | nil x =>
+    cases q with
+    | nil => rfl
+    | cons f q => exact False.elim (nil_not_heq_cons (te f) (q.mapAlong t te) hx hy h)
+  | @cons x z y e p ih =>
+    cases q with
+    | nil => exact False.elim (nil_not_heq_cons (se e) (p.mapAlong s se) hx.symm hy.symm (HEq.symm h))
+    | @cons x' z' y' f q =>
+      have hc := cons_heq_components (se e) (p.mapAlong s se) (te f) (q.mapAlong t te) hx hy h
+      change Chain.cons (left (op (a := ⟨(x, x'), hx⟩) (b := ⟨(z, z'), hc.1⟩) e f hc.2.1))
+        ((zipAlong s t se te R op p q hc.1 hy hc.2.2).mapAlong (fun a => a.val.1) left) = _
+      exact _root_.congrArg₂ Chain.cons
+        (law (a := ⟨(x, x'), hx⟩) (b := ⟨(z, z'), hc.1⟩) e f hc.2.1) (ih q hc.1 hy hc.2.2)
+
+theorem zipAlong_right {O P Q : Type u}
+    {E : O → O → Type u} {F : P → P → Type u} {D : Q → Q → Type u}
+    (s : O → Q) (t : P → Q)
+    (se : {x y : O} → E x y → D (s x) (s y))
+    (te : {x y : P} → F x y → D (t x) (t y))
+    (R : {p : O × P // s p.1 = t p.2} → {p : O × P // s p.1 = t p.2} → Type u)
+    (op : ∀ {a b : {p : O × P // s p.1 = t p.2}},
+      (e : E a.val.1 b.val.1) → (f : F a.val.2 b.val.2) → HEq (se e) (te f) → R a b)
+    (right : ∀ {a b}, R a b → F a.val.2 b.val.2)
+    (law : ∀ {a b} (e : E a.val.1 b.val.1) (f : F a.val.2 b.val.2) h,
+      right (op (a := a) (b := b) e f h) = f)
+    {x y : O} {x' y' : P} (p : Chain E x y) (q : Chain F x' y')
+    (hx : s x = t x') (hy : s y = t y')
+    (h : HEq (p.mapAlong s se) (q.mapAlong t te)) :
+    (zipAlong s t se te R op p q hx hy h).mapAlong (fun a => a.val.2) right = q := by
+  induction p generalizing x' y' with
+  | nil x =>
+    cases q with
+    | nil => rfl
+    | cons f q => exact False.elim (nil_not_heq_cons (te f) (q.mapAlong t te) hx hy h)
+  | @cons x z y e p ih =>
+    cases q with
+    | nil => exact False.elim (nil_not_heq_cons (se e) (p.mapAlong s se) hx.symm hy.symm (HEq.symm h))
+    | @cons x' z' y' f q =>
+      have hc := cons_heq_components (se e) (p.mapAlong s se) (te f) (q.mapAlong t te) hx hy h
+      change Chain.cons (right (op (a := ⟨(x, x'), hx⟩) (b := ⟨(z, z'), hc.1⟩) e f hc.2.1))
+        ((zipAlong s t se te R op p q hc.1 hy hc.2.2).mapAlong (fun a => a.val.2) right) = _
+      exact _root_.congrArg₂ Chain.cons
+        (law (a := ⟨(x, x'), hx⟩) (b := ⟨(z, z'), hc.1⟩) e f hc.2.1) (ih q hc.1 hy hc.2.2)
+
+end Chain
+
 /-- The dimension-recursive labelled pasting carrier. -/
 def Pasting : Nat → GlobularSet.{u} → Type u
   | 0, G => G.Cell 0
@@ -934,6 +1053,75 @@ theorem pullbackComparison_singleton {G H K : GlobularSet.{u}}
       (singleton p.val.1, singleton p.val.2) :=
   Prod.ext (map_singleton (GlobularSet.pullbackFst f g) p)
     (map_singleton (GlobularSet.pullbackSnd f g) p)
+
+theorem map_homInclusion_heq {K : GlobularSet.{u}} {a b c d : K.Cell 0} {n : Nat}
+    (p : Pasting n (K.hom a b)) (q : Pasting n (K.hom c d))
+    (ha : a = c) (hb : b = d) (h : HEq p q) :
+    map (GlobularSet.homInclusion K a b) p = map (GlobularSet.homInclusion K c d) q := by
+  cases ha
+  cases hb
+  cases h
+  rfl
+
+/-- Reconstruct a labelled pasting from two matching projections in every
+dimension. Internal vertices and hom labels are reconstructed recursively. -/
+theorem pullback_pasting_exists {n : Nat} {G H K : GlobularSet.{u}}
+    (f : GlobularSet.Map G K) (g : GlobularSet.Map H K)
+    (p : Pasting n G) (q : Pasting n H) (h : map f p = map g q) :
+    ∃ r : Pasting n (GlobularSet.pullback f g),
+      map (GlobularSet.pullbackFst f g) r = p ∧ map (GlobularSet.pullbackSnd f g) r = q := by
+  induction n generalizing G H K with
+  | zero => exact ⟨⟨(p, q), h⟩, rfl, rfl⟩
+  | succ n ih =>
+    rcases p with ⟨a, b, p⟩
+    rcases q with ⟨a', b', q⟩
+    have ha : f.app a = g.app a' := _root_.congrArg Sigma.fst h
+    have hb : f.app b = g.app b' := _root_.congrArg (fun z => z.2.1) h
+    have hc : HEq (p.mapAlong (F := fun x y => Pasting n (K.hom x y)) f.app
+        (fun {x y} e => map (f.hom x y) e))
+        (q.mapAlong (F := fun x y => Pasting n (K.hom x y)) g.app
+          (fun {x y} e => map (g.hom x y) e)) := by
+      exact Chain.packed_eq_heq _ _ h
+    let B := GlobularSet.pullback f g
+    let R (x y : B.Cell 0) := Pasting n (B.hom x y)
+    have edge {x y : B.Cell 0} (e : Pasting n (G.hom x.val.1 y.val.1))
+        (d : Pasting n (H.hom x.val.2 y.val.2))
+        (he : HEq (map (f.hom _ _) e) (map (g.hom _ _) d)) :
+        ∃ r : R x y, map ((GlobularSet.pullbackFst f g).hom x y) r = e ∧
+          map ((GlobularSet.pullbackSnd f g).hom x y) r = d := by
+      let f' := GlobularSet.Map.comp f.shift (GlobularSet.homInclusion G x.val.1 y.val.1)
+      let g' := GlobularSet.Map.comp g.shift (GlobularSet.homInclusion H x.val.2 y.val.2)
+      have hm : map f' e = map g' d :=
+        (map_comp (f.hom _ _) (GlobularSet.homInclusion K _ _) e).symm.trans
+          ((map_homInclusion_heq _ _ x.property y.property he).trans
+            (map_comp (g.hom _ _) (GlobularSet.homInclusion K _ _) d))
+      obtain ⟨r, hr, hs⟩ := ih f' g' e d hm
+      refine ⟨map (GlobularSet.pullbackHomBackward f g x y) r, ?_, ?_⟩
+      · exact (map_comp _ _ r).trans
+          ((_root_.congrArg (fun k => map k r) (GlobularSet.pullbackHomBackward_fst f g x y)).trans hr)
+      · exact (map_comp _ _ r).trans
+          ((_root_.congrArg (fun k => map k r) (GlobularSet.pullbackHomBackward_snd f g x y)).trans hs)
+    let op {x y : B.Cell 0} (e : Pasting n (G.hom x.val.1 y.val.1))
+        (d : Pasting n (H.hom x.val.2 y.val.2))
+        (he : HEq (map (f.hom _ _) e) (map (g.hom _ _) d)) : R x y := (edge e d he).choose
+    refine ⟨⟨⟨(a, a'), ha⟩, ⟨(b, b'), hb⟩,
+      Chain.zipAlong (D := fun x y => Pasting n (K.hom x y)) f.app g.app (fun e => map (f.hom _ _) e)
+        (fun d => map (g.hom _ _) d) R op p q ha hb hc⟩, ?_, ?_⟩
+    · apply _root_.congrArg (fun z => (⟨a, b, z⟩ : Pasting (n + 1) G))
+      exact Chain.zipAlong_left _ _ _ _ R op
+        (fun {x y} r => map ((GlobularSet.pullbackFst f g).hom x y) r)
+        (fun e d he => (edge e d he).choose_spec.1) p q ha hb hc
+    · apply _root_.congrArg (fun z => (⟨a', b', z⟩ : Pasting (n + 1) H))
+      exact Chain.zipAlong_right _ _ _ _ R op
+        (fun {x y} r => map ((GlobularSet.pullbackSnd f g).hom x y) r)
+        (fun e d he => (edge e d he).choose_spec.2) p q ha hb hc
+
+theorem pullbackComparison_surjective {G H K : GlobularSet.{u}}
+    (f : GlobularSet.Map G K) (g : GlobularSet.Map H K) (n : Nat) :
+    Function.Surjective ((pullbackComparison f g).app (n := n)) := by
+  intro p
+  obtain ⟨r, hr, hs⟩ := pullback_pasting_exists f g p.val.1 p.val.2 p.property
+  exact ⟨r, Subtype.ext (Prod.ext hr hs)⟩
 
 /-- Identity pastings in every dimension: the empty chain on an object,
 and recursively the identity on each label in higher dimensions. -/

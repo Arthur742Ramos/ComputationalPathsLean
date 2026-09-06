@@ -123,8 +123,17 @@ For the dimension-recursive inverse, `pullbackHomForward` and
 the pullback of the two fixed-endpoint homs over the shifted common target.
 Both are globular maps; both inverse equations and the two backward
 projection equations are proved. The use of the shifted target avoids
-silently identifying distinct endpoint fibres. The remaining chain-matching
-and recursive reconstruction proof for `pullbackComparison` is not yet done.
+silently identifying distinct endpoint fibres.
+
+`Chain.zipAlong` now matches chains over different vertex sets, deriving
+internal vertex matches and heterogeneous label equalities from the common
+relabelled chain. Its two projection theorems recover the original chains.
+`pullback_pasting_exists` uses this zipper and the hom-pullback inverse by
+dimension recursion to reconstruct a pasting from any two matching pastings.
+`pullbackComparison_surjective` therefore proves surjectivity at every
+dimension, including empty chains. Injectivity remains unproved, so the
+comparison is not yet verified invertible and full pullback preservation
+remains open.
 
 `evaluate` now evaluates labelled diagrams by dimension recursion into a
 target equipped with horizontal operations in all its iterated hom contexts
