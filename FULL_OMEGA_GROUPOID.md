@@ -351,6 +351,17 @@ unitors, including every required coherence field. This supplies a standard
 lawful setting for an operad as a monoid in collections; it does not yet
 supply such a contractible monoid or its action on the native tower.
 
+For any actual Mathlib `MonObj C` in this substitution category,
+`operadUnit` and `operadMul` now construct labelled unit and multiplication
+maps. They use the monoid's operation maps, the identity-application inclusion,
+and the verified substitution comparison. `operadUnitTransformation` and
+`operadMulTransformation` prove naturality under every input relabelling.
+`operadUnit_arity` and `operadMul_arity` identify their input projections
+with the singleton and flattening maps of the concrete pasting monad.
+The application-level monad laws still need verification before this is
+packaged as a monad or monad morphism. No concrete contractible monoid or
+native action is asserted by this conditional construction.
+
 `evaluate` now evaluates labelled diagrams by dimension recursion into a
 target equipped with horizontal operations in all its iterated hom contexts
 (`RecursiveComposition`). The evaluator is implemented, not a field assumed

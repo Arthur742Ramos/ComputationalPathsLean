@@ -3,6 +3,7 @@ import Mathlib.CategoryTheory.Functor.Basic
 import Mathlib.CategoryTheory.NatTrans
 import Mathlib.CategoryTheory.Monad.Algebra
 import Mathlib.CategoryTheory.Monoidal.Category
+import Mathlib.CategoryTheory.Monoidal.Mon
 
 /-!
 # Recursively labelled globular pasting diagrams
@@ -6242,6 +6243,60 @@ noncomputable instance monoidalCategory : MonoidalCategory GlobularCollection.{u
   (rightUnitor_naturality := Hom.rightUnit_natural)
   (pentagon := pentagon)
   (triangle := triangle)
+
+/-- A monoid in the verified substitution category supplies labelled
+unit operations. No action on a particular globular carrier is assumed. -/
+noncomputable def operadUnit (C : GlobularCollection.{u}) [MonObj C] (G : GlobularSet.{u}) :
+    GlobularSet.Map G (C.application G) :=
+  GlobularSet.Map.comp ((MonObj.one (X := C)).application G) (identityApplicationIn G)
+
+noncomputable def operadMul (C : GlobularCollection.{u}) [MonObj C] (G : GlobularSet.{u}) :
+    GlobularSet.Map (C.application (C.application G)) (C.application G) :=
+  GlobularSet.Map.comp ((MonObj.mul (X := C)).application G) (C.substitutionComparison C G)
+
+theorem operadUnit_natural (C : GlobularCollection.{u}) [MonObj C] {G H : GlobularSet.{u}}
+    (f : GlobularSet.Map G H) :
+    GlobularSet.Map.comp (C.operadUnit H) f = GlobularSet.Map.comp (C.map f) (C.operadUnit G) := by
+  apply GlobularSet.Map.ext
+  intro n p
+  exact Subtype.ext (Prod.ext rfl (Pasting.map_singleton f p).symm)
+
+theorem operadMul_natural (C : GlobularCollection.{u}) [MonObj C] {G H : GlobularSet.{u}}
+    (f : GlobularSet.Map G H) :
+    GlobularSet.Map.comp (C.operadMul H) (C.map (C.map f)) =
+      GlobularSet.Map.comp (C.map f) (C.operadMul G) := by
+  apply GlobularSet.Map.ext
+  intro n p
+  have hc := _root_.congrArg (fun k : GlobularSet.Map (C.application (C.application G))
+    ((C.substitute C).application H) => k.app p) (C.substitutionComparison_natural C f)
+  have hm := _root_.congrArg (fun k : GlobularSet.Map ((C.substitute C).application G)
+    (C.application H) => k.app ((C.substitutionComparison C G).app p))
+      ((MonObj.mul (X := C)).application_natural f)
+  exact (_root_.congrArg ((MonObj.mul (X := C)).application H).app hc).trans hm
+
+noncomputable def operadUnitTransformation (C : GlobularCollection.{u}) [MonObj C] :
+    NatTrans (Functor.id GlobularSet.{u}) C.functor where
+  app := C.operadUnit
+  naturality {X Y} f := C.operadUnit_natural f
+
+noncomputable def operadMulTransformation (C : GlobularCollection.{u}) [MonObj C] :
+    NatTrans (Functor.comp C.functor C.functor) C.functor where
+  app := C.operadMul
+  naturality {X Y} f := C.operadMul_natural f
+
+theorem operadUnit_arity (C : GlobularCollection.{u}) [MonObj C] (G : GlobularSet.{u}) :
+    GlobularSet.Map.comp (C.inputs G) (C.operadUnit G) = Pasting.singletonGlobular G := by
+  apply GlobularSet.Map.ext
+  intro n p
+  rfl
+
+theorem operadMul_arity (C : GlobularCollection.{u}) [MonObj C] (G : GlobularSet.{u}) :
+    GlobularSet.Map.comp (C.inputs G) (C.operadMul G) =
+      GlobularSet.Map.comp (Pasting.flattenGlobular G)
+        (GlobularSet.Map.comp (Pasting.mapGlobular (C.inputs G)) (C.inputs (C.application G))) := by
+  apply GlobularSet.Map.ext
+  intro n p
+  rfl
 
 end GlobularCollection
 
