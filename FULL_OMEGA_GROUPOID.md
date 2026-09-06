@@ -139,8 +139,17 @@ flattening commute in every dimension, and `flattenNatTrans` packages this
 as a Mathlib natural transformation from the doubled pasting functor to the
 pasting functor. The proof uses actual preservation of cut composition and
 units (`mapGlobular_preserves`), their inheritance to hom sets, and the
-implemented evaluator's pre- and postcomposition laws. The other unit
-equation, associativity, and the free universal property remain unfinished.
+implemented evaluator's pre- and postcomposition laws.
+
+`flatten_map_singleton` now proves the other unit equation on every labelled
+diagram. The proof uses `homPastingInclusion`, a boundary- and
+cut-operation-preserving map from the pasting carrier of a hom set into
+the corresponding hom set of the original pasting carrier. Its singleton
+factorization is exact. `evaluate_singletonLabels` and
+`recursive_fold_single` recover all the original labels and chain structure,
+including empty chains. `singletonNatTrans` packages the unit naturally;
+`flatten_unit_left` and `flatten_unit_right` are both equations of globular
+maps. Associativity and the free universal property remain unfinished.
 Consequently this is not yet a proved monad or globular operad.
 
 Endpoint-indexed chain substitution now has proved left/right unit and

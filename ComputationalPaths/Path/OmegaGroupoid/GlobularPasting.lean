@@ -8,8 +8,8 @@ import Mathlib.CategoryTheory.NatTrans
 Objects label dimension zero. In dimension `n+1`, a diagram is a composable
 chain of `n`-diagrams in hom globular sets. The carrier and adjacent boundary
 maps are defined by genuine dimension recursion. Candidate multiplication
-is an actual globular flattening map with one verified unit equation; the
-remaining monad laws and free strict-category property are not yet claimed.
+is natural globular flattening with both verified unit equations; monad
+associativity and the free strict-category property are not yet claimed.
 -/
 
 namespace ComputationalPaths.Path.OmegaFoundations
@@ -520,6 +520,13 @@ theorem mapAlong_id {E : O → O → Type u} {x y : O} (p : Chain E x y) :
   induction p with
   | nil => rfl
   | cons t p ih => exact _root_.congrArg (Chain.cons t) ih
+
+theorem mapAlong_identity_vertices {E F : O → O → Type u}
+    (f : {x y : O} → E x y → F x y) {x y : O} (p : Chain E x y) :
+    p.mapAlong (fun x => x) f = p.map f := by
+  induction p with
+  | nil => rfl
+  | cons e p ih => exact _root_.congrArg (Chain.cons (f e)) ih
 
 theorem mapAlong_append {E : O → O → Type u} {F : P → P → Type v}
     (f : O → P) (e : {x y : O} → E x y → F (f x) (f y))
@@ -2915,6 +2922,108 @@ theorem horizontalComposition_fold {G : GlobularSet.{u}} {n : Nat} {a b : G.Cell
       (unpackFibre (packFibre (p.bind (fun e => e))))) = _
     rw [unpack_packFibre, unpack_packFibre]
     rfl
+
+/-- Include a pasting diagram in one hom set as a single horizontal edge
+of the original pasting carrier. Its labels are retained literally. -/
+def homPastingInclusion (G : GlobularSet.{u}) (a b : G.Cell 0) :
+    GlobularSet.Map (globular (G.hom a b)) ((globular G).hom a b) where
+  app p := packFibre (Chain.single p)
+  source_app _ := Subtype.ext rfl
+  target_app _ := Subtype.ext rfl
+
+theorem homPastingInclusion_preserves (G : GlobularSet.{u}) (a b : G.Cell 0) :
+    CutOperations.Preserves (cutOperations (G.hom a b)) ((cutOperations G).hom a b)
+      (homPastingInclusion G a b) where
+  compose c p q h h' := Subtype.ext rfl
+  unit c p := Subtype.ext rfl
+
+/-- The native singleton inclusion factors through the actual hom-pasting
+inclusion; this is an equation of globular maps, including all boundaries. -/
+theorem singleton_hom_factor (G : GlobularSet.{u}) (a b : G.Cell 0) :
+    (singletonGlobular G).hom a b =
+      GlobularSet.Map.comp (homPastingInclusion G a b) (singletonGlobular (G.hom a b)) := by
+  apply GlobularSet.Map.ext
+  intro n p
+  apply Subtype.ext
+  exact (singleton_of_hom G p).symm
+
+/-- The concrete recursive evaluator folds a chain of single horizontal
+edges back to that same chain, including the empty chain. -/
+theorem recursive_fold_single {G : GlobularSet.{u}} {n : Nat} {a b : G.Cell 0}
+    (p : Horizontal n G a b) :
+    (recursiveComposition G .root).fold (p.map (fun {x y} e => (homPastingInclusion G x y).app e)) =
+      packFibre p := by
+  induction p with
+  | nil => rfl
+  | cons e p ih =>
+    change (cutOperations G).horizontalMul (homPastingInclusion G _ _ |>.app e)
+      ((recursiveComposition G .root).fold (p.map (fun {x y} e => (homPastingInclusion G x y).app e))) = _
+    rw [ih]
+    rfl
+
+/-- Evaluation of the generating-cell inclusion recovers every labelled
+pasting diagram. The recursive step uses the actual hom-pasting inclusion,
+not an identification of different raw cell types. -/
+theorem evaluate_singletonLabels {G : GlobularSet.{u}} {n : Nat} (p : Pasting n G) :
+    evaluate (recursiveComposition G) .root (singletonGlobular G) p = p := by
+  induction n generalizing G with
+  | zero => rfl
+  | succ n ih =>
+    rcases p with ⟨a, b, p⟩
+    have he : ∀ {x y : G.Cell 0} (e : Pasting n (G.hom x y)),
+        evaluate (recursiveComposition G) ((HomContext.root (H := globular G)).hom x y)
+          ((singletonGlobular G).hom x y) e =
+          (homPastingInclusion G x y).app e := by
+      intro x y e
+      have ht := evaluate_postcompose (cutOperations (G.hom x y)) (cutOperations G)
+        (cutOperations_compatible (G.hom x y)) (cutOperations_compatible G)
+        .root ((HomContext.root (H := globular G)).hom x y) (homPastingInclusion G x y)
+        (homPastingInclusion_preserves G x y) (singletonGlobular (G.hom x y)) e
+      exact (_root_.congrArg (fun f => evaluate (recursiveComposition G)
+        ((HomContext.root (H := globular G)).hom x y) f e)
+        (singleton_hom_factor G x y)).trans
+          (ht.symm.trans (_root_.congrArg (fun z => (homPastingInclusion G x y).app z) (ih e)))
+    change ((recursiveComposition G .root).fold
+      (p.mapAlong (fun x => x) (fun {x y} e => evaluate (recursiveComposition G)
+        ((HomContext.root (H := globular G)).hom x y) ((singletonGlobular G).hom x y) e))).val = pack p
+    exact (_root_.congrArg (fun q => ((recursiveComposition G .root).fold q).val)
+      ((Chain.mapAlong_congr _ _ _ (fun e => he e) p).trans
+        (Chain.mapAlong_identity_vertices _ p))).trans
+          (_root_.congrArg Subtype.val (recursive_fold_single p))
+
+/-- The second multiplication unit equation: replacing every generating
+label by a singleton, then flattening, retains the entire original diagram. -/
+theorem flatten_map_singleton {G : GlobularSet.{u}} {n : Nat} (p : Pasting n G) :
+    (flattenGlobular G).app (n := n) (map (singletonGlobular G) p) = p := by
+  have hp := evaluate_precompose (recursiveComposition G) .root
+    (GlobularSet.Map.id (globular G)) (singletonGlobular G) p
+  have he : GlobularSet.Map.comp (GlobularSet.Map.id (globular G)) (singletonGlobular G) =
+      singletonGlobular G := by
+    apply GlobularSet.Map.ext
+    intro n c
+    rfl
+  exact hp.trans ((_root_.congrArg (fun f => evaluate (recursiveComposition G) .root f p) he).trans
+    (evaluate_singletonLabels p))
+
+def singletonNatTrans : CategoryTheory.NatTrans (CategoryTheory.Functor.id GlobularSet.{u}) pastingFunctor where
+  app := singletonGlobular
+  naturality {X Y} f := (singleton_natural f).symm
+
+/-- First unit law as an equation of actual globular maps. -/
+theorem flatten_unit_left (G : GlobularSet.{u}) :
+    GlobularSet.Map.comp (flattenGlobular G) (singletonGlobular (globular G)) =
+      GlobularSet.Map.id (globular G) := by
+  apply GlobularSet.Map.ext
+  intro n p
+  exact flatten_singleton p
+
+/-- Second unit law as an equation of actual globular maps. -/
+theorem flatten_unit_right (G : GlobularSet.{u}) :
+    GlobularSet.Map.comp (flattenGlobular G) (mapGlobular (singletonGlobular G)) =
+      GlobularSet.Map.id (globular G) := by
+  apply GlobularSet.Map.ext
+  intro n p
+  exact flatten_map_singleton p
 
 end Pasting
 
