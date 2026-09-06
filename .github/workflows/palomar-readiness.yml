@@ -25,8 +25,8 @@ jobs:
       - uses: leanprover/lean-action@38fbc41a8c28c4cbaec22d7f7de508ec2e7c0dd9
         with:
           build: false
-      - name: Build the operadic certificate comparisons and universal systems
-        run: lake build ComputationalPaths.Path.OmegaGroupoid.NativeAssociativityBridge ComputationalPaths.Path.OmegaGroupoid.NativeUniversalInvertibility
+      - name: Build the full native weak omega-groupoid package
+        run: lake build ComputationalPaths.Path.OmegaGroupoid.NativeWeakOmegaGroupoid
       - name: Audit the full construction and all-dimensional theorem dependencies
         run: lake env lean scripts/FullOmegaAudit.lean
 

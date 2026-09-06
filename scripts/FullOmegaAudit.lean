@@ -4,6 +4,28 @@ import ComputationalPaths.Path.OmegaGroupoid.GlobularEndomorphism
 import ComputationalPaths.Path.OmegaGroupoid.NativeOperadicOperations
 import ComputationalPaths.Path.OmegaGroupoid.NativeAssociativityBridge
 import ComputationalPaths.Path.OmegaGroupoid.NativeUniversalInvertibility
+import ComputationalPaths.Path.OmegaGroupoid.NativeWeakOmegaGroupoid
+
+#print axioms ComputationalPaths.Path.OmegaFoundations.NormalizedContractibleOperad.arityMonadHom
+#print axioms ComputationalPaths.Path.OmegaFoundations.NormalizedContractibleOperad.arity_globular_pullback
+#print axioms ComputationalPaths.Path.OmegaFoundations.NormalizedContractibleOperad.objectsEquiv
+#print axioms ComputationalPaths.Path.OmegaFoundations.NormalizedContractibleOperad.objectsEquiv_natural
+#print axioms ComputationalPaths.Path.OmegaFoundations.NormalizedContractibleOperad.terminalContraction
+#print axioms ComputationalPaths.Path.OmegaFoundations.NativeWeakOmega.category
+#print axioms ComputationalPaths.Path.OmegaFoundations.NativeWeakOmega.fullWeakOmegaGroupoid
+#print axioms ComputationalPaths.Path.OmegaFoundations.NativeWeakOmega.identity_objects
+#print axioms ComputationalPaths.Path.OmegaFoundations.NativeWeakOmega.leftUnitor_operadic_boundary
+#print axioms ComputationalPaths.Path.OmegaFoundations.NativeWeakOmega.rightUnitor_operadic_boundary
+#print axioms ComputationalPaths.Path.OmegaFoundations.NativeWeakOmega.cancelRight_operadic_boundary
+#print axioms ComputationalPaths.Path.OmegaFoundations.NativeWeakOmega.cancelLeft_operadic_boundary
+#print axioms ComputationalPaths.Path.OmegaFoundations.NativeWeakOmega.Semantics.pathComponentsEquiv
+#print axioms ComputationalPaths.Path.OmegaFoundations.NativeWeakOmega.Semantics.loopClassesUnique
+#print axioms ComputationalPaths.Path.OmegaFoundations.NativeWeakOmega.Semantics.higher_cells_determined_by_boundary
+#print axioms ComputationalPaths.Path.OmegaFoundations.NativeWeakOmega.Semantics.raw_rewrites_still_distinct
+#print axioms ComputationalPaths.Path.OmegaFoundations.NativeTower.leftUnitor_paths
+#print axioms ComputationalPaths.Path.OmegaFoundations.NativeTower.rightUnitor_paths
+#print axioms ComputationalPaths.Path.OmegaFoundations.NativeTower.cancelRight_paths
+#print axioms ComputationalPaths.Path.OmegaFoundations.NativeTower.cancelLeft_paths
 
 #print axioms ComputationalPaths.Path.OmegaFoundations.NativeUniversal.BoundaryOperations.weaklyInvertible_unfold
 #print axioms ComputationalPaths.Path.OmegaFoundations.NativeUniversal.BoundaryOperations.all_cells_weaklyInvertible
@@ -56,8 +78,8 @@ open ComputationalPaths
 open ComputationalPaths.Path
 open ComputationalPaths.Path.OmegaFoundations
 
-/-! Incremental audit. This checks the foundations only; it is not yet a
-completion gate for the full weak omega-groupoid theorem. -/
+/-! Full construction audit, including the definition-level native package,
+its semantic limitations, and the preserved independent certificate. -/
 
 #print axioms NativeOperadic.compose_paths
 #print axioms NativeAssociativity.operadicAssociator_derivation

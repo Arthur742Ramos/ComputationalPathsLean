@@ -1,9 +1,15 @@
-# Full weak omega-groupoid construction: live obligations
+# Full weak omega-groupoid construction: development record
 
-Status: in progress. The completed associativity certificate remains in
-`ASSOCIATIVITY_HIGHER_COHERENCE.md`; it is not the theorem specified here.
+The definition-level native package is now implemented in
+`NativeWeakOmegaGroupoid.lean`. See [the completion audit](FULL_OMEGA_COMPLETION_AUDIT.md)
+for the authoritative result, definition correspondence, semantic limits,
+and verification commands. The sections below retain the incremental
+development history; references to remaining work describe those milestones.
 
-Current milestone: the normalized native endomorphism operad now has a
+The independent associativity certificate remains in
+`ASSOCIATIVITY_HIGHER_COHERENCE.md` and is explicitly compared, not replaced.
+
+Earlier milestone: the normalized native endomorphism operad now has a
 verified contraction and an actual algebra action on the native tower.
 Contraction-selected adjacent operations now have coinductive invertibility
 and explicit comparison cells to the earlier native operations. The full
