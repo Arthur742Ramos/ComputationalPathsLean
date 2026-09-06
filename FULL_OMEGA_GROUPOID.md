@@ -152,8 +152,17 @@ compositions (`sourceAt_map`, `targetAt_map`, `map_identityAt`,
 from the original boundary equality; no injectivity or boundary-equality
 reflection is assumed. The chain-level transport laws cover maps that change
 both vertices and labels (`mapAlong_zipOver`) as well as label-only maps
-(`map_zipOver`). Compatibility of composition with taking adjacent boundaries
-and the remaining cross-dimensional laws are not implied by naturality alone.
+(`map_zipOver`). These naturality laws alone do not imply cross-dimensional laws.
+
+Taking adjacent source and target now preserves composition at every strictly
+lower boundary (`dropSource_composeAt_boundary`, `dropTarget_composeAt_boundary`).
+The lower-dimensional composability proof is derived from the original one.
+The dimension-indexed `dropSource`/`dropTarget` operations are proved equal to
+the existing source/target after arithmetic reindexing (`dropSource_eq`,
+`dropTarget_eq`), and preserve the corresponding identity diagrams. All four
+combinations of lower source/target with either adjacent boundary are checked.
+Full interchange, identification of special-case operations, monad construction,
+and the eventual weak-groupoid action and invertibility remain incomplete.
 
 ## Semantic audit and completion gates
 

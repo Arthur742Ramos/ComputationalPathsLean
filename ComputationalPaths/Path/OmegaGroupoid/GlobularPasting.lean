@@ -1329,6 +1329,167 @@ theorem map_composeAt_natural (k n : Nat) {G H : GlobularSet.{u}} (f : GlobularS
       ((targetAt_map k n f p).trans ((_root_.congrArg (map f) h).trans (sourceAt_map k n f q).symm)) :=
   map_composeAt k n f p q h _
 
+/-- Adjacent source, indexed so the dimension gap decreases without hiding
+arithmetic casts inside a composition. `dropSource_eq` identifies this with
+the existing source operation. -/
+def dropSource : (k n : Nat) → {G : GlobularSet.{u}} →
+    Pasting ((n + 1) + k + 1) G → Pasting (n + k + 1) G
+  | 0, _, _, p => source p
+  | k + 1, n, G, ⟨a, b, p⟩ =>
+      ⟨a, b, p.map (fun {x y} e => dropSource k n (G := G.hom x y) e)⟩
+
+def dropTarget : (k n : Nat) → {G : GlobularSet.{u}} →
+    Pasting ((n + 1) + k + 1) G → Pasting (n + k + 1) G
+  | 0, _, _, p => target p
+  | k + 1, n, G, ⟨a, b, p⟩ =>
+      ⟨a, b, p.map (fun {x y} e => dropTarget k n (G := G.hom x y) e)⟩
+
+theorem dropSource_eq (k n : Nat) {G : GlobularSet.{u}} (p : Pasting ((n + 1) + k + 1) G) :
+    dropSource k n p = source (reindex (excess_succ_dimension k n).symm p) := by
+  induction k generalizing G with
+  | zero => rfl
+  | succ k ih =>
+    rcases p with ⟨a, b, p⟩
+    change _ = source (reindex (_root_.congrArg Nat.succ (excess_succ_dimension k n).symm) (pack p))
+    rw [reindex_pack (excess_succ_dimension k n).symm]
+    apply _root_.congrArg pack
+    exact (Chain.map_congr _ _ (fun e => ih e) p).trans (Chain.map_map _ _ p).symm
+
+theorem dropTarget_eq (k n : Nat) {G : GlobularSet.{u}} (p : Pasting ((n + 1) + k + 1) G) :
+    dropTarget k n p = target (reindex (excess_succ_dimension k n).symm p) := by
+  induction k generalizing G with
+  | zero => rfl
+  | succ k ih =>
+    rcases p with ⟨a, b, p⟩
+    change _ = target (reindex (_root_.congrArg Nat.succ (excess_succ_dimension k n).symm) (pack p))
+    rw [reindex_pack (excess_succ_dimension k n).symm]
+    apply _root_.congrArg pack
+    exact (Chain.map_congr _ _ (fun e => ih e) p).trans (Chain.map_map _ _ p).symm
+
+theorem sourceAt_dropSource (k n : Nat) {G : GlobularSet.{u}} (p : Pasting ((n + 1) + k + 1) G) :
+    sourceAt k n (dropSource k n p) = sourceAt k (n + 1) p := by
+  induction k generalizing G with
+  | zero => rcases p with ⟨a, b, p⟩; rfl
+  | succ k ih =>
+    rcases p with ⟨a, b, p⟩
+    exact _root_.congrArg pack ((Chain.map_map _ _ p).trans (Chain.map_congr _ _ (fun e => ih e) p))
+
+theorem targetAt_dropSource (k n : Nat) {G : GlobularSet.{u}} (p : Pasting ((n + 1) + k + 1) G) :
+    targetAt k n (dropSource k n p) = targetAt k (n + 1) p := by
+  induction k generalizing G with
+  | zero => rcases p with ⟨a, b, p⟩; rfl
+  | succ k ih =>
+    rcases p with ⟨a, b, p⟩
+    exact _root_.congrArg pack ((Chain.map_map _ _ p).trans (Chain.map_congr _ _ (fun e => ih e) p))
+
+theorem sourceAt_dropTarget (k n : Nat) {G : GlobularSet.{u}} (p : Pasting ((n + 1) + k + 1) G) :
+    sourceAt k n (dropTarget k n p) = sourceAt k (n + 1) p := by
+  induction k generalizing G with
+  | zero => rcases p with ⟨a, b, p⟩; rfl
+  | succ k ih =>
+    rcases p with ⟨a, b, p⟩
+    exact _root_.congrArg pack ((Chain.map_map _ _ p).trans (Chain.map_congr _ _ (fun e => ih e) p))
+
+theorem targetAt_dropTarget (k n : Nat) {G : GlobularSet.{u}} (p : Pasting ((n + 1) + k + 1) G) :
+    targetAt k n (dropTarget k n p) = targetAt k (n + 1) p := by
+  induction k generalizing G with
+  | zero => rcases p with ⟨a, b, p⟩; rfl
+  | succ k ih =>
+    rcases p with ⟨a, b, p⟩
+    exact _root_.congrArg pack ((Chain.map_map _ _ p).trans (Chain.map_congr _ _ (fun e => ih e) p))
+
+theorem dropSource_composeAt (k n : Nat) {G : GlobularSet.{u}}
+    (p q : Pasting ((n + 1) + k + 1) G) (h : targetAt k (n + 1) p = sourceAt k (n + 1) q)
+    (h' : targetAt k n (dropSource k n p) = sourceAt k n (dropSource k n q)) :
+    dropSource k n (composeAt k (n + 1) p q h) =
+      composeAt k n (dropSource k n p) (dropSource k n q) h' := by
+  induction k generalizing G with
+  | zero =>
+    rcases p with ⟨a, b, p⟩
+    rcases q with ⟨c, d, q⟩
+    change b = c at h
+    cases h
+    exact source_horizontal p q
+  | succ k ih =>
+    rcases p with ⟨a, b, p⟩
+    rcases q with ⟨c, d, q⟩
+    have ha : a = c := _root_.congrArg Sigma.fst h
+    have hb : b = d := _root_.congrArg (fun z => z.2.1) h
+    cases ha
+    cases hb
+    have hp : p.map (fun e => targetAt k (n + 1) e) = q.map (fun e => sourceAt k (n + 1) e) :=
+      eq_of_heq (Sigma.mk.inj (eq_of_heq (Sigma.mk.inj h).2)).2
+    have hp' : (p.map (fun e => dropSource k n e)).map (fun e => targetAt k n e) =
+        (q.map (fun e => dropSource k n e)).map (fun e => sourceAt k n e) :=
+      eq_of_heq (Sigma.mk.inj (eq_of_heq (Sigma.mk.inj h').2)).2
+    exact _root_.congrArg pack (Chain.map_zipOver
+      (fun e => targetAt k (n + 1) e) (fun e => sourceAt k (n + 1) e)
+      (fun e => targetAt k n e) (fun e => sourceAt k n e)
+      (fun e d h => composeAt k (n + 1) e d h) (fun e d h => composeAt k n e d h)
+      (fun e => dropSource k n e) (fun e d h j => ih e d h j) p q hp hp')
+
+theorem dropTarget_composeAt (k n : Nat) {G : GlobularSet.{u}}
+    (p q : Pasting ((n + 1) + k + 1) G) (h : targetAt k (n + 1) p = sourceAt k (n + 1) q)
+    (h' : targetAt k n (dropTarget k n p) = sourceAt k n (dropTarget k n q)) :
+    dropTarget k n (composeAt k (n + 1) p q h) =
+      composeAt k n (dropTarget k n p) (dropTarget k n q) h' := by
+  induction k generalizing G with
+  | zero =>
+    rcases p with ⟨a, b, p⟩
+    rcases q with ⟨c, d, q⟩
+    change b = c at h
+    cases h
+    exact target_horizontal p q
+  | succ k ih =>
+    rcases p with ⟨a, b, p⟩
+    rcases q with ⟨c, d, q⟩
+    have ha : a = c := _root_.congrArg Sigma.fst h
+    have hb : b = d := _root_.congrArg (fun z => z.2.1) h
+    cases ha
+    cases hb
+    have hp : p.map (fun e => targetAt k (n + 1) e) = q.map (fun e => sourceAt k (n + 1) e) :=
+      eq_of_heq (Sigma.mk.inj (eq_of_heq (Sigma.mk.inj h).2)).2
+    have hp' : (p.map (fun e => dropTarget k n e)).map (fun e => targetAt k n e) =
+        (q.map (fun e => dropTarget k n e)).map (fun e => sourceAt k n e) :=
+      eq_of_heq (Sigma.mk.inj (eq_of_heq (Sigma.mk.inj h').2)).2
+    exact _root_.congrArg pack (Chain.map_zipOver
+      (fun e => targetAt k (n + 1) e) (fun e => sourceAt k (n + 1) e)
+      (fun e => targetAt k n e) (fun e => sourceAt k n e)
+      (fun e d h => composeAt k (n + 1) e d h) (fun e d h => composeAt k n e d h)
+      (fun e => dropTarget k n e) (fun e d h j => ih e d h j) p q hp hp')
+
+/-- Adjacent source preserves composition with a derived, not assumed,
+lower-dimensional composability witness. -/
+theorem dropSource_composeAt_boundary (k n : Nat) {G : GlobularSet.{u}}
+    (p q : Pasting ((n + 1) + k + 1) G) (h : targetAt k (n + 1) p = sourceAt k (n + 1) q) :
+    dropSource k n (composeAt k (n + 1) p q h) =
+      composeAt k n (dropSource k n p) (dropSource k n q)
+        ((targetAt_dropSource k n p).trans (h.trans (sourceAt_dropSource k n q).symm)) :=
+  dropSource_composeAt k n p q h _
+
+theorem dropTarget_composeAt_boundary (k n : Nat) {G : GlobularSet.{u}}
+    (p q : Pasting ((n + 1) + k + 1) G) (h : targetAt k (n + 1) p = sourceAt k (n + 1) q) :
+    dropTarget k n (composeAt k (n + 1) p q h) =
+      composeAt k n (dropTarget k n p) (dropTarget k n q)
+        ((targetAt_dropTarget k n p).trans (h.trans (sourceAt_dropTarget k n q).symm)) :=
+  dropTarget_composeAt k n p q h _
+
+theorem dropSource_identityAt (k n : Nat) {G : GlobularSet.{u}} (p : Pasting k G) :
+    dropSource k n (identityAt k (n + 1) p) = identityAt k n p := by
+  induction k generalizing G with
+  | zero => rfl
+  | succ k ih =>
+    rcases p with ⟨a, b, p⟩
+    exact _root_.congrArg pack ((Chain.map_map _ _ p).trans (Chain.map_congr _ _ (fun e => ih e) p))
+
+theorem dropTarget_identityAt (k n : Nat) {G : GlobularSet.{u}} (p : Pasting k G) :
+    dropTarget k n (identityAt k (n + 1) p) = identityAt k n p := by
+  induction k generalizing G with
+  | zero => rfl
+  | succ k ih =>
+    rcases p with ⟨a, b, p⟩
+    exact _root_.congrArg pack ((Chain.map_map _ _ p).trans (Chain.map_congr _ _ (fun e => ih e) p))
+
 end Pasting
 
 /-- Interpretation of composable path-labelled chains keeps the endpoints
