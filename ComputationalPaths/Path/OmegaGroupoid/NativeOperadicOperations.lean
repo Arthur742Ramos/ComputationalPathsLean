@@ -1035,6 +1035,390 @@ theorem operationComposeAt_target {A : Type u} {n : Nat} (c : Pasting.Cut n)
     (_root_.congrArg (operationEvaluation A).app
       (binaryDiagramOn_target (collection A).operations c p q h h'))
 
+/-- Operation-level contraction over an identity arity. The parallelism and
+equal-arity hypotheses remain explicit at every dimension. -/
+def operationCoherenceProblem {A : Type u} {n : Nat}
+    (o r : (collection A).operations.Cell n)
+    (hp : (collection A).operations.Parallel n o r)
+    (ha : (collection A).arity.app o = (collection A).arity.app r) :
+    GlobularSet.LiftingProblem (collection A).arity n :=
+  ⟨⟨o, r, hp⟩, Pasting.identity ((collection A).arity.app o),
+    (Pasting.source_identity _ _).symm,
+    ha.symm.trans (Pasting.target_identity _ _).symm⟩
+
+noncomputable def operationCoherence {A : Type u} {n : Nat}
+    (o r : (collection A).operations.Cell n) hp ha :
+    GlobularSet.Lift (operationCoherenceProblem o r hp ha) :=
+  (Endomorphism.nativeContraction A).lift (operationCoherenceProblem o r hp ha)
+
+theorem operationCoherence_arity {A : Type u} {n : Nat}
+    (o r : (collection A).operations.Cell n) hp ha :
+    (collection A).arity.app (n := n + 1) (operationCoherence o r hp ha).cell =
+      Pasting.identity (n := n) ((collection A).arity.app (n := n) o) :=
+  (operationCoherence o r hp ha).arity_cell
+
+/-- Binary substitution of one-dimensional operations. Normalization at
+dimension zero makes these operations composable, independently of labels. -/
+noncomputable def operationBinary {A : Type u}
+    (o r : (collection A).operations.Cell 1) : (collection A).operations.Cell 1 :=
+  operationComposeAt .bottom o r (@Subsingleton.elim PUnit _ _ _)
+
+noncomputable def binaryArity (a b : Pasting 1 GlobularSet.terminal) :
+    Pasting 1 GlobularSet.terminal :=
+  (Pasting.cutOperations GlobularSet.terminal).compose .bottom a b
+    (@Subsingleton.elim PUnit _ _ _)
+
+theorem operationBinary_arity {A : Type u}
+    (o r : (collection A).operations.Cell 1) :
+    (collection A).arity.app (operationBinary o r) =
+      binaryArity ((collection A).arity.app o) ((collection A).arity.app r) :=
+  operationComposeAt_arity .bottom o r _ _
+
+theorem binaryArity_assoc (a b c : Pasting 1 GlobularSet.terminal) :
+    binaryArity (binaryArity a b) c = binaryArity a (binaryArity b c) :=
+  Pasting.cutOperations_associative GlobularSet.terminal .bottom a b c _ _ _ _
+
+/-- Both binary substitution trees have the same full pasting arity. -/
+theorem operationBinary_assoc_arity {A : Type u}
+    (o r s : (collection A).operations.Cell 1) :
+    (collection A).arity.app (operationBinary (operationBinary o r) s) =
+      (collection A).arity.app (operationBinary o (operationBinary r s)) := by
+  simp only [operationBinary_arity]
+  exact binaryArity_assoc _ _ _
+
+/-- The associator between actual multiplication trees of operations, prior
+to evaluation on any carrier labels. -/
+noncomputable def operationAssociator {A : Type u}
+    (o r s : (collection A).operations.Cell 1) :=
+  operationCoherence (operationBinary (operationBinary o r) s)
+    (operationBinary o (operationBinary r s))
+    (GlobularSet.Parallel.cells (@Subsingleton.elim PUnit _ _ _)
+      (@Subsingleton.elim PUnit _ _ _)) (operationBinary_assoc_arity o r s)
+
+theorem operationAssociator_boundary {A : Type u}
+    (o r s : (collection A).operations.Cell 1) :
+    (collection A).operations.source (operationAssociator o r s).cell =
+      operationBinary (operationBinary o r) s ∧
+    (collection A).operations.target (operationAssociator o r s).cell =
+      operationBinary o (operationBinary r s) :=
+  ⟨(operationAssociator o r s).source_cell, (operationAssociator o r s).target_cell⟩
+
+theorem operationAssociator_arity {A : Type u}
+    (o r s : (collection A).operations.Cell 1) :
+    (collection A).arity.app (operationAssociator o r s).cell =
+      Pasting.identity ((collection A).arity.app (operationBinary (operationBinary o r) s)) :=
+  (operationAssociator o r s).arity_cell
+
+/-- An operation 2-cell with fixed operation endpoints, for assembling
+coherence diagrams without discarding their actual multiplication trees. -/
+structure Operation2Between {A : Type u} (o r : (collection A).operations.Cell 1) where
+  cell : (collection A).operations.Cell 2
+  source_cell : (collection A).operations.source cell = o
+  target_cell : (collection A).operations.target cell = r
+
+noncomputable def operationAssociatorArrow {A : Type u}
+    (o r s : (collection A).operations.Cell 1) :
+    Operation2Between (operationBinary (operationBinary o r) s)
+      (operationBinary o (operationBinary r s)) :=
+  ⟨(operationAssociator o r s).cell,
+    (operationAssociator_boundary o r s).1, (operationAssociator_boundary o r s).2⟩
+
+noncomputable def operationIdentityArrow {A : Type u}
+    (o : (collection A).operations.Cell 1) : Operation2Between o o :=
+  ⟨operationIdentity o, (operationIdentity_boundary o).1, (operationIdentity_boundary o).2⟩
+
+noncomputable def operationVerticalArrow {A : Type u}
+    {o r s : (collection A).operations.Cell 1}
+    (p : Operation2Between o r) (q : Operation2Between r s) : Operation2Between o s :=
+  ⟨operationCompose p.cell q.cell (p.target_cell.trans q.source_cell.symm),
+    (operationCompose_boundary _ _ _).1.trans p.source_cell,
+    (operationCompose_boundary _ _ _).2.trans q.target_cell⟩
+
+noncomputable def operationHorizontalArrow {A : Type u}
+    {o r s t : (collection A).operations.Cell 1}
+    (p : Operation2Between o r) (q : Operation2Between s t) :
+    Operation2Between (operationBinary o s) (operationBinary r t) := by
+  let k := operationComposeAt (.bottom : Pasting.Cut 2) p.cell q.cell
+    (@Subsingleton.elim PUnit _ _ _)
+  have hs : (collection A).operations.source k =
+      operationBinary ((collection A).operations.source p.cell)
+        ((collection A).operations.source q.cell) :=
+    operationComposeAt_source (.bottom : Pasting.Cut 1) p.cell q.cell _ _
+  have ht : (collection A).operations.target k =
+      operationBinary ((collection A).operations.target p.cell)
+        ((collection A).operations.target q.cell) :=
+    operationComposeAt_target (.bottom : Pasting.Cut 1) p.cell q.cell _ _
+  exact ⟨k, hs.trans (_root_.congrArg₂ operationBinary p.source_cell q.source_cell),
+    ht.trans (_root_.congrArg₂ operationBinary p.target_cell q.target_cell)⟩
+
+/-- The two-edge side of the pentagon, composed in the actual operad. -/
+noncomputable def operationPentagonShort {A : Type u}
+    (f g h k : (collection A).operations.Cell 1) :
+    Operation2Between (operationBinary (operationBinary (operationBinary f g) h) k)
+      (operationBinary f (operationBinary g (operationBinary h k))) :=
+  operationVerticalArrow (operationAssociatorArrow (operationBinary f g) h k)
+    (operationAssociatorArrow f g (operationBinary h k))
+
+/-- The three-edge side uses both whiskered associators and the middle
+associator; no carrier-level filler is substituted for any of its edges. -/
+noncomputable def operationPentagonLong {A : Type u}
+    (f g h k : (collection A).operations.Cell 1) :
+    Operation2Between (operationBinary (operationBinary (operationBinary f g) h) k)
+      (operationBinary f (operationBinary g (operationBinary h k))) :=
+  operationVerticalArrow
+    (operationHorizontalArrow (operationAssociatorArrow f g h) (operationIdentityArrow k))
+    (operationVerticalArrow (operationAssociatorArrow f (operationBinary g h) k)
+      (operationHorizontalArrow (operationIdentityArrow f) (operationAssociatorArrow g h k)))
+
+/-- Parallelism of the actual short and long operation composites. Equal
+arity is a separate obligation before the contraction can be applied. -/
+theorem operationPentagon_parallel {A : Type u}
+    (f g h k : (collection A).operations.Cell 1) :
+    (collection A).operations.Parallel 2 (operationPentagonShort f g h k).cell
+      (operationPentagonLong f g h k).cell :=
+  GlobularSet.Parallel.cells
+    ((operationPentagonShort f g h k).source_cell.trans
+      (operationPentagonLong f g h k).source_cell.symm)
+    ((operationPentagonShort f g h k).target_cell.trans
+      (operationPentagonLong f g h k).target_cell.symm)
+
+theorem identity_one_cutUnit {G : GlobularSet.{u + 1}} (p : Pasting 1 G) :
+    Pasting.identity p = Pasting.cutUnit (.lift .bottom : Pasting.Cut 2) p := by
+  rcases p with ⟨a, b, p⟩
+  rfl
+
+theorem vertical_two_cutCompose {G : GlobularSet.{u + 1}}
+    (p q : Pasting 2 G) (h : Pasting.target p = Pasting.source q)
+    (h' : Pasting.cutTarget (.lift .bottom) p = Pasting.cutSource (.lift .bottom) q) :
+    Pasting.vertical p q h = Pasting.cutCompose (.lift .bottom) p q h' := by
+  rfl
+
+theorem operationIdentity_one_arity {A : Type u}
+    (o : (collection A).operations.Cell 1) :
+    (collection A).arity.app (operationIdentity o) =
+      Pasting.identity ((collection A).arity.app o) := by
+  have hi := identity_one_cutUnit (Pasting.singleton o)
+  have hm := Pasting.map_cutUnit (.lift .bottom : Pasting.Cut 2) (collection A).arity
+    (Pasting.singleton o)
+  have hs := _root_.congrArg (Pasting.cutUnit (.lift .bottom : Pasting.Cut 2))
+    (Pasting.map_singleton (collection A).arity o)
+  exact (operationEvaluation_arity (Pasting.identity (Pasting.singleton o))).trans
+    ((_root_.congrArg (Pasting.flattenGlobular GlobularSet.terminal).app
+      ((_root_.congrArg (Pasting.map (collection A).arity) hi).trans (hm.trans hs))).trans
+    (((Pasting.flatten_preserves GlobularSet.terminal).unit
+    (.lift .bottom : Pasting.Cut 2) (Pasting.singleton ((collection A).arity.app o))).trans
+    ((_root_.congrArg (Pasting.cutUnit (.lift .bottom : Pasting.Cut 2))
+      (Pasting.flatten_singleton ((collection A).arity.app o))).trans (identity_one_cutUnit _).symm)))
+
+theorem operationCompose_two_eq {A : Type u}
+    (o r : (collection A).operations.Cell 2)
+    (h : (collection A).operations.target o = (collection A).operations.source r) :
+    operationCompose o r h = operationComposeAt (.lift .bottom) o r h := by
+  apply _root_.congrArg (operationEvaluation A).app
+  have hl := (Pasting.target_singleton (collection A).operations o).trans
+    ((_root_.congrArg Pasting.singleton h).trans (Pasting.source_singleton _ r).symm)
+  have hh := (Pasting.canonical_target_eq_cutTarget (.lift .bottom) (Pasting.singleton o)).symm.trans
+    (hl.trans (Pasting.canonical_source_eq_cutSource (.lift .bottom) (Pasting.singleton r)))
+  exact vertical_two_cutCompose _ _ _ hh
+
+theorem operationCompose_two_arity {A : Type u}
+    (o r : (collection A).operations.Cell 2)
+    (h : (collection A).operations.target o = (collection A).operations.source r) h' :
+    (collection A).arity.app (operationCompose o r h) =
+      (Pasting.cutOperations GlobularSet.terminal).compose (.lift .bottom)
+        ((collection A).arity.app o) ((collection A).arity.app r) h' := by
+  rw [operationCompose_two_eq]
+  exact operationComposeAt_arity _ _ _ _ _
+
+def Operation2Between.IdentityArity {A : Type u} {o r : (collection A).operations.Cell 1}
+    (p : Operation2Between o r) : Prop :=
+  (collection A).arity.app p.cell = Pasting.identity ((collection A).arity.app o)
+
+theorem Operation2Between.arity_endpoints {A : Type u}
+    {o r : (collection A).operations.Cell 1} (p : Operation2Between o r)
+    (hp : p.IdentityArity) : (collection A).arity.app o = (collection A).arity.app r := by
+  have ht := (collection A).arity.target_app p.cell
+  exact ((Pasting.target_identity _ _).symm.trans
+    ((_root_.congrArg Pasting.target hp.symm).trans ht)).trans
+    (_root_.congrArg (collection A).arity.app p.target_cell)
+
+theorem operationAssociatorArrow_identityArity {A : Type u}
+    (o r s : (collection A).operations.Cell 1) :
+    (operationAssociatorArrow o r s).IdentityArity := operationAssociator_arity o r s
+
+theorem operationIdentityArrow_identityArity {A : Type u}
+    (o : (collection A).operations.Cell 1) :
+    (operationIdentityArrow o).IdentityArity := operationIdentity_one_arity o
+
+set_option backward.isDefEq.respectTransparency false in
+theorem identityArity_vertical (a : Pasting 1 GlobularSet.terminal.{u + 1})
+    (h : Pasting.CutBoundary.target (.lift .bottom : Pasting.Cut 2)
+      (Pasting.globular GlobularSet.terminal) (Pasting.identity a) =
+      Pasting.CutBoundary.source (.lift .bottom : Pasting.Cut 2)
+        (Pasting.globular GlobularSet.terminal) (Pasting.identity a)) :
+    (Pasting.cutOperations GlobularSet.terminal).compose (.lift .bottom)
+      (Pasting.identity a) (Pasting.identity a) h = Pasting.identity a := by
+  have hh := Pasting.cutCompose_right_unit (.lift .bottom : Pasting.Cut 2)
+    (Pasting.cutUnit (.lift .bottom : Pasting.Cut 2) a)
+  simp only [Pasting.cutTarget_cutUnit] at hh
+  simpa only [identity_one_cutUnit, Pasting.cutOperations] using hh
+
+theorem operationVerticalArrow_identityArity {A : Type u}
+    {o r s : (collection A).operations.Cell 1}
+    (p : Operation2Between o r) (q : Operation2Between r s)
+    (hp : p.IdentityArity) (hq : q.IdentityArity) :
+    (operationVerticalArrow p q).IdentityArity := by
+  let f := (collection A).arity
+  have hm := (f.target_app p.cell).trans
+    ((_root_.congrArg f.app (p.target_cell.trans q.source_cell.symm)).trans (f.source_app q.cell).symm)
+  have hy : f.app q.cell = Pasting.identity (f.app o) :=
+    hq.trans (_root_.congrArg Pasting.identity (p.arity_endpoints hp).symm)
+  have hi : Pasting.CutBoundary.target (.lift .bottom : Pasting.Cut 2)
+      (Pasting.globular GlobularSet.terminal) (Pasting.identity (f.app o)) =
+      Pasting.CutBoundary.source (.lift .bottom : Pasting.Cut 2)
+        (Pasting.globular GlobularSet.terminal) (Pasting.identity (f.app o)) :=
+    (Pasting.target_identity _ _).trans (Pasting.source_identity _ _).symm
+  exact (operationCompose_two_arity p.cell q.cell (p.target_cell.trans q.source_cell.symm) hm).trans
+    ((eq_of_heq ((Pasting.CutModel.free GlobularSet.terminal).compose_heq
+      rfl (.lift .bottom : Pasting.Cut 2) (.lift .bottom : Pasting.Cut 2) rfl
+      _ _ _ _ (heq_of_eq hp) (heq_of_eq hy) hm hi)).trans (identityArity_vertical _ hi))
+
+theorem identityArity_horizontal (a b : Pasting 1 GlobularSet.terminal.{u + 1})
+    (h : Pasting.CutBoundary.target (.bottom : Pasting.Cut 2)
+      (Pasting.globular GlobularSet.terminal) (Pasting.identity a) =
+      Pasting.CutBoundary.source (.bottom : Pasting.Cut 2)
+        (Pasting.globular GlobularSet.terminal) (Pasting.identity b)) :
+    (Pasting.cutOperations GlobularSet.terminal).compose .bottom
+      (Pasting.identity a) (Pasting.identity b) h = Pasting.identity (binaryArity a b) := by
+  rcases a with ⟨x, y, a⟩
+  rcases b with ⟨z, w, b⟩
+  cases x
+  cases y
+  cases z
+  cases w
+  exact (Pasting.identity_horizontal a b).symm
+
+theorem operationHorizontalArrow_identityArity {A : Type u}
+    {o r s t : (collection A).operations.Cell 1}
+    (p : Operation2Between o r) (q : Operation2Between s t)
+    (hp : p.IdentityArity) (hq : q.IdentityArity) :
+    (operationHorizontalArrow p q).IdentityArity := by
+  let f := (collection A).arity
+  have hm : Pasting.CutBoundary.target (.bottom : Pasting.Cut 2)
+      (Pasting.globular GlobularSet.terminal) (f.app p.cell) =
+      Pasting.CutBoundary.source (.bottom : Pasting.Cut 2)
+        (Pasting.globular GlobularSet.terminal) (f.app q.cell) := @Subsingleton.elim PUnit _ _ _
+  have hi : Pasting.CutBoundary.target (.bottom : Pasting.Cut 2)
+      (Pasting.globular GlobularSet.terminal) (Pasting.identity (f.app o)) =
+      Pasting.CutBoundary.source (.bottom : Pasting.Cut 2)
+        (Pasting.globular GlobularSet.terminal) (Pasting.identity (f.app s)) := @Subsingleton.elim PUnit _ _ _
+  exact (operationComposeAt_arity (.bottom : Pasting.Cut 2) p.cell q.cell _ hm).trans
+    ((eq_of_heq ((Pasting.CutModel.free GlobularSet.terminal).compose_heq
+      rfl (.bottom : Pasting.Cut 2) (.bottom : Pasting.Cut 2) rfl
+      _ _ _ _ (heq_of_eq hp) (heq_of_eq hq) hm hi)).trans
+      ((identityArity_horizontal _ _ hi).trans
+        (_root_.congrArg Pasting.identity (operationBinary_arity o s).symm)))
+
+theorem operationPentagonShort_identityArity {A : Type u}
+    (f g h k : (collection A).operations.Cell 1) :
+    (operationPentagonShort f g h k).IdentityArity :=
+  operationVerticalArrow_identityArity _ _
+    (operationAssociatorArrow_identityArity _ _ _) (operationAssociatorArrow_identityArity _ _ _)
+
+theorem operationPentagonLong_identityArity {A : Type u}
+    (f g h k : (collection A).operations.Cell 1) :
+    (operationPentagonLong f g h k).IdentityArity :=
+  operationVerticalArrow_identityArity _ _
+    (operationHorizontalArrow_identityArity _ _
+      (operationAssociatorArrow_identityArity _ _ _) (operationIdentityArrow_identityArity _))
+    (operationVerticalArrow_identityArity _ _ (operationAssociatorArrow_identityArity _ _ _)
+      (operationHorizontalArrow_identityArity _ _
+        (operationIdentityArrow_identityArity _) (operationAssociatorArrow_identityArity _ _ _)))
+
+/-- The pentagon contracts between the actual two-edge and three-edge
+operation composites, after verifying both parallelism and equal arity. -/
+noncomputable def operationPentagon {A : Type u}
+    (f g h k : (collection A).operations.Cell 1) :=
+  operationCoherence (operationPentagonShort f g h k).cell (operationPentagonLong f g h k).cell
+    (operationPentagon_parallel f g h k)
+    ((operationPentagonShort_identityArity f g h k).trans (operationPentagonLong_identityArity f g h k).symm)
+
+theorem operationPentagon_boundary {A : Type u}
+    (f g h k : (collection A).operations.Cell 1) :
+    (collection A).operations.source (operationPentagon f g h k).cell =
+      (operationPentagonShort f g h k).cell ∧
+    (collection A).operations.target (operationPentagon f g h k).cell =
+      (operationPentagonLong f g h k).cell :=
+  ⟨(operationPentagon f g h k).source_cell, (operationPentagon f g h k).target_cell⟩
+
+theorem operationPentagon_arity {A : Type u}
+    (f g h k : (collection A).operations.Cell 1) :
+    (collection A).arity.app (n := 3) (operationPentagon f g h k).cell =
+      Pasting.identity (n := 2) (Pasting.identity (n := 1)
+        ((collection A).arity.app (n := 1) (operationBinary (operationBinary (operationBinary f g) h) k))) := by
+  have ha : (collection A).arity.app (n := 3) (operationPentagon f g h k).cell =
+      Pasting.identity (n := 2) ((collection A).arity.app (n := 2)
+        (operationPentagonShort f g h k).cell) :=
+    operationCoherence_arity (operationPentagonShort f g h k).cell (operationPentagonLong f g h k).cell _ _
+  exact ha.trans (_root_.congrArg (Pasting.identity (n := 2))
+    (operationPentagonShort_identityArity f g h k))
+
+theorem operationPentagon_sourceArity {A : Type u}
+    (f g h k : (collection A).operations.Cell 1) (d : Pasting 3 (carrier A))
+    (hd : (collection A).arity.app (n := 3) (operationPentagon f g h k).cell =
+      (GlobularCollection.shape (carrier A)).app (n := 3) d) :
+    (collection A).arity.app (n := 2) (operationPentagonShort f g h k).cell =
+      (GlobularCollection.shape (carrier A)).app (n := 2) (Pasting.source d) := by
+  have hs := _root_.congrArg ((collection A).arity.app (n := 2)) (operationPentagon_boundary f g h k).1
+  have hm := (collection A).arity.source_app (n := 2) (operationPentagon f g h k).cell
+  exact hs.symm.trans (hm.symm.trans ((_root_.congrArg
+    ((Pasting.globular GlobularSet.terminal).source (n := 2)) hd).trans
+    ((GlobularCollection.shape (carrier A)).source_app (n := 2) d)))
+
+theorem operationPentagon_targetArity {A : Type u}
+    (f g h k : (collection A).operations.Cell 1) (d : Pasting 3 (carrier A))
+    (hd : (collection A).arity.app (n := 3) (operationPentagon f g h k).cell =
+      (GlobularCollection.shape (carrier A)).app (n := 3) d) :
+    (collection A).arity.app (n := 2) (operationPentagonLong f g h k).cell =
+      (GlobularCollection.shape (carrier A)).app (n := 2) (Pasting.target d) := by
+  have ht := _root_.congrArg ((collection A).arity.app (n := 2)) (operationPentagon_boundary f g h k).2
+  have hm := (collection A).arity.target_app (n := 2) (operationPentagon f g h k).cell
+  exact ht.symm.trans (hm.symm.trans ((_root_.congrArg
+    ((Pasting.globular GlobularSet.terminal).target (n := 2)) hd).trans
+    ((GlobularCollection.shape (carrier A)).target_app (n := 2) d)))
+
+/-- Action of this specific pentagon operation on a full admissible labelled
+diagram. Both boundaries are actions of the actual composite operations. -/
+noncomputable def appliedOperationPentagon {A : Type u}
+    (f g h k : (collection A).operations.Cell 1) (d : Pasting 3 (carrier A))
+    (hd : (collection A).arity.app (n := 3) (operationPentagon f g h k).cell =
+      (GlobularCollection.shape (carrier A)).app (n := 3) d) :
+    { c : NativeTower.Cell A 3 //
+      NativeTower.source c = applyOperation (operationPentagonShort f g h k).cell (Pasting.source d)
+        (operationPentagon_sourceArity f g h k d hd) ∧
+      NativeTower.target c = applyOperation (operationPentagonLong f g h k).cell (Pasting.target d)
+        (operationPentagon_targetArity f g h k d hd) } := by
+  let i : ((collection A).application (carrier A)).Cell 3 :=
+    ⟨⟨(operationPentagon f g h k).cell, d⟩, hd⟩
+  have hs : ((collection A).application (carrier A)).source i =
+      ⟨⟨(operationPentagonShort f g h k).cell, Pasting.source d⟩,
+        operationPentagon_sourceArity f g h k d hd⟩ :=
+    Subtype.ext (Prod.ext (operationPentagon_boundary f g h k).1 rfl)
+  have ht : ((collection A).application (carrier A)).target i =
+      ⟨⟨(operationPentagonLong f g h k).cell, Pasting.target d⟩,
+        operationPentagon_targetArity f g h k d hd⟩ :=
+    Subtype.ext (Prod.ext (operationPentagon_boundary f g h k).2 rfl)
+  exact ⟨applyOperation (operationPentagon f g h k).cell d hd,
+    ((Endomorphism.evaluation (carrier A)).source_app i).trans
+      (_root_.congrArg (Endomorphism.evaluation (carrier A)).app hs),
+    ((Endomorphism.evaluation (carrier A)).target_app i).trans
+      (_root_.congrArg (Endomorphism.evaluation (carrier A)).app ht)⟩
+
+theorem appliedOperationPentagon_invertible {A : Type u}
+    (f g h k : (collection A).operations.Cell 1) (d : Pasting 3 (carrier A)) hd :
+    WeaklyInvertible 2 (appliedOperationPentagon f g h k d hd).val :=
+  all_cells_weaklyInvertible _ _
+
 end NativeOperadic
 
 end ComputationalPaths.Path.OmegaFoundations

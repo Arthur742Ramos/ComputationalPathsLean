@@ -885,5 +885,24 @@ its arity is the strict cut composite of the original arities, and its
 source and target recursively compose the original operation boundaries.
 These statements concern operations themselves, not merely the carrier
 cells on which they act. They provide the boundary and arity infrastructure
-for the remaining selected pentagon construction; that comparison remains
-open.
+for the selected pentagon construction described below.
+
+`operationAssociator` contracts the actual binary multiplication trees of
+three one-dimensional operations. `operationPentagonShort` vertically
+composes the two associators on the short side; `operationPentagonLong`
+composes the three edges, including both horizontal whiskerings by operation
+identities. Their exact endpoints coincide. The `IdentityArity` invariant
+is proved for each associator and identity and preserved by both vertical
+and horizontal composition, using the strict pasting unit and exchange
+laws. Thus both pentagon paths have the same full identity arity, not just
+parallel carrier evaluations.
+
+`operationPentagon` applies the operad's contraction to those two actual
+composites. Its source, target, and double-identity arity are verified.
+`appliedOperationPentagon` evaluates that specific operation on any full
+labelled 3-diagram satisfying its arity equation and retains the actions of
+the short and long composites as its exact native boundaries; the resulting
+3-cell is weakly invertible. The concrete quadruple-path input and comparison
+to the unchanged primitive `Step`/`RwEq` pentagon still need to be
+instantiated. This is not yet the completed selected pentagon comparison,
+and the selected interchange comparison also remains open.
