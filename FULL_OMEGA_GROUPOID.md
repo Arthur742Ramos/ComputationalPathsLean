@@ -10,7 +10,8 @@ and explicit comparison cells to the earlier native operations. The full
 associativity, pentagon, and interchange certificate comparisons are now
 constructed below, with their exact boundary bridges. The final
 definition-level packaging and requirement-by-requirement completion audit
-remain open. The free-category definition bridge is verified through the
+remain open. Invertibility is now proved for every operadic composition
+system, not only the previously selected one. The free-category definition bridge is verified through the
 adjacent-identity strict presentation and its actual free/forgetful adjunction.
 
 ## Mathematical target
@@ -953,3 +954,36 @@ the pentagon, the comparison lies in the declared coskeletal fourth layer;
 it does not assert equality of raw histories or faithful higher semantics.
 The explicit selected interchange comparison is now verified. The final
 definition-level package and full completion audit remain open.
+
+## Universal composition-system audit
+
+The precise published convention is van den Berg--Garner,
+[Definitions 2.1.1, 2.1.3, and 2.1.4](https://arxiv.org/pdf/0812.0298): an
+algebra for a normalized contractible globular operad, with coinductive weak
+invertibility for **every** system of compositions. This convention does not
+require constructing Leinster's initial operad. The earlier proof for one
+selected system alone did not discharge the universal quantifier.
+
+`NativeUniversalInvertibility.lean` now addresses it. `BoundaryOperations`
+specifies arbitrary adjacent identity/composition functions with their
+globular boundary laws. Its monotone cancellation operator, greatest
+postfixed predicate, coinduction principle, and fixed-point equation are
+proved uniformly in those functions. Every positive native cell belongs to
+that predicate, with no dimension bound. The same supplied functions are
+used at every stage of the inverse tower.
+
+`OperadicSystem` records actual native endomorphism-operad choices over the
+nullary and adjacent binary arities, with trivial boundary operations.
+The interpreted carrier functions satisfy the boundary laws by the algebra
+action and unit laws; this is proved by `identity_boundary` and
+`compose_boundary`, not added as an assumption on the interpreted functions.
+`canonicalSystem` constructs such a choice from contraction.
+`every_operadic_system_invertible` proves nonemptiness together with the
+universal all-dimensional invertibility statement. `selected_invertibility_iff`
+identifies the original selected-system predicate with its instance of the
+new operator. The carrier and its semantic limitations are unchanged.
+
+The `full-omega` CI job builds both the native certificate comparison module
+and universal invertibility module, then runs `scripts/FullOmegaAudit.lean`.
+Its local commands are verified separately from any hosted CI run. The final
+packaged theorem and complete requirement matrix remain to be assembled.
