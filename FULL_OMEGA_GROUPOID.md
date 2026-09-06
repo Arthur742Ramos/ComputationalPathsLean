@@ -161,6 +161,15 @@ This does not replace the hom of the pasting carrier with a different
 hom-pasting type. Unique lifting for these recursive hom evaluations remains
 to be proved before claiming cartesianness of globular multiplication.
 
+`flattenHom_factor` now identifies that hom evaluator with the restriction
+of `flattenGlobular` along `homPastingInclusion`; the inclusion itself is
+verified injective in every dimension and natural under relabelling.
+`HomFlattenCartesianAt f n` states the remaining unique-lifting obligation
+with both the output hom cell and relabelled nested diagram prescribed.
+Its dimension-zero case is proved by the identity evaluator. No positive-
+dimensional instance of this predicate is currently claimed; this boundary
+check does not complete cartesianness of multiplication.
+
 `evaluate` now evaluates labelled diagrams by dimension recursion into a
 target equipped with horizontal operations in all its iterated hom contexts
 (`RecursiveComposition`). The evaluator is implemented, not a field assumed

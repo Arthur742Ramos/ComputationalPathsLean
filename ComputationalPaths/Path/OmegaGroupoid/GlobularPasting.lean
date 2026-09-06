@@ -4162,6 +4162,56 @@ theorem homPastingInclusion_preserves (G : GlobularSet.{u}) (a b : G.Cell 0) :
   compose c p q h h' := Subtype.ext rfl
   unit c p := Subtype.ext rfl
 
+theorem homPastingInclusion_injective (G : GlobularSet.{u}) (a b : G.Cell 0) (n : Nat) :
+    Function.Injective ((homPastingInclusion G a b).app (n := n)) := by
+  intro p q h
+  have he := _root_.congrArg (fun c => unpackFibre c) h
+  change unpackFibre (packFibre (Chain.single p)) = unpackFibre (packFibre (Chain.single q)) at he
+  rw [unpack_packFibre, unpack_packFibre] at he
+  injection he
+
+theorem homPastingInclusion_natural {G H : GlobularSet.{u}} (f : GlobularSet.Map G H)
+    (a b : G.Cell 0) :
+    GlobularSet.Map.comp ((mapGlobular f).hom a b) (homPastingInclusion G a b) =
+      GlobularSet.Map.comp (homPastingInclusion H (f.app a) (f.app b)) (mapGlobular (f.hom a b)) := by
+  apply GlobularSet.Map.ext
+  intro n p
+  exact Subtype.ext rfl
+
+/-- The hom evaluator is the restriction of the implemented multiplication
+along the single-horizontal-segment inclusion. It is not an independent
+replacement multiplication on a different hom carrier. -/
+theorem flattenHom_factor (G : GlobularSet.{u}) (a b : G.Cell 0) :
+    GlobularSet.Map.comp ((flattenGlobular G).hom a b)
+      (homPastingInclusion (globular G) a b) = flattenHom G a b := by
+  apply GlobularSet.Map.ext
+  intro n p
+  apply Subtype.ext
+  have hp := flatten_horizontal_segments (G := G) (n := n) (Chain.single p)
+  have hs := Chain.bind_single (fun e => e) (unpackFibre ((flattenHom G a b).app p))
+  exact hp.trans ((_root_.congrArg pack hs).trans
+    (_root_.congrArg Subtype.val (pack_unpackFibre ((flattenHom G a b).app p))))
+
+/-- Exact hom-evaluation lifting obligation. Both the output cell and the
+nested relabelled diagram are prescribed; arbitrary hom fillers do not
+satisfy this condition. -/
+def HomFlattenCartesianAt {G H : GlobularSet.{u}} (f : GlobularSet.Map G H)
+    (n : Nat) : Prop :=
+  ∀ (a b : G.Cell 0) (p : ((globular G).hom a b).Cell n)
+    (q : Pasting n ((globular H).hom (f.app a) (f.app b))),
+    ((mapGlobular f).hom a b).app p = (flattenHom H (f.app a) (f.app b)).app q →
+    ∃! r : Pasting n ((globular G).hom a b),
+      (flattenHom G a b).app r = p ∧ map ((mapGlobular f).hom a b) r = q
+
+/-- The zero-dimensional hom evaluator is identity on the actual cells;
+the first hom-lifting boundary case therefore has a unique literal lift. -/
+theorem homFlattenCartesianAt_zero {G H : GlobularSet.{u}} (f : GlobularSet.Map G H) :
+    HomFlattenCartesianAt f 0 := by
+  intro a b p q h
+  refine ⟨p, ⟨rfl, h⟩, ?_⟩
+  intro r hr
+  exact hr.1
+
 /-- The native singleton inclusion factors through the actual hom-pasting
 inclusion; this is an equation of globular maps, including all boundaries. -/
 theorem singleton_hom_factor (G : GlobularSet.{u}) (a b : G.Cell 0) :

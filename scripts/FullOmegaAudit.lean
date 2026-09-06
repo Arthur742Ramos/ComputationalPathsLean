@@ -45,6 +45,18 @@ completion gate for the full weak omega-groupoid theorem. -/
 #print axioms Pasting.flattenHom_natural
 #print axioms Pasting.flattenHom_segments_natural
 #print axioms Pasting.flatten_horizontal_segments
+#print axioms Pasting.homPastingInclusion_injective
+#print axioms Pasting.homPastingInclusion_natural
+#print axioms Pasting.flattenHom_factor
+#print axioms Pasting.homFlattenCartesianAt_zero
+
+example (G : GlobularSet.{u}) (a b : G.Cell 0) :
+    GlobularSet.Map.comp ((Pasting.flattenGlobular G).hom a b)
+      (Pasting.homPastingInclusion (Pasting.globular G) a b) = Pasting.flattenHom G a b :=
+  Pasting.flattenHom_factor G a b
+
+example {G H : GlobularSet.{u}} (f : GlobularSet.Map G H) :
+    Pasting.HomFlattenCartesianAt f 0 := Pasting.homFlattenCartesianAt_zero f
 
 example {G : GlobularSet.{u}} {n : Nat} {a b : G.Cell 0}
     (p : Chain (fun x y => Pasting n ((Pasting.globular G).hom x y)) a b) :
