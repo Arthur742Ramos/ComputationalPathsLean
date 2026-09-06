@@ -134,7 +134,12 @@ pasting diagrams to ordinary labelled pasting diagrams, in every dimension.
 `flatten_singleton` proves the first multiplication unit equation on all
 diagrams, including empty and composite ones. Its proof uses the actual
 right-unit law inherited through all hom contexts; it does not erase labels
-or postulate an evaluator. Naturality of multiplication, its other unit
+or postulate an evaluator. `flatten_natural` now proves that relabelling and
+flattening commute in every dimension, and `flattenNatTrans` packages this
+as a Mathlib natural transformation from the doubled pasting functor to the
+pasting functor. The proof uses actual preservation of cut composition and
+units (`mapGlobular_preserves`), their inheritance to hom sets, and the
+implemented evaluator's pre- and postcomposition laws. The other unit
 equation, associativity, and the free universal property remain unfinished.
 Consequently this is not yet a proved monad or globular operad.
 

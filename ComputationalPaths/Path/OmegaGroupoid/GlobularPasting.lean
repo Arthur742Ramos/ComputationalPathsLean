@@ -1,5 +1,6 @@
 import ComputationalPaths.Path.OmegaGroupoid.GlobularFoundations
 import Mathlib.CategoryTheory.Functor.Basic
+import Mathlib.CategoryTheory.NatTrans
 
 /-!
 # Recursively labelled globular pasting diagrams
@@ -1898,6 +1899,13 @@ structure CutOperations (G : GlobularSet.{u}) where
 
 namespace CutOperations
 
+/-- A globular map preserving the actual operations at every cut. -/
+structure Preserves {G H : GlobularSet.{u}} (C : CutOperations G) (D : CutOperations H)
+    (f : GlobularSet.Map G H) : Prop where
+  compose : ∀ {n} (c : Cut n) (p q : G.Cell n) h h',
+    f.app (C.compose c p q h) = D.compose c (f.app p) (f.app q) h'
+  unit : ∀ {n} (c : Cut n) (p : G.Cell c.height), f.app (C.unit c p) = D.unit c (f.app p)
+
 def RightUnital {G : GlobularSet.{u}} (C : CutOperations G) : Prop :=
   ∀ {n} (c : Cut n) (p : G.Cell n),
     C.compose c p (C.unit c (CutBoundary.target c G p))
@@ -1996,6 +2004,12 @@ theorem RightUnital.hom {G : GlobularSet.{u}} {C : CutOperations G}
   change C.compose (.lift c) p.val (C.unit (.lift c) (CutBoundary.target c (G.hom a b) p).val) _ = p.val
   simp only [← CutBoundary.target_hom]
   exact R (.lift c) p.val
+
+theorem Preserves.hom {G H : GlobularSet.{u}} {C : CutOperations G} {D : CutOperations H}
+    {f : GlobularSet.Map G H} (P : Preserves C D f) (a b : G.Cell 0) :
+    Preserves (C.hom a b) (D.hom (f.app a) (f.app b)) (f.hom a b) where
+  compose c p q h h' := Subtype.ext (P.compose (.lift c) p.val q.val _ _)
+  unit c p := Subtype.ext (P.unit (.lift c) p.val)
 
 end CutOperations
 
@@ -2269,6 +2283,50 @@ theorem cutOperations_rightUnital (G : GlobularSet.{u}) : (cutOperations G).Righ
   simp only [canonical_target_eq_cutTarget]
   exact cutCompose_right_unit c p
 
+theorem map_cutCompose {n : Nat} (c : Cut n) {G H : GlobularSet.{u}} (f : GlobularSet.Map G H)
+    (p q : Pasting n G) (h : cutTarget c p = cutSource c q)
+    (h' : cutTarget c (map f p) = cutSource c (map f q)) :
+    map f (cutCompose c p q h) = cutCompose c (map f p) (map f q) h' := by
+  induction c generalizing G H with
+  | bottom =>
+    rcases p with ⟨a, b, p⟩
+    rcases q with ⟨c, d, q⟩
+    change b = c at h
+    cases h
+    exact map_horizontal f p q
+  | @lift n c ih =>
+    rcases p with ⟨a, b, p⟩
+    rcases q with ⟨d, e, q⟩
+    have ha : a = d := _root_.congrArg Sigma.fst h
+    have hb : b = e := _root_.congrArg (fun z => z.2.1) h
+    cases ha
+    cases hb
+    have hp : p.map (fun e => cutTarget c e) = q.map (fun e => cutSource c e) :=
+      eq_of_heq (Sigma.mk.inj (eq_of_heq (Sigma.mk.inj h).2)).2
+    have hp' : (p.mapAlong f.app (fun {x y} e => map (f.hom x y) e)).map (fun e => cutTarget c e) =
+        (q.mapAlong f.app (fun {x y} e => map (f.hom x y) e)).map (fun e => cutSource c e) :=
+      eq_of_heq (Sigma.mk.inj (eq_of_heq (Sigma.mk.inj h').2)).2
+    exact _root_.congrArg (pack (G := H)) (Chain.mapAlong_zipOver
+      (F := fun x y => Pasting n (H.hom x y)) f.app (fun {x y} e => map (f.hom x y) e)
+      (fun e => cutTarget c e) (fun e => cutSource c e)
+      (fun e => cutTarget c e) (fun e => cutSource c e)
+      (fun e d h => cutCompose c e d h) (fun e d h => cutCompose c e d h)
+      (fun {x y} e d h j => ih (f.hom x y) e d h j) p q hp hp')
+
+theorem map_cutUnit {n : Nat} (c : Cut n) {G H : GlobularSet.{u}} (f : GlobularSet.Map G H)
+    (p : Pasting c.height G) : map f (cutUnit c p) = cutUnit c (map f p) := by
+  induction c generalizing G H with
+  | bottom => rfl
+  | lift c ih =>
+    rcases p with ⟨a, b, p⟩
+    exact _root_.congrArg pack
+      (Chain.mapAlong_natural _ _ _ _ _ (fun {x y} e => (ih (f.hom x y) e).symm) p).symm
+
+theorem mapGlobular_preserves {G H : GlobularSet.{u}} (f : GlobularSet.Map G H) :
+    CutOperations.Preserves (cutOperations G) (cutOperations H) (mapGlobular f) where
+  compose c p q h h' := map_cutCompose c f p q _ _
+  unit c p := map_cutUnit c f p
+
 theorem cutSource_at (k n : Nat) {G : GlobularSet.{u}} (p : Pasting (n + k + 1) G) :
     HEq (cutSource (Cut.at k n) p) (sourceAt k n p) := by
   induction k generalizing G with
@@ -2534,6 +2592,20 @@ theorem CutOperations.horizontal_right_unit {H : GlobularSet.{u}} {C : CutOperat
   have h : CutBoundary.target (.bottom : Cut (n + 1)) H p.val = b := p.property.2
   simpa only [h] using R (.bottom : Cut (n + 1)) p.val
 
+theorem CutOperations.Preserves.horizontal_unit {G H : GlobularSet.{u}}
+    {C : CutOperations G} {D : CutOperations H} {f : GlobularSet.Map G H}
+    (P : Preserves C D f) (n : Nat) (a : G.Cell 0) :
+    (f.hom a a).app (C.horizontalUnit n a) = D.horizontalUnit n (f.app a) :=
+  Subtype.ext (P.unit (.bottom : Cut (n + 1)) a)
+
+theorem CutOperations.Preserves.horizontal_mul {G H : GlobularSet.{u}}
+    {C : CutOperations G} {D : CutOperations H} {f : GlobularSet.Map G H}
+    (P : Preserves C D f) {n : Nat} {a b c : G.Cell 0}
+    (p : (G.hom a b).Cell n) (q : (G.hom b c).Cell n) :
+    (f.hom a c).app (C.horizontalMul p q) =
+      D.horizontalMul ((f.hom a b).app p) ((f.hom b c).app q) :=
+  Subtype.ext (P.compose (.bottom : Cut (n + 1)) p.val q.val _ _)
+
 /-- All finite iterated hom contexts of a fixed globular set. This allows a
 single evaluation recursion to descend into the actual target hom sets. -/
 inductive HomContext (H : GlobularSet.{u}) : GlobularSet.{u} → Type (u + 1) where
@@ -2566,10 +2638,13 @@ theorem CutOperations.RightUnital.inContext {H K : GlobularSet.{u}} {C : CutOper
 abbrev RecursiveComposition (H : GlobularSet.{u}) :=
   ∀ {K : GlobularSet.{u}}, HomContext H K → HorizontalComposition K
 
+def CutOperations.recursive {H : GlobularSet.{u}} (C : CutOperations H) (L : C.Compatible) :
+    RecursiveComposition H := fun h => (C.inContext h).horizontal (L.inContext h)
+
 /-- The concrete pasting carrier now supplies operations in every iterated
 hom context, including the boundary equations needed by evaluation. -/
 noncomputable def recursiveComposition (G : GlobularSet.{u}) : RecursiveComposition (globular G) :=
-  fun h => ((cutOperations G).inContext h).horizontal ((cutOperations_compatible G).inContext h)
+  (cutOperations G).recursive (cutOperations_compatible G)
 
 theorem recursiveComposition_right_unit (G : GlobularSet.{u}) {K : GlobularSet.{u}}
     (h : HomContext (globular G) K) {n : Nat} {a b : K.Cell 0} (p : (K.hom a b).Cell n) :
@@ -2600,6 +2675,18 @@ theorem target_fold {H : GlobularSet.{u}} (C : HorizontalComposition H)
 
 end HorizontalComposition
 
+theorem CutOperations.Preserves.fold {G H : GlobularSet.{u}}
+    {C : CutOperations G} {D : CutOperations H} {f : GlobularSet.Map G H}
+    (P : Preserves C D f) (L : C.Compatible) (M : D.Compatible)
+    {n : Nat} {a b : G.Cell 0} (p : Chain (fun x y => (G.hom x y).Cell n) a b) :
+    (f.hom a b).app ((C.horizontal L).fold p) =
+      (D.horizontal M).fold (p.mapAlong f.app (fun {x y} e => (f.hom x y).app e)) := by
+  induction p with
+  | nil a => exact P.horizontal_unit n a
+  | cons e p ih =>
+    exact (P.horizontal_mul e ((C.horizontal L).fold p)).trans
+      (_root_.congrArg (D.horizontalMul ((f.hom _ _).app e)) ih)
+
 /-- Evaluate every labelled pasting cell by dimension recursion, using the
 target's operations in its actual iterated hom sets. The concrete pasting
 target instantiation below supplies candidate multiplication. -/
@@ -2610,6 +2697,41 @@ def evaluate {H : GlobularSet.{u}} (C : RecursiveComposition H) :
   | n + 1, _, _, h, f, ⟨a, b, p⟩ =>
       ((C h).fold (p.mapAlong f.app (fun {x y} e =>
         evaluate C (n := n) (h.hom (f.app x) (f.app y)) (f.hom x y) e))).val
+
+theorem evaluate_precompose {H : GlobularSet.{u}} (C : RecursiveComposition H)
+    {n : Nat} {G K J : GlobularSet.{u}} (h : HomContext H J)
+    (f : GlobularSet.Map K J) (g : GlobularSet.Map G K) (p : Pasting n G) :
+    evaluate C h f (map g p) = evaluate C h (GlobularSet.Map.comp f g) p := by
+  induction n generalizing G K J with
+  | zero => rfl
+  | succ n ih =>
+    rcases p with ⟨a, b, p⟩
+    apply _root_.congrArg (fun q => ((C h).fold q).val)
+    refine (Chain.mapAlong_comp _ _ _ _ p).trans (Chain.mapAlong_congr _ _ _ ?_ p)
+    intro x y e
+    simp only [GlobularSet.Map.hom_comp]
+    exact ih (h.hom (f.app (g.app x)) (f.app (g.app y))) (f.hom _ _) (g.hom x y) e
+
+theorem evaluate_postcompose {H K : GlobularSet.{u}} (C : CutOperations H) (D : CutOperations K)
+    (L : C.Compatible) (M : D.Compatible) {n : Nat} {G H' K' : GlobularSet.{u}}
+    (h : HomContext H H') (k : HomContext K K') (g : GlobularSet.Map H' K')
+    (P : CutOperations.Preserves (C.inContext h) (D.inContext k) g)
+    (f : GlobularSet.Map G H') (p : Pasting n G) :
+    g.app (evaluate (C.recursive L) h f p) =
+      evaluate (D.recursive M) k (GlobularSet.Map.comp g f) p := by
+  induction n generalizing G H' K' with
+  | zero => rfl
+  | succ n ih =>
+    rcases p with ⟨a, b, p⟩
+    refine (_root_.congrArg Subtype.val (P.fold (L.inContext h) (M.inContext k)
+      (p.mapAlong f.app (fun {x y} e => evaluate (C.recursive L)
+        (h.hom (f.app x) (f.app y)) (f.hom x y) e)))).trans ?_
+    apply _root_.congrArg (fun q => (((D.inContext k).horizontal (M.inContext k)).fold q).val)
+    refine (Chain.mapAlong_comp _ _ _ _ p).trans (Chain.mapAlong_congr _ _ _ ?_ p)
+    intro x y e
+    simp only [GlobularSet.Map.hom_comp]
+    exact ih (h.hom (f.app x) (f.app y)) (k.hom (g.app (f.app x)) (g.app (f.app y)))
+      (g.hom (f.app x) (f.app y)) (P.hom (f.app x) (f.app y)) (f.hom x y) e
 
 theorem source_evaluate {H : GlobularSet.{u}} (C : RecursiveComposition H)
     {n : Nat} {G K : GlobularSet.{u}} (h : HomContext H K) (f : GlobularSet.Map G K)
@@ -2654,10 +2776,38 @@ def evaluateGlobular {H : GlobularSet.{u}} (C : RecursiveComposition H)
 
 /-- Flatten genuinely nested labelled pasting diagrams in every dimension.
 This is the candidate monad multiplication as an actual globular map;
-its naturality and monad equations still require separate proofs. -/
+its naturality and monad equations are separate proof obligations. -/
 noncomputable def flattenGlobular (G : GlobularSet.{u}) :
     GlobularSet.Map (globular (globular G)) (globular G) :=
   evaluateGlobular (recursiveComposition G) .root (GlobularSet.Map.id (globular G))
+
+/-- Relabelling commutes with the implemented all-dimensional flattening. -/
+theorem flatten_natural {G H : GlobularSet.{u}} (f : GlobularSet.Map G H)
+    {n : Nat} (p : Pasting n (globular G)) :
+    map f ((flattenGlobular G).app (n := n) p) =
+      (flattenGlobular H).app (n := n) (map (mapGlobular f) p) := by
+  have hpost := evaluate_postcompose (cutOperations G) (cutOperations H)
+    (cutOperations_compatible G) (cutOperations_compatible H) .root .root
+    (mapGlobular f) (mapGlobular_preserves f) (GlobularSet.Map.id (globular G)) p
+  have hpre := evaluate_precompose (recursiveComposition H) .root
+    (GlobularSet.Map.id (globular H)) (mapGlobular f) p
+  have he : GlobularSet.Map.comp (mapGlobular f) (GlobularSet.Map.id (globular G)) =
+      GlobularSet.Map.comp (GlobularSet.Map.id (globular H)) (mapGlobular f) := by
+    apply GlobularSet.Map.ext
+    intro m c
+    rfl
+  exact hpost.trans ((_root_.congrArg (fun g => evaluate (recursiveComposition H) .root g p) he).trans hpre.symm)
+
+/-- Candidate multiplication is now a natural transformation, not just an
+objectwise family of boundary-preserving maps. The remaining monad equations
+are still separate obligations. -/
+noncomputable def flattenNatTrans :
+    CategoryTheory.NatTrans (pastingFunctor.comp pastingFunctor) pastingFunctor where
+  app := flattenGlobular
+  naturality {X Y} f := by
+    apply GlobularSet.Map.ext
+    intro n p
+    exact (flatten_natural f p).symm
 
 /-- Evaluation extends the original labelling whenever each target hom
 context has a right unit. The labels are recovered exactly, not quotiented. -/

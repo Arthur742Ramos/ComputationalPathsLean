@@ -365,6 +365,20 @@ example {A : Type} {n : Nat} (p : NativeTower.Cell A (n + 1)) :
 #print axioms Pasting.flattenGlobular
 #print axioms Pasting.flatten_singleton
 
+#print axioms Pasting.CutOperations.Preserves.hom
+#print axioms Pasting.map_cutCompose
+#print axioms Pasting.map_cutUnit
+#print axioms Pasting.mapGlobular_preserves
+#print axioms Pasting.evaluate_precompose
+#print axioms Pasting.evaluate_postcompose
+#print axioms Pasting.flatten_natural
+#print axioms Pasting.flattenNatTrans
+
+example {G H : GlobularSet} (f : GlobularSet.Map G H) {n : Nat} (p : Pasting n (Pasting.globular G)) :
+    Pasting.map f ((Pasting.flattenGlobular G).app (n := n) p) =
+      (Pasting.flattenGlobular H).app (n := n) (Pasting.map (Pasting.mapGlobular f) p) :=
+  Pasting.flatten_natural f p
+
 example (G : GlobularSet) {n : Nat} (p : Pasting (n + 1) (Pasting.globular G)) :
     Pasting.source ((Pasting.flattenGlobular G).app (n := n + 1) p) =
       (Pasting.flattenGlobular G).app (n := n) (Pasting.source p) :=
