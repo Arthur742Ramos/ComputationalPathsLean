@@ -6,9 +6,10 @@ import ComputationalPaths.Path.OmegaGroupoid.NativeGlobularTower
 
 Operations retain their pasting arity and evaluate labelled inputs of that
 arity. The zero-dimensional operation is normalized to the identity.
-This file constructs a collection, evaluation, unit and substitution maps,
-and a native contraction. The operadic coherence laws remain to be proved;
-the displayed maps alone do not yet constitute an operad.
+The collection is a lawful monoid in globular collections, and evaluation
+is an actual algebra for its induced monad. For the native tower its arity
+map also has a contraction. Comparisons with the selected native binary
+operations and coherence certificates are separate obligations.
 -/
 
 namespace ComputationalPaths.Path.OmegaFoundations
@@ -327,8 +328,8 @@ theorem multiplicationEvaluation_normalized (G : GlobularSet.{u}) :
   exact _root_.congrArg (fun q : (((collection G).substitute (collection G)).application G).Cell 0 =>
     q.val.2) h
 
-/-- Concrete substitution of endomorphism operations. Its evaluation law
-is proved below; the monoid's coherence laws are still separate obligations. -/
+/-- Concrete substitution of endomorphism operations. Its evaluation and
+monoid coherence laws are proved below. -/
 noncomputable def multiplication (G : GlobularSet.{u}) :
     GlobularCollection.Hom ((collection G).substitute (collection G)) (collection G) :=
   abstraction (multiplicationEvaluation G) (multiplicationEvaluation_normalized G)
@@ -365,6 +366,232 @@ theorem evaluation_multiplication_nested (G : GlobularSet.{u}) {n : Nat}
     ((collection G).substitutionComparisonIso (collection G) G).hom_inv_id
   exact hm.trans (_root_.congrArg (fun q =>
     (evaluation G).app (((collection G).map (evaluation G)).app q)) hi)
+
+/-- Application of the collection left unitor is singleton extraction
+on the outer operation, with every inner input retained. -/
+theorem leftUnit_comparison (C : GlobularCollection.{u}) (G : GlobularSet.{u})
+    {n : Nat} (p : (GlobularCollection.identity.application (C.application G)).Cell n) :
+    ((GlobularCollection.Hom.leftUnit C).application G).app
+      ((GlobularCollection.identity.substitutionComparison C G).app p) =
+        (GlobularCollection.identityApplicationOut (C.application G)).app p := by
+  let r := (GlobularCollection.identityApplicationOut (C.application G)).app p
+  have hp : Pasting.singleton r = p.val.2 :=
+    _root_.congrArg (fun k : GlobularSet.Map
+      (GlobularCollection.identity.application (C.application G)) (Pasting.globular (C.application G)) =>
+        k.app p) (GlobularCollection.identityApplicationOut_inputs (C.application G))
+  apply Subtype.ext
+  apply Prod.ext
+  · apply Pasting.singleton_injective C.operations
+    have ho := _root_.congrArg (fun k : GlobularSet.Map
+      (GlobularCollection.identity.application C.operations) (Pasting.globular C.operations) =>
+        k.app ((GlobularCollection.identity.substitutionOperation C G).app p))
+      (GlobularCollection.identityApplicationOut_inputs C.operations)
+    exact ho.trans ((_root_.congrArg (Pasting.map (C.operation G)) hp.symm).trans
+      (Pasting.map_singleton (C.operation G) r))
+  · exact (_root_.congrArg (fun q => (Pasting.flattenGlobular G).app
+      (Pasting.map (C.inputs G) q)) hp.symm).trans
+      ((_root_.congrArg (Pasting.flattenGlobular G).app
+        (Pasting.map_singleton (C.inputs G) r)).trans (Pasting.flatten_singleton r.val.2))
+
+/-- Application of the collection right unitor extracts each singleton
+input before using the outer operation. -/
+theorem rightUnit_comparison (C : GlobularCollection.{u}) (G : GlobularSet.{u})
+    {n : Nat} (p : (C.application (GlobularCollection.identity.application G)).Cell n) :
+    ((GlobularCollection.Hom.rightUnit C).application G).app
+      ((C.substitutionComparison GlobularCollection.identity G).app p) =
+        (C.map (GlobularCollection.identityApplicationOut G)).app p := by
+  apply Subtype.ext
+  apply Prod.ext
+  · rfl
+  · have hi := GlobularCollection.identityApplicationOut_inputs G
+    exact (_root_.congrArg (Pasting.flattenGlobular G).app
+      ((_root_.congrArg (fun k => Pasting.map k p.val.2) hi.symm).trans
+        (Pasting.map_comp (GlobularCollection.identityApplicationOut G)
+          (Pasting.singletonGlobular G) p.val.2).symm)).trans
+      (Pasting.flatten_map_singleton (Pasting.map (GlobularCollection.identityApplicationOut G) p.val.2))
+
+/-- Evaluation of substituted collection maps is composition of their
+evaluations. This exposes both the outer and every inner operation. -/
+theorem evaluation_substitute_nested {C D : GlobularCollection.{u}} (G : GlobularSet.{u})
+    (f : GlobularCollection.Hom C (collection G)) (g : GlobularCollection.Hom D (collection G))
+    {n : Nat} (p : (C.application (D.application G)).Cell n) :
+    (evaluation G).app (((multiplication G).application G).app
+      (((GlobularCollection.Hom.substitute f g).application G).app
+        ((C.substitutionComparison D G).app p))) =
+      (evaluation G).app ((f.application G).app
+        ((C.map (GlobularSet.Map.comp (evaluation G) (g.application G))).app p)) := by
+  have hc := _root_.congrArg (fun k : GlobularSet.Map (C.application (D.application G))
+    (((collection G).substitute (collection G)).application G) => k.app p)
+    (GlobularCollection.Hom.substitute_comparison f g G)
+  have hn := _root_.congrArg (fun k : GlobularSet.Map (C.application ((collection G).application G))
+    ((collection G).application G) => k.app ((C.map (g.application G)).app p))
+    (f.application_natural (evaluation G))
+  refine (_root_.congrArg (fun q => (evaluation G).app
+    (((multiplication G).application G).app q)) hc).trans ?_
+  refine (evaluation_multiplication_nested G _).trans ?_
+  refine (_root_.congrArg (evaluation G).app hn.symm).trans ?_
+  apply _root_.congrArg (fun q => (evaluation G).app ((f.application G).app q))
+  apply Subtype.ext
+  exact Prod.ext rfl (Pasting.map_comp (g.application G) (evaluation G) p.val.2)
+
+/-- The concrete endomorphism substitution satisfies the operadic left
+unit law as equality of arity-preserving maps, not just up to a filler. -/
+theorem one_mul (G : GlobularSet.{u}) :
+    GlobularCollection.Hom.comp (multiplication G)
+      (GlobularCollection.Hom.substitute (unit G) (GlobularCollection.Hom.id (collection G))) =
+        GlobularCollection.Hom.leftUnit (collection G) := by
+  apply evaluation_injective
+  apply GlobularSet.Map.ext
+  intro n p
+  obtain ⟨q, rfl, _⟩ :=
+    GlobularCollection.identity.substitutionComparison_unique_lift (collection G) G p
+  refine (evaluation_substitute_nested G (unit G) (GlobularCollection.Hom.id (collection G)) q).trans ?_
+  have hu := _root_.congrArg (fun k : GlobularSet.Map (GlobularCollection.identity.application G) G =>
+    k.app ((GlobularCollection.identity.map (evaluation G)).app q)) (evaluation_unit G)
+  refine hu.trans ?_
+  have hn := _root_.congrArg (fun k : GlobularSet.Map
+    (GlobularCollection.identity.application ((collection G).application G)) G => k.app q)
+    (GlobularCollection.identityApplicationOut_natural (evaluation G))
+  exact hn.trans (_root_.congrArg (evaluation G).app
+    (leftUnit_comparison (collection G) G q).symm)
+
+/-- The concrete endomorphism substitution satisfies the operadic right
+unit law on every arity and all raw evaluation values. -/
+theorem mul_one (G : GlobularSet.{u}) :
+    GlobularCollection.Hom.comp (multiplication G)
+      (GlobularCollection.Hom.substitute (GlobularCollection.Hom.id (collection G)) (unit G)) =
+        GlobularCollection.Hom.rightUnit (collection G) := by
+  apply evaluation_injective
+  apply GlobularSet.Map.ext
+  intro n p
+  obtain ⟨q, rfl, _⟩ :=
+    (collection G).substitutionComparison_unique_lift GlobularCollection.identity G p
+  refine (evaluation_substitute_nested G (GlobularCollection.Hom.id (collection G)) (unit G) q).trans ?_
+  refine (_root_.congrArg (fun k : GlobularSet.Map (GlobularCollection.identity.application G) G =>
+    (evaluation G).app (((collection G).map k).app q)) (evaluation_unit G)).trans ?_
+  exact _root_.congrArg (evaluation G).app (rightUnit_comparison (collection G) G q).symm
+
+/-- Reassociation of collection operations agrees with reassociation of
+their complete labelled application diagrams. -/
+theorem associateInv_comparison (C D E : GlobularCollection.{u}) (G : GlobularSet.{u})
+    {n : Nat} (p : (C.application (D.application (E.application G))).Cell n) :
+    ((GlobularCollection.Hom.associateInv C D E).application G).app
+      ((C.substitutionComparison (D.substitute E) G).app
+        ((C.map (D.substitutionComparison E G)).app p)) =
+      (((C.substitute D).substitutionComparison E G).app
+        ((C.substitutionComparison D (E.application G)).app p)) := by
+  apply Subtype.ext
+  apply Prod.ext
+  · have hn := _root_.congrArg (fun k : GlobularSet.Map
+      (C.application (D.application (E.application G))) ((C.substitute D).application E.operations) =>
+        k.app p) (C.substitutionComparison_natural D (E.operation G))
+    refine Eq.trans ?_ hn
+    apply _root_.congrArg (C.substitutionComparison D E.operations).app
+    apply Subtype.ext
+    exact Prod.ext rfl (Pasting.map_comp (D.substitutionComparison E G)
+      ((D.substitute E).operation G) p.val.2)
+  · change (Pasting.flattenGlobular G).app
+      (Pasting.map ((D.substitute E).inputs G)
+        (Pasting.map (D.substitutionComparison E G) p.val.2)) =
+      (Pasting.flattenGlobular G).app (Pasting.map (E.inputs G)
+        ((Pasting.flattenGlobular (E.application G)).app
+          (Pasting.map (D.inputs (E.application G)) p.val.2)))
+    have hn := Pasting.flatten_natural (E.inputs G)
+      (Pasting.map (D.inputs (E.application G)) p.val.2)
+    refine Eq.trans ?_ (_root_.congrArg (Pasting.flattenGlobular G).app hn).symm
+    refine Eq.trans ?_ (Pasting.flatten_assoc G
+      (Pasting.map (Pasting.mapGlobular (E.inputs G))
+        (Pasting.map (D.inputs (E.application G)) p.val.2))).symm
+    apply _root_.congrArg (Pasting.flattenGlobular G).app
+    refine (Pasting.map_comp (D.substitutionComparison E G) ((D.substitute E).inputs G) p.val.2).trans ?_
+    refine (Pasting.map_comp
+      (GlobularSet.Map.comp (Pasting.mapGlobular (E.inputs G)) (D.inputs (E.application G)))
+      (Pasting.flattenGlobular G) p.val.2).symm.trans ?_
+    exact _root_.congrArg (Pasting.map (Pasting.flattenGlobular G))
+      (Pasting.map_comp (D.inputs (E.application G)) (Pasting.mapGlobular (E.inputs G)) p.val.2).symm
+
+/-- Associativity for the concrete substitution, with the specified
+collection associator transporting the entire nested arity. -/
+theorem mul_assoc_inv (G : GlobularSet.{u}) :
+    GlobularCollection.Hom.comp (multiplication G)
+      (GlobularCollection.Hom.comp
+        (GlobularCollection.Hom.substitute (multiplication G) (GlobularCollection.Hom.id (collection G)))
+        (GlobularCollection.Hom.associateInv (collection G) (collection G) (collection G))) =
+      GlobularCollection.Hom.comp (multiplication G)
+        (GlobularCollection.Hom.substitute (GlobularCollection.Hom.id (collection G)) (multiplication G)) := by
+  let C := collection G
+  let e := evaluation G
+  let m := (multiplication G).application G
+  have hem : GlobularSet.Map.comp e (GlobularSet.Map.comp m (C.substitutionComparison C G)) =
+      GlobularSet.Map.comp e (C.map e) := by
+    apply GlobularSet.Map.ext
+    intro n r
+    exact evaluation_multiplication_nested G r
+  apply evaluation_injective
+  apply GlobularSet.Map.ext
+  intro n p
+  obtain ⟨q, rfl, _⟩ := C.substitutionComparison_unique_lift (C.substitute C) G p
+  let r := (C.map (C.substitutionComparisonInverse C G)).app q
+  have hq : (C.map (C.substitutionComparison C G)).app r = q :=
+    _root_.congrArg (fun k : GlobularSet.Map (C.application ((C.substitute C).application G))
+      (C.application ((C.substitute C).application G)) => k.app q)
+      (C.functor.mapIso (C.substitutionComparisonIso C G)).inv_hom_id
+  change e.app (m.app
+    (((GlobularCollection.Hom.substitute (multiplication G) (GlobularCollection.Hom.id C)).application G).app
+      (((GlobularCollection.Hom.associateInv C C C).application G).app
+        ((C.substitutionComparison (C.substitute C) G).app q)))) =
+    e.app (m.app
+      (((GlobularCollection.Hom.substitute (GlobularCollection.Hom.id C) (multiplication G)).application G).app
+        ((C.substitutionComparison (C.substitute C) G).app q)))
+  rw [← hq]
+  have ha := associateInv_comparison C C C G r
+  have hl := evaluation_substitute_nested G (multiplication G) (GlobularCollection.Hom.id C)
+    ((C.substitutionComparison C (C.application G)).app r)
+  have hn := _root_.congrArg (fun k : GlobularSet.Map (C.application (C.application (C.application G)))
+    ((C.substitute C).application G) => k.app r) (C.substitutionComparison_natural C e)
+  have hr := evaluation_substitute_nested G (GlobularCollection.Hom.id C) (multiplication G)
+    ((C.map (C.substitutionComparison C G)).app r)
+  refine (_root_.congrArg (fun t => e.app (m.app
+    (((GlobularCollection.Hom.substitute (multiplication G) (GlobularCollection.Hom.id C)).application G).app t))) ha).trans ?_
+  refine hl.trans ?_
+  refine (_root_.congrArg (fun t => e.app (m.app t)) hn.symm).trans ?_
+  refine (evaluation_multiplication_nested G _).trans ?_
+  refine Eq.trans ?_ hr.symm
+  have hc : (C.map e).app ((C.map (C.map e)).app r) =
+      (C.map (GlobularSet.Map.comp e m)).app ((C.map (C.substitutionComparison C G)).app r) := by
+    apply Subtype.ext
+    apply Prod.ext
+    · rfl
+    · exact (Pasting.map_comp (C.map e) e r.val.2).trans
+        ((_root_.congrArg (fun k => Pasting.map k r.val.2) hem.symm).trans
+          (Pasting.map_comp (C.substitutionComparison C G) (GlobularSet.Map.comp e m) r.val.2).symm)
+  exact _root_.congrArg e.app hc
+
+/-- Endomorphism operations form a monoid in the verified monoidal
+category of globular collections: a lawful operad over the pasting monad. -/
+noncomputable instance operad (G : GlobularSet.{u}) : CategoryTheory.MonObj (collection G) where
+  one := unit G
+  mul := multiplication G
+  one_mul := one_mul G
+  mul_one := mul_one G
+  mul_assoc := (CategoryTheory.Iso.inv_comp_eq
+    (GlobularCollection.associatorIso (collection G) (collection G) (collection G))).mp
+      (mul_assoc_inv G)
+
+/-- The original globular carrier is an actual algebra for its
+endomorphism operad. Both laws concern every dimension and raw cell value. -/
+noncomputable def algebra (G : GlobularSet.{u}) :
+    CategoryTheory.Monad.Algebra (GlobularCollection.operadMonad (collection G)) where
+  A := G
+  a := evaluation G
+  unit := by
+    apply GlobularSet.Map.ext
+    intro n p
+    exact evaluation_unit_input G p
+  assoc := by
+    apply GlobularSet.Map.ext
+    intro n p
+    exact evaluation_multiplication_nested G p
 
 /-- Recover the actual trace carried by a one-dimensional hom label. -/
 def nativeEdge {A : Type u} {a b : (NativeTower.globular A).Cell 0}
@@ -436,9 +663,8 @@ noncomputable def nativeNext {A : Type u} {n : Nat}
     source_eval := fun p h => (NativeTower.fillPositive_boundary _ _ _ _).1
     target_eval := fun p h => (NativeTower.fillPositive_boundary _ _ _ _).2 }
 
-/-- The normalized native endomorphism collection has an actual contraction
-over the pasting-shape map in every positive dimension. This is not yet a
-contractible operad: its substitution and unit laws remain to be supplied. -/
+/-- The normalized native endomorphism operad has an actual contraction
+over the pasting-shape map in every positive dimension. -/
 noncomputable def nativeContraction (A : Type u) :
     GlobularSet.Contraction (arity (NativeTower.globular A)) where
   lift {n} p := by

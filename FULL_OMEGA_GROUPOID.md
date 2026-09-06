@@ -3,6 +3,12 @@
 Status: in progress. The completed associativity certificate remains in
 `ASSOCIATIVITY_HIGHER_COHERENCE.md`; it is not the theorem specified here.
 
+Current milestone: the normalized native endomorphism operad now has a
+verified contraction and an actual algebra action on the native tower.
+The comparisons with the selected native compositions, invertibility and
+associativity certificate, and the standard free-category definition bridge,
+remain completion gates.
+
 ## Mathematical target
 
 Use a precise globular-operadic definition, with an algebra over an appropriate
@@ -64,8 +70,9 @@ proved. A finite-dimensional package does not complete this objective.
 
 These definitions and lemmas build without proof holes. The candidate native
 carrier described below now instantiates the correspondence interface and
-has coinductive invertibility for its specified adjacent operations; an
-operadic action and its compatibility with those operations remain unproved.
+has coinductive invertibility for its specified adjacent operations. The
+endomorphism operad action is now proved below; compatibility with those
+specified operations remains unproved.
 
 ```sh
 lake build ComputationalPaths.Path.OmegaGroupoid.GlobularPasting
@@ -339,7 +346,7 @@ orientation. Its proof separately preserves both operation layers and the
 flattened inputs using relabelling composition, flattening naturality, and
 flattening associativity. These verified structural equations alone still
 do not construct the requested contractible operad or its native
-computational-path action; the operad/algebra bridge remains required.
+computational-path action; the concrete construction is now supplied below.
 
 The collection category now instantiates Mathlib's actual
 `MonoidalCategory`. `substituteIso` transports isomorphisms through the
@@ -348,8 +355,8 @@ the inverse-oriented equations into the standard forward orientation by
 the proved isomorphism laws. `monoidalCategory` packages substitution as
 tensor, the singleton collection as unit, and the verified associator and
 unitors, including every required coherence field. This supplies a standard
-lawful setting for an operad as a monoid in collections; it does not yet
-supply such a contractible monoid or its action on the native tower.
+lawful setting for an operad as a monoid in collections. The concrete
+endomorphism monoid and its native action are now supplied below.
 
 For any actual Mathlib `MonObj C` in this substitution category,
 `operadUnit` and `operadMul` now construct labelled unit and multiplication
@@ -376,8 +383,8 @@ theorems establish unique lifts for arbitrary globular cones; the shared
 `GlobularSet.square_globular_pullback` proof forces both boundary equations
 by cellwise uniqueness. Together with application pullback preservation,
 these prove the cartesian properties of the induced monad. The concrete
-contractible operad/native action remains to be constructed; this conditional
-bridge is not the full weak omega-groupoid theorem.
+contractible operad/native action is now constructed below; this conditional
+bridge alone is not the full weak omega-groupoid theorem.
 
 `evaluate` now evaluates labelled diagrams by dimension recursion into a
 target equipped with horizontal operations in all its iterated hom contexts
@@ -567,8 +574,8 @@ four inner ones, and `cutCompose_interchange_grid` proves interchange using
 only those four hypotheses. This covers arbitrary ordered boundary dimensions;
 the outer composites are not assumed to exist independently. The chain proof
 retains the actual labels through `zipOver_grid`. The monad is now constructed;
-its standard free-category comparison, cartesian verification, and the eventual
-weak-groupoid operadic action remain incomplete. Native/coskeletal
+its standard free-category comparison remains incomplete. Cartesian
+verification and the native endomorphism action are now supplied separately. Native/coskeletal
 coinductive invertibility is proved separately below, not yet linked to an
 operadic action.
 
@@ -589,8 +596,8 @@ is proved by `higher_ext`: cells of dimension at least three are determined by
 their boundaries. Identities and globularity are checked at every dimension.
 This carrier construction alone does not establish an operadic action,
 and does not replace the independent, presentation-sensitive associativity
-certificate. The action must still be constructed and its algebra laws verified
-before this candidate can support the requested theorem.
+certificate. The endomorphism action and algebra laws are now verified below;
+the required operation and certificate comparisons are still outstanding.
 
 The candidate now has adjacent composition and reversal at every positive
 dimension, with verified source/target laws. `compose_paths` and
@@ -634,8 +641,8 @@ boundary of positive-dimensional native cells. Its dimension-two case is
 literally the existing `QuotientPathInduction.rweqAny` derivation
 (`fillPositive_paths`); higher cases use the explicitly adjoined coskeletal
 cells. This asserts inhabitation, not equality of raw rewrite derivations,
-and does not fill arbitrary pairs of objects. It is a helper for the pending
-native operation construction, not an operadic contraction by itself.
+and does not fill arbitrary pairs of objects. It is used in the native
+operation construction below, not an operadic contraction by itself.
 The primitive trace-collapse definitions were moved without renaming into
 the dependency-light `Rewrite.TraceCollapse` module and re-exported by the
 original quotient-path-induction module. The latter still has pre-existing
@@ -669,10 +676,19 @@ inputs through the substitution comparison and performs nested evaluation.
 `evaluation_unit_input` and `evaluation_multiplication_nested` prove those
 action equations in all dimensions; the audit also checks that the unit
 preserves a raw `Path` cell literally.
-This is a contractible collection with evaluation, unit and multiplication
-maps, **not yet a contractible operad or its algebra**. The operadic left and
-right unit laws and associativity law remain required, as do comparisons
-with the specified native compositions and coherence certificates.
+`one_mul`, `mul_one`, and `mul_assoc_inv` now prove all three operadic laws
+as equalities of collection maps. The associativity proof retains the full
+nested input diagrams through `associateInv_comparison`; it does not use
+native higher fillers to replace an operadic equality.
+`Endomorphism.operad` packages the actual Mathlib `MonObj`, and
+`Endomorphism.algebra` packages the actual algebra for its induced monad.
+Together with `nativeContraction`, these give a normalized contractible
+endomorphism operad over the implemented pasting monad acting on the native
+tower. The audit instantiates both structures on that tower.
+This is not yet the full weak omega-groupoid theorem: comparison with the
+standard free strict-category monad, the specified native compositions and
+coinductive invertibility, and the independent associativity/pentagon and
+interchange certificates still require verification.
 
 Completion requires the mathematical target above to be instantiated, all
 proof dependencies audited, the relevant modules built, and preservation of
