@@ -253,6 +253,42 @@ theorem zipOver_assoc {O : Type u} {E D : O → O → Type v}
         have hq' := eq_of_heq hq
         exact _root_.congrArg₂ Chain.cons (assoc e f g he' hf') (ih q r hp' hq')
 
+/-- A label map preserving partial composition lifts to aligned chains.
+Both boundary equalities are explicit, so no injectivity of the label map
+or reflection of boundary equality is assumed. -/
+theorem map_zipOver {O : Type u} {E F D B : O → O → Type v}
+    (s t : {x y : O} → E x y → D x y)
+    (s' t' : {x y : O} → F x y → B x y)
+    (op : {x y : O} → (e f : E x y) → s e = t f → E x y)
+    (op' : {x y : O} → (e f : F x y) → s' e = t' f → F x y)
+    (f : {x y : O} → E x y → F x y)
+    (law : ∀ {x y} (e d : E x y) (h : s e = t d) (h' : s' (f e) = t' (f d)),
+      f (op e d h) = op' (f e) (f d) h')
+    {x y : O} (p q : Chain E x y) (h : p.map s = q.map t)
+    (h' : (p.map f).map s' = (q.map f).map t') :
+    (zipOver s t op p q h).map f = zipOver s' t' op' (p.map f) (q.map f) h' := by
+  induction p with
+  | nil x =>
+    cases q with
+    | nil => rfl
+    | cons d q => cases h
+  | @cons x z y e p ih =>
+    cases q with
+    | nil => cases h
+    | @cons _ z' _ d q =>
+      have hc := h
+      simp only [map] at hc
+      injection hc with hx hz hy he hp
+      cases hz
+      have he' := eq_of_heq he
+      have hp' := eq_of_heq hp
+      have hd := h'
+      simp only [map] at hd
+      injection hd with hx hz hy hf hq
+      have hf' : s' (f e) = t' (f d) := hf
+      have hq' : (p.map f).map s' = (q.map f).map t' := hq
+      exact _root_.congrArg₂ Chain.cons (law e d he' hf') (ih q hp' hq')
+
 variable {O : Type u} {E : O → O → Type v} {F : O → O → Type w}
 
 def single {x y : O} (e : E x y) : Chain E x y := .cons e (.nil y)
@@ -340,6 +376,40 @@ theorem mapAlong_append {E : O → O → Type u} {F : P → P → Type v}
   induction p with
   | nil => rfl
   | cons t p ih => exact _root_.congrArg (Chain.cons (e t)) (ih q)
+
+theorem mapAlong_zipOver {E D : O → O → Type u} {F B : P → P → Type v}
+    (a : O → P) (f : {x y : O} → E x y → F (a x) (a y))
+    (s t : {x y : O} → E x y → D x y)
+    (s' t' : {x y : P} → F x y → B x y)
+    (op : {x y : O} → (e d : E x y) → s e = t d → E x y)
+    (op' : {x y : P} → (e d : F x y) → s' e = t' d → F x y)
+    (law : ∀ {x y} (e d : E x y) (h : s e = t d) (h' : s' (f e) = t' (f d)),
+      f (op e d h) = op' (f e) (f d) h')
+    {x y : O} (p q : Chain E x y) (h : p.map s = q.map t)
+    (h' : (p.mapAlong a f).map s' = (q.mapAlong a f).map t') :
+    (zipOver s t op p q h).mapAlong a f =
+      zipOver s' t' op' (p.mapAlong a f) (q.mapAlong a f) h' := by
+  induction p with
+  | nil x =>
+    cases q with
+    | nil => rfl
+    | cons d q => cases h
+  | @cons x z y e p ih =>
+    cases q with
+    | nil => cases h
+    | @cons _ z' _ d q =>
+      have hc := h
+      simp only [map] at hc
+      injection hc with hx hz hy he hp
+      cases hz
+      have he' := eq_of_heq he
+      have hp' := eq_of_heq hp
+      have hd := h'
+      simp only [mapAlong, map] at hd
+      injection hd with hx hz hy hf hq
+      have hf' : s' (f e) = t' (f d) := hf
+      have hq' : (p.mapAlong a f).map s' = (q.mapAlong a f).map t' := hq
+      exact _root_.congrArg₂ Chain.cons (law e d he' hf') (ih q hp' hq')
 
 theorem mapAlong_comp {Q : Type w} {E : O → O → Type u}
     {F : P → P → Type v} {D : Q → Q → Type w}
@@ -886,6 +956,24 @@ def targetAt : (k n : Nat) → {G : GlobularSet.{u}} → Pasting (n + k + 1) G �
   | k + 1, n, G, ⟨a, b, p⟩ =>
       ⟨a, b, p.map (fun {x y} e => targetAt k n (G := G.hom x y) e)⟩
 
+theorem sourceAt_map (k n : Nat) {G H : GlobularSet.{u}} (f : GlobularSet.Map G H)
+    (p : Pasting (n + k + 1) G) : sourceAt k n (map f p) = map f (sourceAt k n p) := by
+  induction k generalizing G H with
+  | zero => rcases p with ⟨a, b, p⟩; rfl
+  | succ k ih =>
+    rcases p with ⟨a, b, p⟩
+    exact _root_.congrArg pack (Chain.mapAlong_natural _ _ _ _ _
+      (fun {x y} e => ih (f.hom x y) e) p)
+
+theorem targetAt_map (k n : Nat) {G H : GlobularSet.{u}} (f : GlobularSet.Map G H)
+    (p : Pasting (n + k + 1) G) : targetAt k n (map f p) = map f (targetAt k n p) := by
+  induction k generalizing G H with
+  | zero => rcases p with ⟨a, b, p⟩; rfl
+  | succ k ih =>
+    rcases p with ⟨a, b, p⟩
+    exact _root_.congrArg pack (Chain.mapAlong_natural _ _ _ _ _
+      (fun {x y} e => ih (f.hom x y) e) p)
+
 theorem sourceAt_adjacent (k : Nat) {G : GlobularSet.{u}} (p : Pasting (0 + k + 1) G) :
     HEq (sourceAt k 0 p) (source p) := by
   induction k generalizing G with
@@ -1112,6 +1200,15 @@ def identityAt : (k n : Nat) → {G : GlobularSet.{u}} → Pasting k G → Pasti
   | k + 1, n, G, ⟨a, b, p⟩ =>
       ⟨a, b, p.map (fun {x y} e => identityAt k n (G := G.hom x y) e)⟩
 
+theorem map_identityAt (k n : Nat) {G H : GlobularSet.{u}} (f : GlobularSet.Map G H)
+    (p : Pasting k G) : map f (identityAt k n p) = identityAt k n (map f p) := by
+  induction k generalizing G H with
+  | zero => rfl
+  | succ k ih =>
+    rcases p with ⟨a, b, p⟩
+    apply _root_.congrArg pack
+    exact (Chain.mapAlong_natural _ _ _ _ _ (fun {x y} e => (ih (f.hom x y) e).symm) p).symm
+
 theorem sourceAt_identityAt (k n : Nat) {G : GlobularSet.{u}} (p : Pasting k G) :
     sourceAt k n (identityAt k n p) = p := by
   induction k generalizing G with
@@ -1193,6 +1290,44 @@ theorem composeAt_assoc (k n : Nat) {G : GlobularSet.{u}}
       (fun e => targetAt k n e) (fun e => sourceAt k n e) (fun e f h => composeAt k n e f h)
       (fun e f h => targetAt_composeAt k n e f h) (fun e f h => sourceAt_composeAt k n e f h)
       (fun e f g h j => ih e f g h j) p q r hp hq)
+
+theorem map_composeAt (k n : Nat) {G H : GlobularSet.{u}} (f : GlobularSet.Map G H)
+    (p q : Pasting (n + k + 1) G) (h : targetAt k n p = sourceAt k n q)
+    (h' : targetAt k n (map f p) = sourceAt k n (map f q)) :
+    map f (composeAt k n p q h) = composeAt k n (map f p) (map f q) h' := by
+  induction k generalizing G H with
+  | zero =>
+    rcases p with ⟨a, b, p⟩
+    rcases q with ⟨c, d, q⟩
+    change b = c at h
+    cases h
+    exact map_horizontal f p q
+  | succ k ih =>
+    rcases p with ⟨a, b, p⟩
+    rcases q with ⟨c, d, q⟩
+    have ha : a = c := _root_.congrArg Sigma.fst h
+    have hb : b = d := _root_.congrArg (fun z => z.2.1) h
+    cases ha
+    cases hb
+    have hp : p.map (fun e => targetAt k n e) = q.map (fun e => sourceAt k n e) :=
+      eq_of_heq (Sigma.mk.inj (eq_of_heq (Sigma.mk.inj h).2)).2
+    have hp' : (p.mapAlong f.app (fun {x y} e => map (f.hom x y) e)).map (fun e => targetAt k n e) =
+        (q.mapAlong f.app (fun {x y} e => map (f.hom x y) e)).map (fun e => sourceAt k n e) :=
+      eq_of_heq (Sigma.mk.inj (eq_of_heq (Sigma.mk.inj h').2)).2
+    exact _root_.congrArg (pack (G := H)) (Chain.mapAlong_zipOver
+      (F := fun x y => Pasting (n + k + 1) (H.hom x y)) f.app
+      (fun {x y} e => map (f.hom x y) e)
+      (fun e => targetAt k n e) (fun e => sourceAt k n e)
+      (fun e => targetAt k n e) (fun e => sourceAt k n e)
+      (fun e d h => composeAt k n e d h) (fun e d h => composeAt k n e d h)
+      (fun {x y} e d h j => ih (f.hom x y) e d h j) p q hp hp')
+
+/-- Relabelling supplies its own composability proof from the original one. -/
+theorem map_composeAt_natural (k n : Nat) {G H : GlobularSet.{u}} (f : GlobularSet.Map G H)
+    (p q : Pasting (n + k + 1) G) (h : targetAt k n p = sourceAt k n q) :
+    map f (composeAt k n p q h) = composeAt k n (map f p) (map f q)
+      ((targetAt_map k n f p).trans ((_root_.congrArg (map f) h).trans (sourceAt_map k n f q).symm)) :=
+  map_composeAt k n f p q h _
 
 end Pasting
 

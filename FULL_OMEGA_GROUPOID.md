@@ -146,6 +146,15 @@ with the previous special cases, their compatibility across truncation levels,
 and interchange between every pair of distinct composition dimensions still
 require proofs before claiming a free strict omega-category or its monad.
 
+Relabelling now preserves all arbitrary-boundary maps, identities and
+compositions (`sourceAt_map`, `targetAt_map`, `map_identityAt`,
+`map_composeAt_natural`). The latter derives composability after relabelling
+from the original boundary equality; no injectivity or boundary-equality
+reflection is assumed. The chain-level transport laws cover maps that change
+both vertices and labels (`mapAlong_zipOver`) as well as label-only maps
+(`map_zipOver`). Compatibility of composition with taking adjacent boundaries
+and the remaining cross-dimensional laws are not implied by naturality alone.
+
 ## Semantic audit and completion gates
 
 The current rewrite theory has a totality theorem for `RwEq` on parallel

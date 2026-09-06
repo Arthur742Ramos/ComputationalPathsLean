@@ -167,3 +167,18 @@ example {G : GlobularSet} (p : Pasting 9 G) :
 #print axioms Pasting.targetAt_lower
 #print axioms Pasting.sourceAt_eq_sourceIter
 #print axioms Pasting.targetAt_eq_targetIter
+
+example {G H : GlobularSet} (f : GlobularSet.Map G H) (k n : Nat)
+    (p q : Pasting (n + k + 1) G) (h : Pasting.targetAt k n p = Pasting.sourceAt k n q) :
+    Pasting.map f (Pasting.composeAt k n p q h) =
+      Pasting.composeAt k n (Pasting.map f p) (Pasting.map f q)
+        ((Pasting.targetAt_map k n f p).trans
+          ((_root_.congrArg (Pasting.map f) h).trans (Pasting.sourceAt_map k n f q).symm)) :=
+  Pasting.map_composeAt_natural k n f p q h
+
+#print axioms Chain.map_zipOver
+#print axioms Chain.mapAlong_zipOver
+#print axioms Pasting.sourceAt_map
+#print axioms Pasting.targetAt_map
+#print axioms Pasting.map_identityAt
+#print axioms Pasting.map_composeAt_natural
