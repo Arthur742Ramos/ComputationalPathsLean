@@ -141,6 +141,16 @@ globular lifting property for each image pullback cone. Thus the pasting
 functor preserves the constructed globular pullbacks, not merely their
 zero-dimensional vertices. Multiplication cartesianness is still unproved.
 
+For multiplication, the chain-segmentation ingredient is now verified.
+`Chain.split_mapAlong` lifts any specified split of a relabelled chain;
+`split_mapAlong_unique` determines its actual cut vertex and original
+segments without an injectivity assumption. `lift_bind_mapAlong` lifts an
+entire nested-chain segmentation, retaining empty inner chains explicitly.
+`bind_mapAlong_joint_injective` and `bind_cartesian` prove uniqueness of this
+chain-level multiplication lift. These are not yet a proof about the full
+globular `flattenGlobular`: its recursively evaluated hom labels still have
+to be connected to this segmentation theorem in every dimension.
+
 `evaluate` now evaluates labelled diagrams by dimension recursion into a
 target equipped with horizontal operations in all its iterated hom contexts
 (`RecursiveComposition`). The evaluator is implemented, not a field assumed

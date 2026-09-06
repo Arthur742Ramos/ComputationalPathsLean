@@ -604,6 +604,17 @@ theorem cons_heq_components {Q : Type u} {D : Q → Q → Type u}
   injection he with _ hy _ hab hpq
   exact ⟨hy, hab, hpq⟩
 
+theorem cons_heq_of_components {Q : Type u} {D : Q → Q → Type u}
+    {x y z x' y' z' : Q} (a : D x y) (p : Chain D y z)
+    (b : D x' y') (q : Chain D y' z') (hx : x = x') (hy : y = y') (hz : z = z')
+    (ha : HEq a b) (hp : HEq p q) : HEq (Chain.cons a p) (Chain.cons b q) := by
+  cases hx
+  cases hy
+  cases hz
+  cases ha
+  cases hp
+  rfl
+
 theorem nil_not_heq_cons {Q : Type u} {D : Q → Q → Type u}
     {x x' y' z' : Q} (b : D x' y') (q : Chain D y' z')
     (hx : x = x') (hz : x = z') : ¬ HEq (Chain.nil x : Chain D x x) (Chain.cons b q) := by
@@ -729,6 +740,126 @@ theorem mapAlong_joint_injective {O P Q : Type u}
       cases hz
       exact _root_.congrArg₂ Chain.cons (he a b (eq_of_heq h₁.2.1) (eq_of_heq h₂.2.1))
         (ih q (eq_of_heq h₁.2.2) (eq_of_heq h₂.2.2))
+
+/-- A specified segmentation after relabelling lifts to an actual
+segmentation of the original chain. No injectivity of the label map is used. -/
+theorem split_mapAlong {O P : Type u} {E : O → O → Type u} {F : P → P → Type u}
+    (f : O → P) (e : {x y : O} → E x y → F (f x) (f y))
+    {a b c : P} (q : Chain F a b) (r : Chain F b c)
+    {x z : O} (p : Chain E x z) (hx : f x = a) (hz : f z = c)
+    (h : HEq (p.mapAlong f e) (q.append r)) :
+    ∃ y : O, ∃ p₁ : Chain E x y, ∃ p₂ : Chain E y z,
+      f y = b ∧ p₁.append p₂ = p ∧ HEq (p₁.mapAlong f e) q ∧ HEq (p₂.mapAlong f e) r := by
+  induction q generalizing x z with
+  | nil a =>
+    refine ⟨x, .nil x, p, hx, rfl, ?_, h⟩
+    exact packed_eq_heq _ _
+      (_root_.congrArg (fun a => (⟨a, a, Chain.nil a⟩ : Σ x y, Chain F x y)) hx)
+  | @cons a d b v q ih =>
+    cases p with
+    | nil x => exact False.elim (nil_not_heq_cons v (q.append r) hx hz h)
+    | @cons x w z u p =>
+      have hc := cons_heq_components (e u) (p.mapAlong f e) v (q.append r) hx hz h
+      obtain ⟨y, p₁, p₂, hy, hp, h₁, h₂⟩ := ih r p hc.1 hz hc.2.2
+      refine ⟨y, .cons u p₁, p₂, hy, _root_.congrArg (Chain.cons u) hp, ?_, h₂⟩
+      exact cons_heq_of_components (e u) (p₁.mapAlong f e) v q hx hc.1 hy hc.2.1 h₁
+
+/-- A segmentation of a fixed original chain is determined by its
+relabelled prefix, even if relabelling identifies vertices or labels. -/
+theorem split_mapAlong_unique {O P : Type u} {E : O → O → Type u} {F : P → P → Type u}
+    (f : O → P) (e : {x y : O} → E x y → F (f x) (f y))
+    {x y y' z : O} (p₁ : Chain E x y) (p₂ : Chain E y z)
+    (q₁ : Chain E x y') (q₂ : Chain E y' z)
+    (hy : f y = f y') (hs : HEq (p₁.mapAlong f e) (q₁.mapAlong f e))
+    (h : p₁.append p₂ = q₁.append q₂) :
+    y = y' ∧ HEq p₁ q₁ ∧ HEq p₂ q₂ := by
+  induction p₁ generalizing y' with
+  | nil x =>
+    cases q₁ with
+    | nil => exact ⟨rfl, HEq.rfl, heq_of_eq h⟩
+    | cons b q => exact False.elim (nil_not_heq_cons (e b) (q.mapAlong f e) rfl hy hs)
+  | @cons x w y a p ih =>
+    cases q₁ with
+    | nil => exact False.elim (nil_not_heq_cons (e a) (p.mapAlong f e) rfl hy.symm (HEq.symm hs))
+    | @cons _ w' y' b q =>
+      have hc := cons_heq_components a (p.append p₂) b (q.append q₂) rfl rfl (heq_of_eq h)
+      have hw := hc.1
+      cases hw
+      have hm := cons_heq_components (e a) (p.mapAlong f e) (e b) (q.mapAlong f e)
+        rfl hy hs
+      obtain ⟨hy', hp, hq⟩ := ih p₂ q q₂ hy hm.2.2 (eq_of_heq hc.2.2)
+      cases hy'
+      exact ⟨rfl, heq_of_eq (_root_.congrArg₂ Chain.cons (eq_of_heq hc.2.1) (eq_of_heq hp)), hq⟩
+
+/-- Lift an entire nested-chain segmentation through relabelling. Empty
+inner chains are retained as explicit segments in the resulting outer chain. -/
+theorem lift_bind_mapAlong {O P : Type u} {E : O → O → Type u} {F : P → P → Type u}
+    (f : O → P) (e : {x y : O} → E x y → F (f x) (f y))
+    {a b : P} (q : Chain (fun x y => Chain F x y) a b)
+    {x z : O} (p : Chain E x z) (hx : f x = a) (hz : f z = b)
+    (h : HEq (p.mapAlong f e) (q.bind (fun r => r))) :
+    ∃ r : Chain (fun x y => Chain E x y) x z,
+      r.bind (fun s => s) = p ∧
+      HEq (r.mapAlong f (fun s => s.mapAlong f e)) q := by
+  induction q generalizing x z with
+  | nil a =>
+    cases p with
+    | nil x =>
+      refine ⟨.nil x, rfl, ?_⟩
+      exact packed_eq_heq _ _
+        (_root_.congrArg (fun a => (⟨a, a, Chain.nil a⟩ : Σ x y, Chain (fun x y => Chain F x y) x y)) hx)
+    | cons a p => exact False.elim (nil_not_heq_cons (e a) (p.mapAlong f e) hx.symm hz.symm (HEq.symm h))
+  | @cons a c b v q ih =>
+    obtain ⟨y, p₁, p₂, hy, hp, h₁, h₂⟩ := split_mapAlong f e v (q.bind (fun r => r)) p hx hz h
+    obtain ⟨r, hr, hq⟩ := ih p₂ hy hz h₂
+    refine ⟨.cons p₁ r, (_root_.congrArg (Chain.append p₁) hr).trans hp, ?_⟩
+    exact cons_heq_of_components (p₁.mapAlong f e)
+      (r.mapAlong f (fun s => s.mapAlong f e)) v q hx hy hz h₁ hq
+
+/-- Flattening and outer-chain relabelling jointly determine a nested
+chain. In particular, empty segments cannot disappear from the lift. -/
+theorem bind_mapAlong_joint_injective {O P : Type u}
+    {E : O → O → Type u} {F : P → P → Type u}
+    (f : O → P) (e : {x y : O} → E x y → F (f x) (f y))
+    {x z : O} (p q : Chain (fun x y => Chain E x y) x z)
+    (hb : p.bind (fun r => r) = q.bind (fun r => r))
+    (hm : p.mapAlong f (fun r => r.mapAlong f e) = q.mapAlong f (fun r => r.mapAlong f e)) : p = q := by
+  induction p with
+  | nil =>
+    cases q with
+    | nil => rfl
+    | cons b q => cases hm
+  | @cons x y z a p ih =>
+    cases q with
+    | nil => cases hm
+    | @cons _ y' _ b q =>
+      have hc := cons_heq_components (D := fun x y => Chain F x y) (a.mapAlong f e)
+        (p.mapAlong (F := fun x y => Chain F x y) f (fun {x y} (r : Chain E x y) => r.mapAlong (F := F) f e))
+        (b.mapAlong f e) (q.mapAlong (F := fun x y => Chain F x y) f
+          (fun {x y} (r : Chain E x y) => r.mapAlong (F := F) f e))
+        rfl rfl (heq_of_eq hm)
+      have hs := split_mapAlong_unique f e a (p.bind (fun r => r)) b (q.bind (fun r => r))
+        hc.1 hc.2.1 hb
+      have hy := hs.1
+      cases hy
+      exact _root_.congrArg₂ Chain.cons (eq_of_heq hs.2.1)
+        (ih q (eq_of_heq hs.2.2) (eq_of_heq hc.2.2))
+
+/-- The chain multiplication square has unique lifts under arbitrary
+vertex and edge relabelling. This is the segmentation ingredient for the
+globular multiplication proof, not that all-dimensional proof itself. -/
+theorem bind_cartesian {O P : Type u} {E : O → O → Type u} {F : P → P → Type u}
+    (f : O → P) (e : {x y : O} → E x y → F (f x) (f y))
+    {x z : O} (p : Chain E x z)
+    (q : Chain (fun a b => Chain F a b) (f x) (f z))
+    (h : p.mapAlong f e = q.bind (fun r => r)) :
+    ∃! r : Chain (fun x y => Chain E x y) x z,
+      r.bind (fun s => s) = p ∧ r.mapAlong f (fun s => s.mapAlong f e) = q := by
+  obtain ⟨r, hr, hq⟩ := lift_bind_mapAlong f e q p rfl rfl (heq_of_eq h)
+  refine ⟨r, ⟨hr, eq_of_heq hq⟩, ?_⟩
+  intro s hs
+  exact bind_mapAlong_joint_injective f e s r (hs.1.trans hr.symm)
+    (hs.2.trans (eq_of_heq hq).symm)
 
 end Chain
 

@@ -35,6 +35,19 @@ completion gate for the full weak omega-groupoid theorem. -/
 #print axioms Pasting.pullback_pasting_ext
 #print axioms Pasting.pullbackComparisonIso
 #print axioms Pasting.pasting_pullback_universal
+#print axioms Chain.split_mapAlong
+#print axioms Chain.split_mapAlong_unique
+#print axioms Chain.lift_bind_mapAlong
+#print axioms Chain.bind_mapAlong_joint_injective
+#print axioms Chain.bind_cartesian
+
+example {O P : Type u} {E : O → O → Type u} {F : P → P → Type u}
+    (f : O → P) (e : {x y : O} → E x y → F (f x) (f y))
+    {x z : O} (p : Chain E x z) (q : Chain (fun a b => Chain F a b) (f x) (f z))
+    (h : p.mapAlong f e = q.bind (fun r => r)) :
+    ∃! r : Chain (fun x y => Chain E x y) x z,
+      r.bind (fun s => s) = p ∧ r.mapAlong f (fun s => s.mapAlong f e) = q :=
+  Chain.bind_cartesian f e p q h
 
 noncomputable example {G H K : GlobularSet.{u}}
     (f : GlobularSet.Map G K) (g : GlobularSet.Map H K) :
