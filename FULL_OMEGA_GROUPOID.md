@@ -339,8 +339,17 @@ orientation. Its proof separately preserves both operation layers and the
 flattened inputs using relabelling composition, flattening naturality, and
 flattening associativity. These verified structural equations alone still
 do not construct the requested contractible operad or its native
-computational-path action; formal packaging and the operad/algebra bridge
-remain required.
+computational-path action; the operad/algebra bridge remains required.
+
+The collection category now instantiates Mathlib's actual
+`MonoidalCategory`. `substituteIso` transports isomorphisms through the
+verified tensor map. `associate_natural`, `triangle`, and `pentagon` convert
+the inverse-oriented equations into the standard forward orientation by
+the proved isomorphism laws. `monoidalCategory` packages substitution as
+tensor, the singleton collection as unit, and the verified associator and
+unitors, including every required coherence field. This supplies a standard
+lawful setting for an operad as a monoid in collections; it does not yet
+supply such a contractible monoid or its action on the native tower.
 
 `evaluate` now evaluates labelled diagrams by dimension recursion into a
 target equipped with horizontal operations in all its iterated hom contexts

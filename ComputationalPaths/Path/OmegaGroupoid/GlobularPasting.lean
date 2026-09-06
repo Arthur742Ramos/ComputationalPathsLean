@@ -2,6 +2,7 @@ import ComputationalPaths.Path.OmegaGroupoid.GlobularFoundations
 import Mathlib.CategoryTheory.Functor.Basic
 import Mathlib.CategoryTheory.NatTrans
 import Mathlib.CategoryTheory.Monad.Algebra
+import Mathlib.CategoryTheory.Monoidal.Category
 
 /-!
 # Recursively labelled globular pasting diagrams
@@ -6176,6 +6177,71 @@ noncomputable def associatorIso (C D E : GlobularCollection.{u}) :
   inv := Hom.associateInv C D E
   hom_inv_id := Hom.ext (C.substitutionComparisonIso D E.operations).inv_hom_id
   inv_hom_id := Hom.ext (C.substitutionComparisonIso D E.operations).hom_inv_id
+
+open CategoryTheory
+
+noncomputable def substituteIso {A B C D : GlobularCollection.{u}} (f : A ≅ B) (g : C ≅ D) :
+    A.substitute C ≅ B.substitute D where
+  hom := Hom.substitute f.hom g.hom
+  inv := Hom.substitute f.inv g.inv
+  hom_inv_id := by
+    change Hom.comp (Hom.substitute f.inv g.inv) (Hom.substitute f.hom g.hom) = Hom.id _
+    exact (Hom.substitute_comp f.hom g.hom f.inv g.inv).symm.trans
+      ((_root_.congrArg₂ Hom.substitute f.hom_inv_id g.hom_inv_id).trans (Hom.substitute_id A C))
+  inv_hom_id := by
+    change Hom.comp (Hom.substitute f.hom g.hom) (Hom.substitute f.inv g.inv) = Hom.id _
+    exact (Hom.substitute_comp f.inv g.inv f.hom g.hom).symm.trans
+      ((_root_.congrArg₂ Hom.substitute f.inv_hom_id g.inv_hom_id).trans (Hom.substitute_id B D))
+
+theorem associate_natural {A B C D E F : GlobularCollection.{u}}
+    (f : Hom A D) (g : Hom B E) (h : Hom C F) :
+    Hom.substitute (Hom.substitute f g) h ≫ (associatorIso D E F).hom =
+      (associatorIso A B C).hom ≫ Hom.substitute f (Hom.substitute g h) := by
+  apply (Iso.inv_comp_eq (associatorIso A B C)).mp
+  have hn := _root_.congrArg (fun k => k ≫ (associatorIso D E F).hom)
+    (Hom.associateInv_natural f g h)
+  change ((associatorIso A B C).inv ≫ Hom.substitute (Hom.substitute f g) h) ≫
+      (associatorIso D E F).hom =
+    (Hom.substitute f (Hom.substitute g h) ≫ (associatorIso D E F).inv) ≫
+      (associatorIso D E F).hom at hn
+  simpa only [Category.assoc, Iso.inv_hom_id, Category.comp_id] using hn
+
+theorem triangle (A B : GlobularCollection.{u}) :
+    (associatorIso A identity B).hom ≫ Hom.substitute (Hom.id A) (Hom.leftUnit B) =
+      Hom.substitute (Hom.rightUnit A) (Hom.id B) := by
+  exact ((Iso.inv_comp_eq (associatorIso A identity B)).mp (Hom.triangle_inv A B)).symm
+
+theorem pentagon (A B C D : GlobularCollection.{u}) :
+    Hom.substitute (associatorIso A B C).hom (Hom.id D) ≫
+      (associatorIso A (B.substitute C) D).hom ≫
+        Hom.substitute (Hom.id A) (associatorIso B C D).hom =
+      (associatorIso (A.substitute B) C D).hom ≫ (associatorIso A B (C.substitute D)).hom := by
+  exact (Iso.inv_eq_inv
+    ((substituteIso (associatorIso A B C) (Iso.refl D)).trans
+      ((associatorIso A (B.substitute C) D).trans (substituteIso (Iso.refl A) (associatorIso B C D))))
+    ((associatorIso (A.substitute B) C D).trans (associatorIso A B (C.substitute D)))).mp
+      (Hom.pentagon_inv A B C D).symm
+
+noncomputable instance monoidalStructure : MonoidalCategoryStruct GlobularCollection.{u} where
+  tensorObj := substitute
+  tensorHom := Hom.substitute
+  whiskerLeft A {B C} f := Hom.substitute (Hom.id A) f
+  whiskerRight {B C} f A := Hom.substitute f (Hom.id A)
+  tensorUnit := identity
+  associator := associatorIso
+  leftUnitor := leftUnitIso
+  rightUnitor := rightUnitIso
+
+noncomputable instance monoidalCategory : MonoidalCategory GlobularCollection.{u} := MonoidalCategory.ofTensorHom
+  (id_tensorHom_id := Hom.substitute_id)
+  (id_tensorHom := fun X {Y Z} f => rfl)
+  (tensorHom_id := fun {X Y} f Z => rfl)
+  (tensorHom_comp_tensorHom := fun {X₁ Y₁ Z₁ X₂ Y₂ Z₂} f g h k => (Hom.substitute_comp f g h k).symm)
+  (associator_naturality := associate_natural)
+  (leftUnitor_naturality := Hom.leftUnit_natural)
+  (rightUnitor_naturality := Hom.rightUnit_natural)
+  (pentagon := pentagon)
+  (triangle := triangle)
 
 end GlobularCollection
 

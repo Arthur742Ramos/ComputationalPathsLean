@@ -120,6 +120,15 @@ completion gate for the full weak omega-groupoid theorem. -/
 #print axioms GlobularCollection.Hom.associateInv_natural
 #print axioms GlobularCollection.Hom.triangle_inv
 #print axioms GlobularCollection.Hom.pentagon_inv
+#print axioms GlobularCollection.associate_natural
+#print axioms GlobularCollection.triangle
+#print axioms GlobularCollection.pentagon
+#print axioms GlobularCollection.monoidalCategory
+
+noncomputable example : CategoryTheory.MonoidalCategory GlobularCollection.{u} := inferInstance
+
+example (C D : GlobularCollection.{u}) :
+    CategoryTheory.MonoidalCategoryStruct.tensorObj C D = C.substitute D := rfl
 
 example (A B C D : GlobularCollection.{u}) :
     GlobularCollection.Hom.comp (GlobularCollection.Hom.associateInv (A.substitute B) C D)
