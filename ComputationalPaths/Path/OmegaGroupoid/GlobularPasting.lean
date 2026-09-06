@@ -3790,6 +3790,10 @@ def CutBoundary.castCell (G : GlobularSet.{u}) {n m : Nat} (h : n = m)
 theorem CutBoundary.castCell_heq (G : GlobularSet.{u}) {n m : Nat} (h : n = m)
     (p : G.Cell n) : HEq (castCell G h p) p := by cases h; rfl
 
+theorem CutBoundary.map_castCell {G H : GlobularSet.{u}} (f : GlobularSet.Map G H)
+    {n m : Nat} (h : n = m) (p : G.Cell n) :
+    f.app (castCell G h p) = castCell H h (f.app p) := by cases h; rfl
+
 theorem CutBoundary.source_heq (G : GlobularSet.{u}) {n m : Nat} (h : n = m)
     (c : Cut n) (d : Cut m) (hc : c.height = d.height)
     (p : G.Cell n) (q : G.Cell m) (hp : HEq p q) :
@@ -5754,6 +5758,17 @@ theorem extend_matching {G : GlobularSet.{u}} (I : AdjacentIdentities G) {n m : 
   eq_of_heq ((I.extend_boundaries hnm c d hd p).2.trans
     ((heq_of_eq h).trans (I.extend_boundaries hnm c d hd q).1.symm))
 
+/-- Preserving the adjacent identity forces preservation of every iterated
+identity, with no separately assumed higher-unit compatibility. -/
+theorem map_extend {G H : GlobularSet.{u}} (I : AdjacentIdentities G) (J : AdjacentIdentities H)
+    (f : GlobularSet.Map G H)
+    (hf : ∀ {n} (p : G.Cell n), f.app (I.identity p) = J.identity (f.app p))
+    {n m : Nat} (h : n ≤ m) (p : G.Cell n) :
+    f.app (I.extend h p) = J.extend h (f.app p) := by
+  induction m, h using Nat.le_induction with
+  | base => rw [I.extend_refl, J.extend_refl]
+  | succ m h ih => rw [I.extend_succ h, J.extend_succ h, hf, ih]
+
 end AdjacentIdentities
 
 /-- Binary composition data without separately stored higher identities. -/
@@ -6182,6 +6197,11 @@ structure Hom (C D : CutModel.{u}) where
   map : GlobularSet.Map C.carrier D.carrier
   preserves : CutOperations.Preserves C.operations D.operations map
 
+theorem Hom.identity {C D : CutModel.{u}} (f : Hom C D) {n : Nat} (p : C.carrier.Cell n) :
+    f.map.app (C.identity p) = D.identity (f.map.app p) := by
+  change f.map.app (C.operations.unit (Cut.top n) _) = D.operations.unit (Cut.top n) _
+  rw [f.preserves.unit, CutBoundary.map_castCell]
+
 @[ext] theorem Hom.ext {C D : CutModel.{u}} (f g : Hom C D)
     (h : f.map = g.map) : f = g := by
   cases f
@@ -6374,7 +6394,165 @@ theorem freeForget_multiplication (G : GlobularSet.{u}) :
 is exactly the monad of the free cut-model adjunction. -/
 theorem freeForget_monad : freeForgetAdjunction.toMonad = pastingMonad := rfl
 
+theorem evaluation_recovered (C : CutModel.{u}) :
+    C.strictPresentation.toCutModel.algebra.a = C.algebra.a := by
+  have eval_eq (D E : CutOperations C.carrier) (L : D.Compatible) (M : E.Compatible) (h : D = E) :
+      evaluateGlobular (D.recursive L) .root (GlobularSet.Map.id C.carrier) =
+        evaluateGlobular (E.recursive M) .root (GlobularSet.Map.id C.carrier) := by
+    cases h
+    rfl
+  exact eval_eq _ _ _ _ C.operations_recovered
+
 end CutModel
+
+/-- Bundled strict presentations with ordinary adjacent identities. -/
+structure StrictModel where
+  carrier : GlobularSet.{u}
+  presentation : StrictPresentation carrier
+
+namespace StrictModel
+
+def toCut (S : StrictModel.{u}) : CutModel.{u} := S.presentation.toCutModel
+
+noncomputable def ofCut (C : CutModel.{u}) : StrictModel.{u} := ⟨C.carrier, C.strictPresentation⟩
+
+structure Hom (S T : StrictModel.{u}) where
+  map : GlobularSet.Map S.carrier T.carrier
+  compose : ∀ {n} (c : Cut n) (p q : S.carrier.Cell n) h h',
+    map.app (S.presentation.compositions.compose c p q h) =
+      T.presentation.compositions.compose c (map.app p) (map.app q) h'
+  identity : ∀ {n} (p : S.carrier.Cell n), map.app (S.presentation.identities.identity p) =
+    T.presentation.identities.identity (map.app p)
+
+@[ext] theorem Hom.ext {S T : StrictModel.{u}} (f g : Hom S T) (h : f.map = g.map) : f = g := by
+  cases f
+  cases g
+  cases h
+  rfl
+
+def Hom.id (S : StrictModel.{u}) : Hom S S where
+  map := GlobularSet.Map.id S.carrier
+  compose _ _ _ _ _ := rfl
+  identity _ := rfl
+
+def Hom.comp {S T U : StrictModel.{u}} (f : Hom S T) (g : Hom T U) : Hom S U where
+  map := GlobularSet.Map.comp g.map f.map
+  compose c p q h h' := by
+    have hm := (CutBoundary.target_map c f.map p).trans
+      ((_root_.congrArg f.map.app h).trans (CutBoundary.source_map c f.map q).symm)
+    exact (_root_.congrArg g.map.app (f.compose c p q h hm)).trans
+      (g.compose c (f.map.app p) (f.map.app q) hm h')
+  identity p := (_root_.congrArg g.map.app (f.identity p)).trans (g.identity (f.map.app p))
+
+instance : CategoryTheory.Category StrictModel.{u} where
+  Hom := Hom
+  id := Hom.id
+  comp := Hom.comp
+  id_comp f := Hom.ext _ _ rfl
+  comp_id f := Hom.ext _ _ rfl
+  assoc f g h := Hom.ext _ _ rfl
+
+def Hom.toCut {S T : StrictModel.{u}} (f : Hom S T) : CutModel.Hom S.toCut T.toCut where
+  map := f.map
+  preserves.compose := f.compose
+  preserves.unit c p :=
+    S.presentation.identities.map_extend T.presentation.identities f.map f.identity c.height_lt.le p
+
+noncomputable def homOfCut {C D : CutModel.{u}} (f : CutModel.Hom C D) : Hom (ofCut C) (ofCut D) where
+  map := f.map
+  compose := f.preserves.compose
+  identity := f.identity
+
+def toCutFunctor : CategoryTheory.Functor StrictModel.{u} CutModel.{u} where
+  obj := toCut
+  map := Hom.toCut
+  map_id S := CutModel.Hom.ext _ _ rfl
+  map_comp f g := CutModel.Hom.ext _ _ rfl
+
+noncomputable def ofCutFunctor : CategoryTheory.Functor CutModel.{u} StrictModel.{u} where
+  obj := ofCut
+  map := homOfCut
+  map_id C := Hom.ext _ _ rfl
+  map_comp f g := Hom.ext _ _ rfl
+
+noncomputable def unitIso (C : CutModel.{u}) : CategoryTheory.Iso C (toCut (ofCut C)) where
+  hom.map := GlobularSet.Map.id C.carrier
+  hom.preserves := by
+    change CutOperations.Preserves C.operations (C.compositions.withIdentities C.adjacentIdentities) _
+    rw [C.operations_recovered]
+    exact (CutModel.Hom.id C).preserves
+  inv.map := GlobularSet.Map.id C.carrier
+  inv.preserves := by
+    change CutOperations.Preserves (C.compositions.withIdentities C.adjacentIdentities) C.operations _
+    rw [C.operations_recovered]
+    exact (CutModel.Hom.id C).preserves
+  hom_inv_id := CutModel.Hom.ext _ _ rfl
+  inv_hom_id := CutModel.Hom.ext _ _ rfl
+
+noncomputable def counitIso (S : StrictModel.{u}) : CategoryTheory.Iso (ofCut S.toCut) S where
+  hom.map := GlobularSet.Map.id S.carrier
+  hom.compose _ _ _ _ _ := rfl
+  hom.identity p := S.presentation.identity_recovered p
+  inv.map := GlobularSet.Map.id S.carrier
+  inv.compose _ _ _ _ _ := rfl
+  inv.identity p := (S.presentation.identity_recovered p).symm
+  hom_inv_id := Hom.ext _ _ rfl
+  inv_hom_id := Hom.ext _ _ rfl
+
+/-- The comparison is an actual equivalence of categories. Both comparison
+isomorphisms act identically on every globular cell. -/
+noncomputable def equivalence : CategoryTheory.Equivalence CutModel.{u} StrictModel.{u} where
+  functor := ofCutFunctor
+  inverse := toCutFunctor
+  unitIso := CategoryTheory.NatIso.ofComponents unitIso (by
+    intro C D f
+    apply CutModel.Hom.ext
+    rfl)
+  counitIso := CategoryTheory.NatIso.ofComponents counitIso (by
+    intro S T f
+    apply Hom.ext
+    rfl)
+  functor_unitIso_comp C := Hom.ext _ _ rfl
+
+noncomputable def freeFunctor : CategoryTheory.Functor GlobularSet.{u} StrictModel.{u} :=
+  CutModel.freeFunctor.comp ofCutFunctor
+
+def forget : CategoryTheory.Functor StrictModel.{u} GlobularSet.{u} :=
+  toCutFunctor.comp CutModel.forget
+
+noncomputable def freeForgetAdjunction : CategoryTheory.Adjunction freeFunctor forget :=
+  CutModel.freeForgetAdjunction.comp equivalence.toAdjunction
+
+theorem freeForget_unit (G : GlobularSet.{u}) :
+    freeForgetAdjunction.unit.app G = singletonGlobular G := rfl
+
+/-- Transporting the adjunction to adjacent-identity strict presentations
+does not change its recursive pasting multiplication. -/
+theorem freeForget_multiplication (G : GlobularSet.{u}) :
+    freeForgetAdjunction.toMonad.μ.app G = flattenGlobular G := by
+  change (CutModel.free G).strictPresentation.toCutModel.algebra.a = flattenGlobular G
+  exact (CutModel.free G).evaluation_recovered
+
+/-- Identification with the free strict-presentation monad includes all
+functor, unit, and multiplication data. -/
+theorem freeForget_monad : freeForgetAdjunction.{u}.toMonad = pastingMonad.{u} := by
+  have monad_ext (T U : CategoryTheory.Monad GlobularSet.{u})
+      (hf : T.toFunctor = U.toFunctor) (hu : HEq T.η U.η) (hm : HEq T.μ U.μ) : T = U := by
+    cases T
+    cases U
+    cases hf
+    cases eq_of_heq hu
+    cases eq_of_heq hm
+    rfl
+  apply monad_ext
+  · rfl
+  · rfl
+  · apply heq_of_eq
+    apply CategoryTheory.NatTrans.ext
+    funext G
+    exact freeForget_multiplication G
+
+end StrictModel
 
 end Pasting
 

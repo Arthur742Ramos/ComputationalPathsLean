@@ -7,8 +7,9 @@ Current milestone: the normalized native endomorphism operad now has a
 verified contraction and an actual algebra action on the native tower.
 Contraction-selected adjacent operations now have coinductive invertibility
 and explicit comparison cells to the earlier native operations. The full
-associativity/pentagon/interchange certificate comparisons and the standard
-free-category definition bridge remain completion gates.
+associativity/pentagon/interchange certificate comparisons remain completion
+gates. The free-category definition bridge is now verified through the
+adjacent-identity strict presentation and its actual free/forgetful adjunction.
 
 ## Mathematical target
 
@@ -816,3 +817,18 @@ proofs account for the numerical and iterated-boundary form of the standard
 definition. The remaining comparison gate is the corresponding morphism
 equivalence and transport of the free/forgetful adjunction to this
 presentation; those are not claimed by the object-level round trips alone.
+
+The morphism and adjunction comparison is now complete as well.
+`StrictModel.Hom` requires only preservation of binary compositions and the
+adjacent identity. `AdjacentIdentities.map_extend` derives preservation of
+all generated cut identities; `CutModel.Hom.identity` proves the converse.
+The resulting functors form `StrictModel.equivalence`, an actual Mathlib
+category equivalence with identity-on-cells unit and counit isomorphisms.
+`StrictModel.freeForgetAdjunction` transports the verified free adjunction,
+and `StrictModel.freeForget_monad` identifies its entire induced monad with
+`pastingMonad`. In particular the multiplication remains the same recursive
+flattening, not a substitute chosen after the presentation comparison.
+Together with the previous index, boundary, axiom and object-round-trip
+proofs, this discharges the standard strict-presentation/free-monad gate.
+It does not by itself discharge the remaining native/operadic coherence
+comparisons or certify completion of the full weak omega-groupoid objective.

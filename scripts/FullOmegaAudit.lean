@@ -148,6 +148,21 @@ example (A : Type u) :
 #print axioms Pasting.StrictPresentation.roundTrip
 #print axioms Pasting.CutModel.strictPresentation_roundTrip
 #print axioms Pasting.StrictPresentation.extend_compose
+#print axioms Pasting.StrictModel.equivalence
+#print axioms Pasting.StrictModel.freeForgetAdjunction
+#print axioms Pasting.StrictModel.freeForget_monad
+
+noncomputable example : CategoryTheory.Equivalence Pasting.CutModel Pasting.StrictModel :=
+  Pasting.StrictModel.equivalence
+noncomputable example :
+    CategoryTheory.Adjunction Pasting.StrictModel.freeFunctor Pasting.StrictModel.forget :=
+  Pasting.StrictModel.freeForgetAdjunction
+example : Pasting.StrictModel.freeForgetAdjunction.toMonad = Pasting.pastingMonad :=
+  Pasting.StrictModel.freeForget_monad
+example (C : Pasting.CutModel) :
+    (Pasting.StrictModel.unitIso C).hom.map = GlobularSet.Map.id C.carrier := rfl
+example (S : Pasting.StrictModel) :
+    (Pasting.StrictModel.counitIso S).hom.map = GlobularSet.Map.id S.carrier := rfl
 
 example (G : GlobularSet) (S : Pasting.StrictPresentation G) :
     S.toCutModel.strictPresentation = S := S.roundTrip
