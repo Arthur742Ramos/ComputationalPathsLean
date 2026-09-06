@@ -862,3 +862,16 @@ operation parallelism automatically in dimension one, because the operad
 is normalized at dimension zero. These are the verified operation-level
 tools for the remaining bracketed coherence comparisons; they do not yet
 instantiate every pentagon/interchange expression or close that gate.
+
+The associator is now instantiated at the operation level.
+`nestedBinary_evaluation` identifies nested standard-instruction evaluation
+with the actual selected binary operation, and `nestedBinary_inputs`
+identifies its flattened input with strict composition of the two inner
+diagrams. The concrete left and right triple-path inputs have exactly the
+expected bracketed `Path.trans` evaluations; `bracketed_inputs_equal` proves
+equality of their complete flattened labelled inputs.
+`NativeOperadic.selectedAssociator` contracts between these actual substituted
+operations over that common input. `selectedAssociatorComparison` is an
+invertible comparison to the unchanged primitive `Step.trans_assoc` witness,
+whose exact raw target is checked by the audit. This closes the selected
+associator comparison, not the selected pentagon/interchange comparisons.

@@ -46,6 +46,23 @@ theorem operadicAssociator_derivation {A : Type u} {a b c d : A}
     (p : Path a b) (q : Path b c) (r : Path c d) :
     (operadicAssociator p q r).val.2.2.2.2 = RwEq.step (Step.trans_assoc p q r) := rfl
 
+/-- Compare the actual contraction-selected substituted associator with
+the preserved primitive `Step.trans_assoc` certificate. Raw rewrite equality
+is not asserted; the specified comparison inhabits the declared next layer. -/
+noncomputable def selectedAssociatorComparison {A : Type u} {a b c d : A}
+    (p : Path a b) (q : Path b c) (r : Path c d) :
+    { h : NativeTower.Cell A 3 //
+      NativeTower.source h = (NativeOperadic.selectedAssociator p q r).val ∧
+      NativeTower.target h = (operadicAssociator p q r).val } :=
+  ⟨NativeTower.fillPositive (NativeOperadic.selectedAssociator p q r).val (operadicAssociator p q r).val
+      (NativeOperadic.selectedAssociator p q r).property.1 (NativeOperadic.selectedAssociator p q r).property.2,
+    NativeTower.fillPositive_boundary _ _ _ _⟩
+
+theorem selectedAssociatorComparison_invertible {A : Type u} {a b c d : A}
+    (p : Path a b) (q : Path b c) (r : Path c d) :
+    NativeOperadic.WeaklyInvertible 2 (selectedAssociatorComparison p q r).val :=
+  NativeOperadic.all_cells_weaklyInvertible _ _
+
 noncomputable def two {A : Type u} {a b : A} {p q : Path a b}
     (d : Derivation₂ p q) : NativeTower.Cell A 2 := ⟨a, b, p, q, d.toRwEq⟩
 

@@ -160,6 +160,24 @@ example (A : Type u) :
 #print axioms NativeOperadic.sameArityCoherence
 #print axioms NativeOperadic.substitutionCoherence
 #print axioms NativeOperadic.oneSubstitutionCoherence
+#print axioms NativeOperadic.nestedBinary_evaluation
+#print axioms NativeOperadic.nestedBinary_inputs
+#print axioms NativeOperadic.bracketed_inputs_equal
+#print axioms NativeOperadic.selectedAssociator
+#print axioms NativeAssociativity.selectedAssociatorComparison
+
+example {A : Type} {a b c d : A} (p : Path a b) (q : Path b c) (r : Path c d) :
+    NativeTower.source (NativeOperadic.selectedAssociator p q r).val =
+      ULift.up (⟨a, d, Path.trans (Path.trans p q) r⟩ : PathOne A) ∧
+    NativeTower.target (NativeOperadic.selectedAssociator p q r).val =
+      ULift.up (⟨a, d, Path.trans p (Path.trans q r)⟩ : PathOne A) :=
+  (NativeOperadic.selectedAssociator p q r).property
+example {A : Type} {a b c d : A} (p : Path a b) (q : Path b c) (r : Path c d) :
+    NativeOperadic.WeaklyInvertible 2 (NativeAssociativity.selectedAssociatorComparison p q r).val ∧
+      (NativeTower.target (NativeAssociativity.selectedAssociatorComparison p q r).val).2.2.2.2 =
+        RwEq.step (Step.trans_assoc p q r) := by
+  refine ⟨NativeAssociativity.selectedAssociatorComparison_invertible p q r, ?_⟩
+  rfl
 
 noncomputable example {A : Type} {n : Nat}
     (o r : (NativeOperadic.collection A).operations.Cell n)

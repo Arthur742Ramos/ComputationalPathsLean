@@ -148,6 +148,26 @@ theorem instructions_unit (A : Type u) :
   cases a
   exact instruction_singleton A n
 
+/-- Standard instructions can label diagrams of operations as well as
+diagrams of native cells, which is needed for nested operadic substitution. -/
+noncomputable def labelledInstructionsOn (A : Type u) (G : GlobularSet.{u + 1}) :
+    GlobularSet.Map (Pasting.globular G) ((collection A).application G) where
+  app {n} p := ⟨⟨(instructions A).app ((GlobularCollection.shape G).app p), p⟩,
+    (instruction A n _).property⟩
+  source_app p := Subtype.ext (Prod.ext
+    (((instructions A).source_app _).trans
+      (_root_.congrArg (instructions A).app ((GlobularCollection.shape G).source_app p))) rfl)
+  target_app p := Subtype.ext (Prod.ext
+    (((instructions A).target_app _).trans
+      (_root_.congrArg (instructions A).app ((GlobularCollection.shape G).target_app p))) rfl)
+
+theorem labelledInstructionsOn_natural {A : Type u} {G H : GlobularSet.{u + 1}}
+    (f : GlobularSet.Map G H) {n : Nat} (d : Pasting n G) :
+    ((collection A).map f).app ((labelledInstructionsOn A G).app d) =
+      (labelledInstructionsOn A H).app (Pasting.map f d) :=
+  Subtype.ext (Prod.ext
+    (_root_.congrArg (instructions A).app (GlobularCollection.shape_map f d).symm) rfl)
+
 /-- Pair each complete labelled diagram with its standard instruction.
 The section property gives the exact arity match. -/
 noncomputable def labelledInstructions (A : Type u) :
@@ -294,6 +314,27 @@ noncomputable def identity {A : Type u} {n : Nat} (p : (carrier A).Cell n) :
   (standardEvaluation A).app (Pasting.identity (Pasting.singleton p))
 
 /-- The two-singleton input diagram at any lower composition axis. -/
+noncomputable def binaryDiagramOn (G : GlobularSet.{u + 1}) {n : Nat} (c : Pasting.Cut n)
+    (p q : G.Cell n)
+    (h : Pasting.CutBoundary.target c G p = Pasting.CutBoundary.source c G q) : Pasting n G :=
+  (Pasting.cutOperations G).compose c (Pasting.singleton p) (Pasting.singleton q)
+    ((Pasting.CutBoundary.target_map c (Pasting.singletonGlobular G) p).trans
+      ((_root_.congrArg (Pasting.singletonGlobular G).app h).trans
+        (Pasting.CutBoundary.source_map c (Pasting.singletonGlobular G) q).symm))
+
+theorem binaryDiagramOn_map {G H : GlobularSet.{u + 1}} (f : GlobularSet.Map G H)
+    {n : Nat} (c : Pasting.Cut n) (p q : G.Cell n) h h' :
+    Pasting.map f (binaryDiagramOn G c p q h) = binaryDiagramOn H c (f.app p) (f.app q) h' := by
+  have hm := (Pasting.CutBoundary.target_map c (Pasting.mapGlobular f) (Pasting.singleton p)).trans
+    ((_root_.congrArg (Pasting.mapGlobular f).app
+      ((Pasting.CutBoundary.target_map c (Pasting.singletonGlobular G) p).trans
+        ((_root_.congrArg (Pasting.singletonGlobular G).app h).trans
+          (Pasting.CutBoundary.source_map c (Pasting.singletonGlobular G) q).symm))).trans
+      (Pasting.CutBoundary.source_map c (Pasting.mapGlobular f) (Pasting.singleton q)).symm)
+  exact ((Pasting.mapGlobular_preserves f).compose c _ _ _ hm).trans
+    (eq_of_heq ((Pasting.CutModel.free H).compose_heq rfl c c rfl _ _ _ _
+      (heq_of_eq (Pasting.map_singleton f p)) (heq_of_eq (Pasting.map_singleton f q)) hm _))
+
 noncomputable def binaryDiagram {A : Type u} {n : Nat} (c : Pasting.Cut n)
     (p q : (carrier A).Cell n)
     (h : Pasting.CutBoundary.target c (carrier A) p = Pasting.CutBoundary.source c (carrier A) q) :
@@ -679,6 +720,165 @@ noncomputable def oneSubstitutionCoherence {A : Type u}
     (x : ((collection A).application ((collection A).application (carrier A))).Cell 1) :=
   substitutionCoherence x (GlobularSet.Parallel.cells
     (@Subsingleton.elim PUnit _ _ _) (@Subsingleton.elim PUnit _ _ _))
+
+/-- A genuine nested binary input: its two inner labels are themselves
+operations with labelled input diagrams. -/
+noncomputable def nestedBinary {A : Type u} {n : Nat} (c : Pasting.Cut n)
+    (x y : ((collection A).application (carrier A)).Cell n)
+    (h : Pasting.CutBoundary.target c ((collection A).application (carrier A)) x =
+      Pasting.CutBoundary.source c ((collection A).application (carrier A)) y) :
+    ((collection A).application ((collection A).application (carrier A))).Cell n :=
+  (labelledInstructionsOn A ((collection A).application (carrier A))).app
+    (binaryDiagramOn ((collection A).application (carrier A)) c x y h)
+
+/-- Nested binary evaluation is the selected binary operation on the two
+evaluated inner inputs. This identifies the operational syntax with the
+actual selected composition, at every axis and in every dimension. -/
+theorem nestedBinary_evaluation {A : Type u} {n : Nat} (c : Pasting.Cut n)
+    (x y : ((collection A).application (carrier A)).Cell n) h h' :
+    (Endomorphism.evaluation (carrier A)).app
+      (((collection A).map (Endomorphism.evaluation (carrier A))).app (nestedBinary c x y h)) =
+        composeAt c ((Endomorphism.evaluation (carrier A)).app x)
+          ((Endomorphism.evaluation (carrier A)).app y) h' := by
+  have hl := labelledInstructionsOn_natural (A := A) (Endomorphism.evaluation (carrier A))
+    (binaryDiagramOn ((collection A).application (carrier A)) c x y h)
+  have hm := binaryDiagramOn_map (Endomorphism.evaluation (carrier A)) c x y h h'
+  exact (_root_.congrArg (Endomorphism.evaluation (carrier A)).app hl).trans
+    (_root_.congrArg (fun d => (Endomorphism.evaluation (carrier A)).app
+      ((labelledInstructionsOn A (carrier A)).app d)) hm)
+
+/-- The flattened input of a nested binary operation is the actual strict
+cut composite of its two inner input diagrams. -/
+theorem nestedBinary_inputs {A : Type u} {n : Nat} (c : Pasting.Cut n)
+    (x y : ((collection A).application (carrier A)).Cell n) h h' :
+    (substitutedInput (nestedBinary c x y h)).val.2 =
+      (Pasting.cutOperations (carrier A)).compose c x.val.2 y.val.2 h' := by
+  let f := (collection A).inputs (carrier A)
+  have hi := (Pasting.CutBoundary.target_map c f x).trans
+    ((_root_.congrArg f.app h).trans (Pasting.CutBoundary.source_map c f y).symm)
+  have hm := binaryDiagramOn_map f c x y h hi
+  change (Pasting.flattenGlobular (carrier A)).app
+    (Pasting.map f (binaryDiagramOn ((collection A).application (carrier A)) c x y h)) = _
+  rw [hm]
+  have hx := Pasting.flatten_singleton x.val.2
+  have hy := Pasting.flatten_singleton y.val.2
+  have hf := (Pasting.flatten_preserves (carrier A)).compose c
+    (Pasting.singleton x.val.2) (Pasting.singleton y.val.2)
+    ((Pasting.CutBoundary.target_map c (Pasting.singletonGlobular (Pasting.globular (carrier A))) x.val.2).trans
+      ((_root_.congrArg (Pasting.singletonGlobular (Pasting.globular (carrier A))).app hi).trans
+        (Pasting.CutBoundary.source_map c (Pasting.singletonGlobular (Pasting.globular (carrier A))) y.val.2).symm))
+    ((_root_.congrArg (Pasting.CutBoundary.target c (Pasting.globular (carrier A))) hx).trans
+      (h'.trans (_root_.congrArg (Pasting.CutBoundary.source c (Pasting.globular (carrier A))) hy).symm))
+  exact hf.trans (eq_of_heq ((Pasting.CutModel.free (carrier A)).compose_heq rfl c c rfl
+    _ _ _ _ (heq_of_eq hx) (heq_of_eq hy) _ h'))
+
+def pathDiagram {A : Type u} {a b : A} (p : Path a b) : Pasting 1 (carrier A) :=
+  Pasting.singleton (ULift.up (⟨a, b, p⟩ : PathOne A))
+
+noncomputable def pathInput {A : Type u} {a b : A} (p : Path a b) :
+    ((collection A).application (carrier A)).Cell 1 := (labelledInstructions A).app (pathDiagram p)
+
+noncomputable def binaryPathInput {A : Type u} {a b c : A} (p : Path a b) (q : Path b c) :
+    ((collection A).application (carrier A)).Cell 1 :=
+  (labelledInstructions A).app (binaryDiagram (.bottom : Pasting.Cut 1)
+    (ULift.up (⟨a, b, p⟩ : PathOne A)) (ULift.up (⟨b, c, q⟩ : PathOne A)) rfl)
+
+theorem pathInput_evaluation {A : Type u} {a b : A} (p : Path a b) :
+    (Endomorphism.evaluation (carrier A)).app (pathInput p) = ULift.up (⟨a, b, p⟩ : PathOne A) :=
+  standardEvaluation_singleton (A := A) (n := 1) (ULift.up (⟨a, b, p⟩ : PathOne A))
+
+theorem binaryPathInput_evaluation {A : Type u} {a b c : A} (p : Path a b) (q : Path b c) :
+    (Endomorphism.evaluation (carrier A)).app (binaryPathInput p q) =
+      ULift.up (⟨a, c, Path.trans p q⟩ : PathOne A) := composeAt_paths p q
+
+theorem leftBracketedMatching {A : Type u} {a b c d : A}
+    (p : Path a b) (q : Path b c) (r : Path c d) :
+    Pasting.CutBoundary.target (.bottom : Pasting.Cut 1) ((collection A).application (carrier A))
+      (binaryPathInput p q) =
+    Pasting.CutBoundary.source (.bottom : Pasting.Cut 1) ((collection A).application (carrier A))
+      (pathInput r) :=
+  ((labelledInstructions A).target_app _).trans ((labelledInstructions A).source_app (pathDiagram r)).symm
+
+theorem rightBracketedMatching {A : Type u} {a b c d : A}
+    (p : Path a b) (q : Path b c) (r : Path c d) :
+    Pasting.CutBoundary.target (.bottom : Pasting.Cut 1) ((collection A).application (carrier A))
+      (pathInput p) =
+    Pasting.CutBoundary.source (.bottom : Pasting.Cut 1) ((collection A).application (carrier A))
+      (binaryPathInput q r) :=
+  ((labelledInstructions A).target_app (pathDiagram p)).trans
+    ((labelledInstructions A).source_app (binaryDiagram (.bottom : Pasting.Cut 1)
+      (ULift.up (⟨b, c, q⟩ : PathOne A)) (ULift.up (⟨c, d, r⟩ : PathOne A)) rfl)).symm
+
+noncomputable def leftBracketedInput {A : Type u} {a b c d : A}
+    (p : Path a b) (q : Path b c) (r : Path c d) :
+    ((collection A).application ((collection A).application (carrier A))).Cell 1 :=
+  nestedBinary (.bottom : Pasting.Cut 1) (binaryPathInput p q) (pathInput r)
+    (leftBracketedMatching p q r)
+
+noncomputable def rightBracketedInput {A : Type u} {a b c d : A}
+    (p : Path a b) (q : Path b c) (r : Path c d) :
+    ((collection A).application ((collection A).application (carrier A))).Cell 1 :=
+  nestedBinary (.bottom : Pasting.Cut 1) (pathInput p) (binaryPathInput q r)
+    (rightBracketedMatching p q r)
+
+theorem leftBracketed_evaluation {A : Type u} {a b c d : A}
+    (p : Path a b) (q : Path b c) (r : Path c d) :
+    (Endomorphism.evaluation (carrier A)).app (substitutedInput (leftBracketedInput p q r)) =
+      ULift.up (⟨a, d, Path.trans (Path.trans p q) r⟩ : PathOne A) := by
+  have hx := binaryPathInput_evaluation p q
+  have hy := pathInput_evaluation r
+  have hm := (_root_.congrArg (Pasting.CutBoundary.target (.bottom : Pasting.Cut 1) (carrier A)) hx).trans
+    (_root_.congrArg (Pasting.CutBoundary.source (.bottom : Pasting.Cut 1) (carrier A)) hy).symm
+  exact (substitutedInput_evaluation (leftBracketedInput p q r)).trans
+    ((nestedBinary_evaluation (.bottom : Pasting.Cut 1) (binaryPathInput p q) (pathInput r)
+      (leftBracketedMatching p q r) hm).trans
+        ((composeAt_congr (.bottom : Pasting.Cut 1) hx hy hm rfl).trans (composeAt_paths (Path.trans p q) r)))
+
+theorem rightBracketed_evaluation {A : Type u} {a b c d : A}
+    (p : Path a b) (q : Path b c) (r : Path c d) :
+    (Endomorphism.evaluation (carrier A)).app (substitutedInput (rightBracketedInput p q r)) =
+      ULift.up (⟨a, d, Path.trans p (Path.trans q r)⟩ : PathOne A) := by
+  have hx := pathInput_evaluation p
+  have hy := binaryPathInput_evaluation q r
+  have hm := (_root_.congrArg (Pasting.CutBoundary.target (.bottom : Pasting.Cut 1) (carrier A)) hx).trans
+    (_root_.congrArg (Pasting.CutBoundary.source (.bottom : Pasting.Cut 1) (carrier A)) hy).symm
+  exact (substitutedInput_evaluation (rightBracketedInput p q r)).trans
+    ((nestedBinary_evaluation (.bottom : Pasting.Cut 1) (pathInput p) (binaryPathInput q r)
+      (rightBracketedMatching p q r) hm).trans
+        ((composeAt_congr (.bottom : Pasting.Cut 1) hx hy hm rfl).trans (composeAt_paths p (Path.trans q r))))
+
+/-- Both bracketings retain exactly the same flattened labelled triple. -/
+theorem bracketed_inputs_equal {A : Type u} {a b c d : A}
+    (p : Path a b) (q : Path b c) (r : Path c d) :
+    (substitutedInput (leftBracketedInput p q r)).val.2 =
+      (substitutedInput (rightBracketedInput p q r)).val.2 :=
+  (nestedBinary_inputs (.bottom : Pasting.Cut 1) (binaryPathInput p q) (pathInput r)
+    (leftBracketedMatching p q r) rfl).trans
+    ((Pasting.cutOperations_associative (carrier A) (.bottom : Pasting.Cut 1)
+      (pathDiagram p) (pathDiagram q) (pathDiagram r) rfl rfl rfl rfl).trans
+        (nestedBinary_inputs (.bottom : Pasting.Cut 1) (pathInput p) (binaryPathInput q r)
+          (rightBracketedMatching p q r) rfl).symm)
+
+/-- The associator selected by the operadic contraction between the two
+actual substituted binary operations over their common triple input. -/
+noncomputable def selectedAssociator {A : Type u} {a b c d : A}
+    (p : Path a b) (q : Path b c) (r : Path c d) :
+    { h : NativeTower.Cell A 2 //
+      NativeTower.source h = ULift.up (⟨a, d, Path.trans (Path.trans p q) r⟩ : PathOne A) ∧
+      NativeTower.target h = ULift.up (⟨a, d, Path.trans p (Path.trans q r)⟩ : PathOne A) } := by
+  let l := substitutedInput (leftBracketedInput p q r)
+  let t := substitutedInput (rightBracketedInput p q r)
+  have hd : l.val.2 = t.val.2 := bracketed_inputs_equal p q r
+  have ht := t.property.trans (_root_.congrArg (GlobularCollection.shape (carrier A)).app hd.symm)
+  let k := sameArityCoherence l.val.1 t.val.1
+    (GlobularSet.Parallel.cells (@Subsingleton.elim PUnit _ _ _) (@Subsingleton.elim PUnit _ _ _))
+    l.val.2 l.property ht
+  exact ⟨k.val, k.property.1.trans (leftBracketed_evaluation p q r),
+    k.property.2.trans ((applyOperation_congr rfl hd ht t.property).trans (rightBracketed_evaluation p q r))⟩
+
+theorem selectedAssociator_invertible {A : Type u} {a b c d : A}
+    (p : Path a b) (q : Path b c) (r : Path c d) :
+    WeaklyInvertible 1 (selectedAssociator p q r).val := all_cells_weaklyInvertible _ _
 
 end NativeOperadic
 
