@@ -120,14 +120,26 @@ are now proved in every positive dimension (`vertical_left_unit`,
 `vertical_right_unit`, `vertical_assoc`). Their equalities compare the complete
 diagrams, not just boundary projections. The proofs lift the corresponding
 label laws through boundary-aligned chains (`zipOver_map_left`,
-`zipOver_map_right`, `zipOver_assoc`). Composition at arbitrary intermediate
-boundaries and the full interchange and monad laws remain outstanding.
+`zipOver_map_right`, `zipOver_assoc`). The general intermediate-boundary
+operations are described below; full interchange and monad laws remain outstanding.
 The extreme-boundary interchange law is now checked separately:
 `vertical_horizontal_interchange` commutes zero-boundary concatenation with
 adjacent-boundary composition in all dimensions at least two. Its endpoint
 fibre operation is identified with `vertical` by `pack_verticalFibre`; it is
 not a disconnected replacement operation. This still leaves interchange
 between arbitrary intermediate-dimensional compositions to construct.
+
+`composeAt k n` now constructs composition in dimension `n+k+1` along a
+boundary of dimension `k`, with no bound on either parameter. Its boundary
+maps `sourceAt`/`targetAt` recursively truncate labels through hom globular
+sets; at dimension gap one they agree with the existing adjacent boundary
+maps (`sourceAt_adjacent`, `targetAt_adjacent`). The general operation has
+proved source/target laws, identities (`identityAt`), both unit laws and
+associativity. The audit checks arbitrary parameters and a dimension-nine
+composition along dimension four. Compatibility between all truncation levels,
+identification of the general operations with the previous special cases,
+and interchange between every pair of distinct composition dimensions still
+require proofs before claiming a free strict omega-category or its monad.
 
 ## Semantic audit and completion gates
 

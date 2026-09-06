@@ -125,3 +125,28 @@ example {G : GlobularSet} (p q r : Pasting 9 G)
 #print axioms Pasting.vertical_assoc
 #print axioms Pasting.pack_verticalFibre
 #print axioms Pasting.vertical_horizontal_interchange
+
+example {G : GlobularSet} (k n : Nat) (p q : Pasting (n + k + 1) G)
+    (h : Pasting.targetAt k n p = Pasting.sourceAt k n q) :
+    Pasting.sourceAt k n (Pasting.composeAt k n p q h) = Pasting.sourceAt k n p :=
+  Pasting.sourceAt_composeAt k n p q h
+
+example {G : GlobularSet} (p q r : Pasting 9 G)
+    (h : Pasting.targetAt 4 4 p = Pasting.sourceAt 4 4 q)
+    (j : Pasting.targetAt 4 4 q = Pasting.sourceAt 4 4 r) :
+    Pasting.composeAt 4 4 (Pasting.composeAt 4 4 p q h) r
+      ((Pasting.targetAt_composeAt 4 4 p q h).trans j) =
+    Pasting.composeAt 4 4 p (Pasting.composeAt 4 4 q r j)
+      (h.trans (Pasting.sourceAt_composeAt 4 4 q r j).symm) :=
+  Pasting.composeAt_assoc 4 4 p q r h j
+
+#print axioms Pasting.sourceAt_adjacent
+#print axioms Pasting.targetAt_adjacent
+#print axioms Pasting.composeAt
+#print axioms Pasting.sourceAt_composeAt
+#print axioms Pasting.targetAt_composeAt
+#print axioms Pasting.sourceAt_identityAt
+#print axioms Pasting.targetAt_identityAt
+#print axioms Pasting.composeAt_left_unit
+#print axioms Pasting.composeAt_right_unit
+#print axioms Pasting.composeAt_assoc

@@ -46,6 +46,13 @@ theorem map_congr (f g : {x y : O} → E x y → F x y)
   | nil => rfl
   | cons e p ih => exact _root_.congrArg₂ Chain.cons (h e) ih
 
+theorem map_heq {D : O → O → Type w} (hFD : F = D)
+    (f : {x y : O} → E x y → F x y) (g : {x y : O} → E x y → D x y)
+    (h : ∀ {x y} (e : E x y), HEq (f e) (g e)) {x y : O} (p : Chain E x y) :
+    HEq (p.map f) (p.map g) := by
+  cases hFD
+  exact heq_of_eq (map_congr f g (fun e => eq_of_heq (h e)) p)
+
 theorem map_id {x y : O} (p : Chain E x y) : p.map (fun e => e) = p := by
   induction p with
   | nil => rfl
@@ -598,6 +605,13 @@ abbrev Horizontal (n : Nat) (G : GlobularSet.{u}) (a b : G.Cell 0) :=
 def pack {n : Nat} {G : GlobularSet.{u}} {a b : G.Cell 0}
     (p : Horizontal n G a b) : Pasting (n + 1) G := ⟨a, b, p⟩
 
+theorem pack_heq {n m : Nat} {G : GlobularSet.{u}} {a b : G.Cell 0}
+    (h : n = m) (p : Horizontal n G a b) (q : Horizontal m G a b) (hp : HEq p q) :
+    HEq (pack p) (pack q) := by
+  cases h
+  cases hp
+  rfl
+
 theorem sourceZero_pack {n : Nat} {G : GlobularSet.{u}} {a b : G.Cell 0}
     (p : Horizontal n G a b) : (globular G).sourceZero (n := n + 1) (pack p) = a := by
   induction n with
@@ -826,6 +840,192 @@ theorem vertical_horizontal_interchange {n : Nat} {G : GlobularSet.{u}} {a b c :
         (Chain.map_append _ q s).symm)) =
       horizontal (verticalFibre p q h) (verticalFibre r s k) :=
   Chain.zipOver_append _ _ _ p q h r s k
+
+/-- Source at dimension `k` of a diagram at dimension `n+k+1`.
+The excess dimension `n+1` is arbitrary, not a fixed truncation bound. -/
+def sourceAt : (k n : Nat) → {G : GlobularSet.{u}} → Pasting (n + k + 1) G → Pasting k G
+  | 0, _, _, ⟨a, _, _⟩ => a
+  | k + 1, n, G, ⟨a, b, p⟩ =>
+      ⟨a, b, p.map (fun {x y} e => sourceAt k n (G := G.hom x y) e)⟩
+
+def targetAt : (k n : Nat) → {G : GlobularSet.{u}} → Pasting (n + k + 1) G → Pasting k G
+  | 0, _, _, ⟨_, b, _⟩ => b
+  | k + 1, n, G, ⟨a, b, p⟩ =>
+      ⟨a, b, p.map (fun {x y} e => targetAt k n (G := G.hom x y) e)⟩
+
+theorem sourceAt_adjacent (k : Nat) {G : GlobularSet.{u}} (p : Pasting (0 + k + 1) G) :
+    HEq (sourceAt k 0 p) (source p) := by
+  induction k generalizing G with
+  | zero => rcases p with ⟨a, b, p⟩; rfl
+  | succ k ih =>
+    rcases p with ⟨a, b, p⟩
+    exact pack_heq (Nat.zero_add k).symm _ _
+      (Chain.map_heq (by rw [Nat.zero_add]) _ _ (fun {x y} e => ih e) p)
+
+theorem targetAt_adjacent (k : Nat) {G : GlobularSet.{u}} (p : Pasting (0 + k + 1) G) :
+    HEq (targetAt k 0 p) (target p) := by
+  induction k generalizing G with
+  | zero => rcases p with ⟨a, b, p⟩; rfl
+  | succ k ih =>
+    rcases p with ⟨a, b, p⟩
+    exact pack_heq (Nat.zero_add k).symm _ _
+      (Chain.map_heq (by rw [Nat.zero_add]) _ _ (fun {x y} e => ih e) p)
+
+/-- Composition at an arbitrary lower boundary. Recursion is on the actual
+boundary dimension, reducing to horizontal concatenation in each hom tower. -/
+noncomputable def composeAt (k n : Nat) {G : GlobularSet.{u}}
+    (p q : Pasting (n + k + 1) G) (h : targetAt k n p = sourceAt k n q) :
+    Pasting (n + k + 1) G := by
+  induction k generalizing G with
+  | zero =>
+    rcases p with ⟨a, b, p⟩
+    rcases q with ⟨c, d, q⟩
+    change b = c at h
+    cases h
+    exact pack (horizontal p q)
+  | succ k ih =>
+    rcases p with ⟨a, b, p⟩
+    rcases q with ⟨c, d, q⟩
+    have ha : a = c := _root_.congrArg Sigma.fst h
+    have hb : b = d := _root_.congrArg (fun z => z.2.1) h
+    cases ha
+    cases hb
+    have hp : p.map (fun e => targetAt k n e) = q.map (fun e => sourceAt k n e) :=
+      eq_of_heq (Sigma.mk.inj (eq_of_heq (Sigma.mk.inj h).2)).2
+    exact pack (Chain.zipOver (fun e => targetAt k n e) (fun e => sourceAt k n e)
+      (fun {x y} e f he => ih (G := G.hom x y) e f he) p q hp)
+
+theorem sourceAt_composeAt (k n : Nat) {G : GlobularSet.{u}}
+    (p q : Pasting (n + k + 1) G) (h : targetAt k n p = sourceAt k n q) :
+    sourceAt k n (composeAt k n p q h) = sourceAt k n p := by
+  induction k generalizing G with
+  | zero =>
+    rcases p with ⟨a, b, p⟩
+    rcases q with ⟨c, d, q⟩
+    change b = c at h
+    cases h
+    rfl
+  | succ k ih =>
+    rcases p with ⟨a, b, p⟩
+    rcases q with ⟨c, d, q⟩
+    have ha : a = c := _root_.congrArg Sigma.fst h
+    have hb : b = d := _root_.congrArg (fun z => z.2.1) h
+    cases ha
+    cases hb
+    have hp : p.map (fun e => targetAt k n e) = q.map (fun e => sourceAt k n e) :=
+      eq_of_heq (Sigma.mk.inj (eq_of_heq (Sigma.mk.inj h).2)).2
+    exact _root_.congrArg pack (Chain.map_zipOver_left _ _ _ _ _
+      (fun e f he => ih e f he) p q hp)
+
+theorem targetAt_composeAt (k n : Nat) {G : GlobularSet.{u}}
+    (p q : Pasting (n + k + 1) G) (h : targetAt k n p = sourceAt k n q) :
+    targetAt k n (composeAt k n p q h) = targetAt k n q := by
+  induction k generalizing G with
+  | zero =>
+    rcases p with ⟨a, b, p⟩
+    rcases q with ⟨c, d, q⟩
+    change b = c at h
+    cases h
+    rfl
+  | succ k ih =>
+    rcases p with ⟨a, b, p⟩
+    rcases q with ⟨c, d, q⟩
+    have ha : a = c := _root_.congrArg Sigma.fst h
+    have hb : b = d := _root_.congrArg (fun z => z.2.1) h
+    cases ha
+    cases hb
+    have hp : p.map (fun e => targetAt k n e) = q.map (fun e => sourceAt k n e) :=
+      eq_of_heq (Sigma.mk.inj (eq_of_heq (Sigma.mk.inj h).2)).2
+    exact _root_.congrArg pack (Chain.map_zipOver_right _ _ _ _ _
+      (fun e f he => ih e f he) p q hp)
+
+/-- The identity diagram over a `k`-cell in dimension `n+k+1`. -/
+def identityAt : (k n : Nat) → {G : GlobularSet.{u}} → Pasting k G → Pasting (n + k + 1) G
+  | 0, _, _, a => ⟨a, a, .nil a⟩
+  | k + 1, n, G, ⟨a, b, p⟩ =>
+      ⟨a, b, p.map (fun {x y} e => identityAt k n (G := G.hom x y) e)⟩
+
+theorem sourceAt_identityAt (k n : Nat) {G : GlobularSet.{u}} (p : Pasting k G) :
+    sourceAt k n (identityAt k n p) = p := by
+  induction k generalizing G with
+  | zero => rfl
+  | succ k ih =>
+    rcases p with ⟨a, b, p⟩
+    exact _root_.congrArg pack ((Chain.map_map _ _ p).trans
+      ((Chain.map_congr _ (fun e => e) (fun e => ih e) p).trans (Chain.map_id p)))
+
+theorem targetAt_identityAt (k n : Nat) {G : GlobularSet.{u}} (p : Pasting k G) :
+    targetAt k n (identityAt k n p) = p := by
+  induction k generalizing G with
+  | zero => rfl
+  | succ k ih =>
+    rcases p with ⟨a, b, p⟩
+    exact _root_.congrArg pack ((Chain.map_map _ _ p).trans
+      ((Chain.map_congr _ (fun e => e) (fun e => ih e) p).trans (Chain.map_id p)))
+
+theorem composeAt_left_unit (k n : Nat) {G : GlobularSet.{u}} (p : Pasting (n + k + 1) G) :
+    composeAt k n (identityAt k n (sourceAt k n p)) p
+      (targetAt_identityAt k n (sourceAt k n p)) = p := by
+  induction k generalizing G with
+  | zero => rcases p with ⟨a, b, p⟩; rfl
+  | succ k ih =>
+    rcases p with ⟨a, b, p⟩
+    simp only [identityAt, sourceAt, Chain.map_map]
+    exact _root_.congrArg pack (Chain.zipOver_map_left
+      (fun e => targetAt k n e) (fun e => sourceAt k n e) (fun e f h => composeAt k n e f h)
+      (fun e => identityAt k n (sourceAt k n e)) (fun e => targetAt_identityAt k n (sourceAt k n e))
+      (fun e => ih e) p)
+
+theorem composeAt_right_unit (k n : Nat) {G : GlobularSet.{u}} (p : Pasting (n + k + 1) G) :
+    composeAt k n p (identityAt k n (targetAt k n p))
+      (sourceAt_identityAt k n (targetAt k n p)).symm = p := by
+  induction k generalizing G with
+  | zero =>
+    rcases p with ⟨a, b, p⟩
+    exact _root_.congrArg pack (Chain.append_nil p)
+  | succ k ih =>
+    rcases p with ⟨a, b, p⟩
+    simp only [identityAt, targetAt, Chain.map_map]
+    exact _root_.congrArg pack (Chain.zipOver_map_right
+      (fun e => targetAt k n e) (fun e => sourceAt k n e) (fun e f h => composeAt k n e f h)
+      (fun e => identityAt k n (targetAt k n e)) (fun e => (sourceAt_identityAt k n (targetAt k n e)).symm)
+      (fun e => ih e) p)
+
+theorem composeAt_assoc (k n : Nat) {G : GlobularSet.{u}}
+    (p q r : Pasting (n + k + 1) G)
+    (h : targetAt k n p = sourceAt k n q) (j : targetAt k n q = sourceAt k n r) :
+    composeAt k n (composeAt k n p q h) r ((targetAt_composeAt k n p q h).trans j) =
+      composeAt k n p (composeAt k n q r j) (h.trans (sourceAt_composeAt k n q r j).symm) := by
+  induction k generalizing G with
+  | zero =>
+    rcases p with ⟨a, b, p⟩
+    rcases q with ⟨c, d, q⟩
+    rcases r with ⟨e, f, r⟩
+    change b = c at h
+    change d = e at j
+    cases h
+    cases j
+    exact _root_.congrArg pack (Chain.append_assoc p q r)
+  | succ k ih =>
+    rcases p with ⟨a, b, p⟩
+    rcases q with ⟨c, d, q⟩
+    rcases r with ⟨e, f, r⟩
+    have ha : a = c := _root_.congrArg Sigma.fst h
+    have hb : b = d := _root_.congrArg (fun z => z.2.1) h
+    have hc : c = e := _root_.congrArg Sigma.fst j
+    have hd : d = f := _root_.congrArg (fun z => z.2.1) j
+    cases ha
+    cases hb
+    cases hc
+    cases hd
+    have hp : p.map (fun e => targetAt k n e) = q.map (fun e => sourceAt k n e) :=
+      eq_of_heq (Sigma.mk.inj (eq_of_heq (Sigma.mk.inj h).2)).2
+    have hq : q.map (fun e => targetAt k n e) = r.map (fun e => sourceAt k n e) :=
+      eq_of_heq (Sigma.mk.inj (eq_of_heq (Sigma.mk.inj j).2)).2
+    exact _root_.congrArg pack (Chain.zipOver_assoc
+      (fun e => targetAt k n e) (fun e => sourceAt k n e) (fun e f h => composeAt k n e f h)
+      (fun e f h => targetAt_composeAt k n e f h) (fun e f h => sourceAt_composeAt k n e f h)
+      (fun e f g h j => ih e f g h j) p q r hp hq)
 
 end Pasting
 
