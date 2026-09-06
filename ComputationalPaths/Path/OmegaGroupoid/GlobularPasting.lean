@@ -2,6 +2,7 @@ import ComputationalPaths.Path.OmegaGroupoid.GlobularFoundations
 import Mathlib.CategoryTheory.Functor.Basic
 import Mathlib.CategoryTheory.NatTrans
 import Mathlib.CategoryTheory.Monad.Algebra
+import Mathlib.CategoryTheory.Monad.Adjunction
 import Mathlib.CategoryTheory.Monoidal.Category
 import Mathlib.CategoryTheory.Monoidal.Mon
 
@@ -5535,6 +5536,79 @@ noncomputable def algebraHomEquiv (C D : CutModel.{u}) :
   invFun f := ⟨f.f, algebraHom_preserves f⟩
   left_inv f := Hom.ext _ _ rfl
   right_inv f := CategoryTheory.Monad.Algebra.Hom.ext rfl
+
+/-- The actual labelled-pasting model satisfies all seven cut-law packages. -/
+noncomputable def free (G : GlobularSet.{u}) : CutModel.{u} where
+  carrier := globular G
+  operations := cutOperations G
+  compatible := cutOperations_compatible G
+  leftUnital := cutOperations_leftUnital G
+  rightUnital := cutOperations_rightUnital G
+  associative := cutOperations_associative G
+  interchange := cutOperations_interchange G
+  unitIdempotent := cutOperations_unitIdempotent G
+  unitCompatible := cutOperations_unitCompatible G
+
+def forget : CategoryTheory.Functor CutModel.{u} GlobularSet.{u} where
+  obj C := C.carrier
+  map f := f.map
+
+noncomputable def freeFunctor : CategoryTheory.Functor GlobularSet.{u} CutModel.{u} where
+  obj := free
+  map f := ⟨mapGlobular f, mapGlobular_preserves f⟩
+  map_id G := Hom.ext _ _ (pastingFunctor.map_id G)
+  map_comp f g := Hom.ext _ _ (pastingFunctor.map_comp f g)
+
+noncomputable def extend {G : GlobularSet.{u}} (C : CutModel.{u})
+    (f : GlobularSet.Map G C.carrier) : Hom (free G) C where
+  map := evaluateGlobular (C.operations.recursive C.compatible) .root f
+  preserves := evaluateGlobular_preserves C.operations C.compatible C.leftUnital
+    C.associative C.interchange C.unitIdempotent C.unitCompatible f
+
+/-- The free extension and restriction to generators are inverse functions
+on actual cut-model morphisms in all dimensions. -/
+noncomputable def freeHomEquiv (G : GlobularSet.{u}) (C : CutModel.{u}) :
+    Hom (free G) C ≃ GlobularSet.Map G C.carrier where
+  toFun f := GlobularSet.Map.comp f.map (singletonGlobular G)
+  invFun := extend C
+  left_inv f := by
+    apply Hom.ext
+    apply GlobularSet.Map.ext
+    intro n p
+    exact (preserves_recovered C.operations C.compatible f.map f.preserves p).symm
+  right_inv f := evaluateGlobular_extends C.operations C.compatible C.rightUnital f
+
+/-- This adjunction is for the explicit cut-law presentation. Identification
+with a standard definition of strict omega-categories is still required. -/
+noncomputable def freeForgetAdjunction : CategoryTheory.Adjunction freeFunctor forget :=
+  CategoryTheory.Adjunction.mkOfHomEquiv {
+    homEquiv := freeHomEquiv
+    homEquiv_naturality_left_symm := by
+      intro G H C f g
+      apply Hom.ext
+      apply GlobularSet.Map.ext
+      intro n p
+      exact (evaluate_precompose (C.operations.recursive C.compatible) .root g f p).symm
+    homEquiv_naturality_right := by
+      intro G C D f g
+      apply GlobularSet.Map.ext
+      intro n p
+      rfl }
+
+theorem freeForget_unit (G : GlobularSet.{u}) :
+    freeForgetAdjunction.unit.app G = singletonGlobular G := rfl
+
+theorem freeForget_counit (C : CutModel.{u}) :
+    (freeForgetAdjunction.counit.app C).map = C.algebra.a := rfl
+
+/-- The multiplication induced by the free/forgetful adjunction is literally
+the already verified recursive flattening, not a newly chosen operation. -/
+theorem freeForget_multiplication (G : GlobularSet.{u}) :
+    freeForgetAdjunction.toMonad.μ.app G = flattenGlobular G := rfl
+
+/-- The existing monad, including its functor, unit and multiplication,
+is exactly the monad of the free cut-model adjunction. -/
+theorem freeForget_monad : freeForgetAdjunction.toMonad = pastingMonad := rfl
 
 end CutModel
 

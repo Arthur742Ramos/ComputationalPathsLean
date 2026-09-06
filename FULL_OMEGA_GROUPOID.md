@@ -756,3 +756,14 @@ morphism correspondence. This closes the morphism-level comparison for
 the implemented cut laws; it does not yet identify all algebra objects or
 identify that cut-law presentation with the standard strict omega-category
 definition. No extra higher filler assumption is used in this comparison.
+
+`CutModel.freeHomEquiv` now packages extension and restriction to generators
+as inverse functions on actual morphisms. Its two naturality laws construct
+the Mathlib adjunction `freeForgetAdjunction`. `freeForget_unit` identifies
+the adjunction unit with singleton inclusion, and `freeForget_multiplication`
+identifies its induced multiplication with the existing recursive flattening.
+`freeForget_monad` proves equality of the entire induced monad with
+`pastingMonad`. Thus the free-model monad comparison is complete for the
+explicit cut-law presentation; the remaining standard-definition gate is
+identifying that presentation with strict omega-categories, not merely
+producing an adjunction or checking another multiplication law.

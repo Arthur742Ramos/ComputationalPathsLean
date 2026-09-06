@@ -135,6 +135,17 @@ example (A : Type u) :
 #print axioms Pasting.cutOperationsAlgebra
 #print axioms Pasting.CutModel.algebraHom_preserves
 #print axioms Pasting.CutModel.algebraHomEquiv
+#print axioms Pasting.CutModel.freeForgetAdjunction
+#print axioms Pasting.CutModel.freeForget_monad
+
+noncomputable example :
+    CategoryTheory.Adjunction Pasting.CutModel.freeFunctor Pasting.CutModel.forget :=
+  Pasting.CutModel.freeForgetAdjunction
+example : Pasting.CutModel.freeForgetAdjunction.toMonad = Pasting.pastingMonad :=
+  Pasting.CutModel.freeForget_monad
+example (G : GlobularSet) :
+    Pasting.CutModel.freeForgetAdjunction.toMonad.μ.app G = Pasting.flattenGlobular G :=
+  Pasting.CutModel.freeForget_multiplication G
 
 example : Pasting.CutModel.algebraFunctor.Full := inferInstance
 example : Pasting.CutModel.algebraFunctor.Faithful := inferInstance
