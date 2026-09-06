@@ -77,7 +77,7 @@ The lifting interface follows the elementwise positive-dimensional square
 in Raftogianis, Definition 4.5 (pp. 35–36). It requires a specified arity cell
 and both commuting-boundary equations; it is not a general filler for domain
 parallel pairs. The labelled-pasting monad is now constructed below. Its free
-strict-category characterization, cartesian properties, globular operad and
+strict-category characterization, globular operad and
 algebra action still require verification. The audit is not a completion
 certificate for the full weak omega-groupoid objective.
 
@@ -107,7 +107,7 @@ square, without assuming the relabelling map is injective.
 checks both adjacent boundaries, and proves the unique lifting property for
 arbitrary globular cones. This establishes the actual universal property of
 the unit squares. Pullback preservation is established below; cartesianness
-of multiplication remains a separate, unproved obligation.
+of multiplication is now established by `flatten_globular_pullback` below.
 
 `GlobularSet.pullback` now constructs matched pairs of original cells with
 componentwise boundaries, both globularity laws, and no added fillers.
@@ -139,7 +139,7 @@ boundaries of the inverse, and `pullbackComparisonIso` is an actual Mathlib
 isomorphism. Finally, `pasting_pullback_universal` proves the full unique
 globular lifting property for each image pullback cone. Thus the pasting
 functor preserves the constructed globular pullbacks, not merely their
-zero-dimensional vertices. Multiplication cartesianness is still unproved.
+zero-dimensional vertices. Multiplication cartesianness is established below.
 
 For multiplication, the chain-segmentation ingredient is now verified.
 `Chain.split_mapAlong` lifts any specified split of a relabelled chain;
@@ -158,17 +158,17 @@ its actual hom-context evaluator, and `flatten_horizontal_segments` expresses
 evaluated hom labels. `flattenHom_natural`, `unpackFibre_map_hom`, and
 `flattenHom_segments_natural` check relabelling of these exact segments.
 This does not replace the hom of the pasting carrier with a different
-hom-pasting type. Unique lifting for these recursive hom evaluations remains
-to be proved before claiming cartesianness of globular multiplication.
+hom-pasting type. Unique lifting for these recursive hom evaluations is now
+proved by `evaluate_unique_lift`, as described below.
 
 `flattenHom_factor` now identifies that hom evaluator with the restriction
 of `flattenGlobular` along `homPastingInclusion`; the inclusion itself is
 verified injective in every dimension and natural under relabelling.
-`HomFlattenCartesianAt f n` states the remaining unique-lifting obligation
+`HomFlattenCartesianAt f n` states the exact unique-lifting property
 with both the output hom cell and relabelled nested diagram prescribed.
-Its dimension-zero case is proved by the identity evaluator. No positive-
-dimensional instance of this predicate is currently claimed; this boundary
-check does not complete cartesianness of multiplication.
+Its dimension-zero case is proved by the identity evaluator, and
+`homFlattenCartesianAt` now establishes every dimension using the actual
+hom-context instance of `evaluate_unique_lift`.
 
 The bottom-cut primitives now have verified unique lifts in every positive
 dimension. `horizontal_unit_cartesian` reflects the actual empty-chain
@@ -225,7 +225,8 @@ cells' fixed endpoints from the unit/composite equations.
 `Cartesian.hom` therefore proves closure under genuine hom restriction,
 including both existence and uniqueness; it does not postulate endpoint
 fillers. This supplies the hom-stable premise needed for recursive-evaluation
-lifting. The latter and monad multiplication cartesianness remain unproved.
+lifting. Both that lifting theorem and multiplication cartesianness are now
+proved below.
 
 The evaluator's horizontal lifting steps are now explicit.
 `Cartesian.horizontal_factor_lift` recovers a unique original intermediate
@@ -235,7 +236,7 @@ laws, and both raw relabelling equations are retained.
 `Cartesian.horizontal_unit_lift` handles an empty fold by proving the
 original endpoints coincide and identifying the actual original unit.
 These supply the binary and empty cases for a fold-lifting induction;
-the recursive-evaluation lifting proof remains open.
+the recursive-evaluation lifting proof now uses these cases below.
 
 Arbitrary finite horizontal chains now have unique lifts:
 `Cartesian.fold_lift` proves existence with explicit endpoint equations,
@@ -243,9 +244,25 @@ Arbitrary finite horizontal chains now have unique lifts:
 image, and `Cartesian.fold_unique_lift` combines these into the fixed-endpoint
 pullback property. All three quantify over arbitrary dimension and require
 the proved primitive `Cartesian` interface and compatible cut operations;
-they do not require an injective object map. This closes the horizontal-chain
-step only. Lifting recursively labelled pastings, cartesianness of monad
-multiplication, and the operad/action comparison remain completion gates.
+they do not require an injective object map.
+
+`evaluate_lift` now lifts entire recursively labelled pastings by dimension
+induction in arbitrary actual hom contexts. The induction combines the
+horizontal fold lift with `Chain.lift_mapAlong_square`, applying its lower-
+dimensional hypothesis to each original label. `evaluate_joint_injective`
+proves uniqueness using the fold's joint injectivity and the lower-dimensional
+label uniqueness; `evaluate_unique_lift` combines them. The exact naturality
+helper `evaluate_map_id` connects the two evaluators and relabelling.
+
+Instantiating this theorem with `mapGlobular_cartesian` gives
+`flatten_cartesian`: the implemented multiplication has unique lifts in
+every dimension. `flatten_globular_pullback` assembles these lifts into a
+globular map, proves both boundary equations by cellwise uniqueness, and
+establishes the unique lift for arbitrary globular cones. Together with the
+existing monad laws, unit pullbacks, and functor pullback preservation, this
+establishes the cartesian properties of this concrete labelled-pasting monad.
+The standard free-strict-category identification, globular operad/action,
+and compatibility with the native weak operations remain completion gates.
 
 `evaluate` now evaluates labelled diagrams by dimension recursion into a
 target equipped with horizontal operations in all its iterated hom contexts

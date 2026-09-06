@@ -74,6 +74,34 @@ completion gate for the full weak omega-groupoid theorem. -/
 #print axioms Pasting.CutOperations.Cartesian.fold_lift
 #print axioms Pasting.CutOperations.Cartesian.fold_joint_injective
 #print axioms Pasting.CutOperations.Cartesian.fold_unique_lift
+#print axioms Pasting.evaluate_pack_id
+#print axioms Pasting.evaluate_lift
+#print axioms Pasting.evaluate_map_id
+#print axioms Pasting.evaluate_joint_injective
+#print axioms Pasting.evaluate_unique_lift
+#print axioms Pasting.flatten_cartesian
+#print axioms Pasting.flatten_globular_pullback
+#print axioms Pasting.homFlattenCartesianAt
+
+example {G H : GlobularSet.{u}} (f : GlobularSet.Map G H) {n : Nat}
+    (p : Pasting n G) (q : Pasting n (Pasting.globular H))
+    (h : Pasting.map f p = (Pasting.flattenGlobular H).app (n := n) q) :
+    ∃! r : Pasting n (Pasting.globular G),
+      (Pasting.flattenGlobular G).app (n := n) r = p ∧
+      Pasting.map (Pasting.mapGlobular f) r = q := Pasting.flatten_cartesian f p q h
+
+example {G H X : GlobularSet.{u}} (f : GlobularSet.Map G H)
+    (p : GlobularSet.Map X (Pasting.globular G))
+    (q : GlobularSet.Map X (Pasting.globular (Pasting.globular H)))
+    (h : GlobularSet.Map.comp (Pasting.mapGlobular f) p =
+      GlobularSet.Map.comp (Pasting.flattenGlobular H) q) :
+    ∃! d : GlobularSet.Map X (Pasting.globular (Pasting.globular G)),
+      GlobularSet.Map.comp (Pasting.flattenGlobular G) d = p ∧
+      GlobularSet.Map.comp (Pasting.mapGlobular (Pasting.mapGlobular f)) d = q :=
+  Pasting.flatten_globular_pullback f p q h
+
+example {G H : GlobularSet.{u}} (f : GlobularSet.Map G H) (n : Nat) :
+    Pasting.HomFlattenCartesianAt f n := Pasting.homFlattenCartesianAt f n
 
 example {G H : GlobularSet.{u}} {C : Pasting.CutOperations G} {D : Pasting.CutOperations H}
     {f : GlobularSet.Map G H} (K : Pasting.CutOperations.Cartesian C D f)

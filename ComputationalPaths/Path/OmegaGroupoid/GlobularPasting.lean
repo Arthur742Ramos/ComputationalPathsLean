@@ -4508,6 +4508,146 @@ def evaluateGlobular {H : GlobularSet.{u}} (C : RecursiveComposition H)
   source_app := source_evaluate C h f
   target_app := target_evaluate C h f
 
+/-- Identity-labelled evaluation exposes the genuine hom-context fold. -/
+theorem evaluate_pack_id {H : GlobularSet.{u}} (C : RecursiveComposition H)
+    {G : GlobularSet.{u}} (h : HomContext H G) {n : Nat} {a b : G.Cell 0}
+    (p : Horizontal n G a b) :
+    evaluate C h (GlobularSet.Map.id G) (pack p) =
+      ((C h).fold (p.map (fun {x y} e =>
+        evaluate C (h.hom x y) (GlobularSet.Map.id (G.hom x y)) e))).val := by
+  change ((C h).fold (p.mapAlong (fun x => x) _)).val = _
+  simp only [GlobularSet.Map.hom_id]
+  exact _root_.congrArg (fun q => ((C h).fold q).val)
+    (Chain.mapAlong_identity_vertices
+      (fun {x y} e => evaluate C (h.hom x y) (GlobularSet.Map.id (G.hom x y)) e) p)
+
+/-- Cartesian primitive operations lift recursively labelled diagrams
+through the actual evaluator, in every finite iterated hom context. -/
+theorem evaluate_lift {G₀ H₀ : GlobularSet.{u}} (C : CutOperations G₀) (D : CutOperations H₀)
+    (L : C.Compatible) (M : D.Compatible) {n : Nat} {G H : GlobularSet.{u}}
+    (g : HomContext G₀ G) (h : HomContext H₀ H) (f : GlobularSet.Map G H)
+    (K : CutOperations.Cartesian (C.inContext g) (D.inContext h) f)
+    (p : G.Cell n) (q : Pasting n H)
+    (hp : f.app p = evaluate (D.recursive M) h (GlobularSet.Map.id H) q) :
+    ∃ r : Pasting n G,
+      evaluate (C.recursive L) g (GlobularSet.Map.id G) r = p ∧ map f r = q := by
+  induction n generalizing G H with
+  | zero => exact ⟨p, rfl, hp⟩
+  | succ n ih =>
+    rcases q with ⟨x, y, q⟩
+    let a := G.sourceZero p
+    let b := G.targetZero p
+    let p' : (G.hom a b).Cell n := ⟨p, rfl, rfl⟩
+    let j := fun {x y : H.Cell 0} (e : Pasting n (H.hom x y)) =>
+      evaluate (D.recursive M) (h.hom x y) (GlobularSet.Map.id (H.hom x y)) e
+    have hp' : f.app p = (((D.inContext h).horizontal (M.inContext h)).fold (q.map j)).val :=
+      hp.trans (evaluate_pack_id (D.recursive M) h q)
+    have ha : f.app a = x := (f.sourceZero p).symm.trans
+      ((_root_.congrArg H.sourceZero hp').trans
+        ((((D.inContext h).horizontal (M.inContext h)).fold (q.map j)).property.1))
+    have hb : f.app b = y := (f.targetZero p).symm.trans
+      ((_root_.congrArg H.targetZero hp').trans
+        ((((D.inContext h).horizontal (M.inContext h)).fold (q.map j)).property.2))
+    obtain ⟨s, hs, hf⟩ := K.fold_lift (L.inContext g) (M.inContext h) (q.map j) a b p' ha hb hp'
+    obtain ⟨r, hr, hq⟩ := Chain.lift_mapAlong_square
+      (E := fun x y => (G.hom x y).Cell n) (R := fun x y => Pasting n (G.hom x y))
+      (F := fun x y => (H.hom x y).Cell n) (D := fun x y => Pasting n (H.hom x y))
+      f.app (fun {x y} e => (f.hom x y).app e) j
+      (fun {x y} e => evaluate (C.recursive L) (g.hom x y) (GlobularSet.Map.id (G.hom x y)) e)
+      (fun {x y} e => map (f.hom x y) e) (by
+        intro u v x y e d hx hy he
+        cases hx
+        cases hy
+        obtain ⟨r, hr, hd⟩ := ih (g.hom u v) (h.hom (f.app u) (f.app v))
+          (f.hom u v) (K.hom u v) e d (eq_of_heq he)
+        exact ⟨r, hr, heq_of_eq hd⟩) s q ha hb hf
+    refine ⟨pack r, ?_, Chain.packed_eq_of_heq _ _ ha hb hq⟩
+    exact (evaluate_pack_id (C.recursive L) g r).trans
+      ((_root_.congrArg (fun t => (((C.inContext g).horizontal (L.inContext g)).fold t).val) hr).trans
+        (_root_.congrArg Subtype.val hs))
+
+/-- Naturality of identity-labelled evaluation in arbitrary hom contexts. -/
+theorem evaluate_map_id {G₀ H₀ : GlobularSet.{u}} (C : CutOperations G₀) (D : CutOperations H₀)
+    (L : C.Compatible) (M : D.Compatible) {n : Nat} {G H : GlobularSet.{u}}
+    (g : HomContext G₀ G) (h : HomContext H₀ H) (f : GlobularSet.Map G H)
+    (P : CutOperations.Preserves (C.inContext g) (D.inContext h) f) (p : Pasting n G) :
+    f.app (evaluate (C.recursive L) g (GlobularSet.Map.id G) p) =
+      evaluate (D.recursive M) h (GlobularSet.Map.id H) (map f p) := by
+  exact (evaluate_postcompose C D L M g h f P (GlobularSet.Map.id G) p).trans
+    (evaluate_precompose (D.recursive M) h (GlobularSet.Map.id H) f p).symm
+
+/-- Evaluation and relabelling jointly determine every recursively labelled
+pasting, not merely its unlabelled shape or its folded value. -/
+theorem evaluate_joint_injective {G₀ H₀ : GlobularSet.{u}}
+    (C : CutOperations G₀) (D : CutOperations H₀) (L : C.Compatible) (M : D.Compatible)
+    {n : Nat} {G H : GlobularSet.{u}} (g : HomContext G₀ G) (h : HomContext H₀ H)
+    (f : GlobularSet.Map G H) (K : CutOperations.Cartesian (C.inContext g) (D.inContext h) f)
+    (p q : Pasting n G)
+    (he : evaluate (C.recursive L) g (GlobularSet.Map.id G) p =
+      evaluate (C.recursive L) g (GlobularSet.Map.id G) q)
+    (hm : map f p = map f q) : p = q := by
+  induction n generalizing G H with
+  | zero => exact he
+  | succ n ih =>
+    rcases p with ⟨a, b, p⟩
+    rcases q with ⟨c, d, q⟩
+    let j := fun {x y : G.Cell 0} (e : Pasting n (G.hom x y)) =>
+      evaluate (C.recursive L) (g.hom x y) (GlobularSet.Map.id (G.hom x y)) e
+    have he' : (((C.inContext g).horizontal (L.inContext g)).fold (p.map j)).val =
+        (((C.inContext g).horizontal (L.inContext g)).fold (q.map j)).val :=
+      (evaluate_pack_id (C.recursive L) g p).symm.trans
+        (he.trans (evaluate_pack_id (C.recursive L) g q))
+    have ha : a = c := (((C.inContext g).horizontal (L.inContext g)).fold (p.map j)).property.1.symm.trans
+      ((_root_.congrArg G.sourceZero he').trans
+        (((C.inContext g).horizontal (L.inContext g)).fold (q.map j)).property.1)
+    have hb : b = d := (((C.inContext g).horizontal (L.inContext g)).fold (p.map j)).property.2.symm.trans
+      ((_root_.congrArg G.targetZero he').trans
+        (((C.inContext g).horizontal (L.inContext g)).fold (q.map j)).property.2)
+    cases ha
+    cases hb
+    have hm' := eq_of_heq (Chain.packed_eq_heq _ _ hm)
+    let k := fun {x y : H.Cell 0} (e : Pasting n (H.hom x y)) =>
+      evaluate (D.recursive M) (h.hom x y) (GlobularSet.Map.id (H.hom x y)) e
+    have law : ∀ {x y} (e : Pasting n (G.hom x y)),
+        (f.hom x y).app (j e) = k (map (f.hom x y) e) := fun {x y} e =>
+      evaluate_map_id C D L M (g.hom x y) (h.hom (f.app x) (f.app y))
+        (f.hom x y) (K.toPreserves.hom x y) e
+    have hmj : (p.map j).mapAlong (F := fun x y => (H.hom x y).Cell n)
+        f.app (fun {x y} e => (f.hom x y).app e) =
+        (q.map j).mapAlong f.app (fun {x y} e => (f.hom x y).app e) :=
+      (Chain.mapAlong_natural (F := fun x y => Pasting n (H.hom x y))
+        (K := fun x y => (H.hom x y).Cell n) f.app j k (fun {x y} e => map (f.hom x y) e)
+        (fun {x y} e => (f.hom x y).app e) (fun e => (law e).symm) p).symm.trans
+        ((_root_.congrArg (fun t => t.map k) hm').trans
+          (Chain.mapAlong_natural (F := fun x y => Pasting n (H.hom x y))
+            (K := fun x y => (H.hom x y).Cell n) f.app j k (fun {x y} e => map (f.hom x y) e)
+            (fun {x y} e => (f.hom x y).app e) (fun e => (law e).symm) q))
+    have hj := K.fold_joint_injective (L.inContext g) (M.inContext h)
+      (p.map j) (q.map j) (Subtype.ext he') hmj
+    apply _root_.congrArg pack
+    exact Chain.mapAlong_joint_injective (F := fun x y => (G.hom x y).Cell n)
+      (D := fun x y => Pasting n (H.hom x y)) (fun x => x) f.app j
+      (fun {x y} e => map (f.hom x y) e) (fun _ _ hx _ => hx)
+      (fun {x y} e d he hd => ih (g.hom x y) (h.hom (f.app x) (f.app y))
+        (f.hom x y) (K.hom x y) e d he hd) p q
+      ((Chain.mapAlong_identity_vertices j p).trans (hj.trans (Chain.mapAlong_identity_vertices j q).symm)) hm'
+
+/-- Unique recursive evaluation lifts: the full cellwise pullback property,
+uniform in the dimension and in the genuine iterated hom contexts. -/
+theorem evaluate_unique_lift {G₀ H₀ : GlobularSet.{u}}
+    (C : CutOperations G₀) (D : CutOperations H₀) (L : C.Compatible) (M : D.Compatible)
+    {n : Nat} {G H : GlobularSet.{u}} (g : HomContext G₀ G) (h : HomContext H₀ H)
+    (f : GlobularSet.Map G H) (K : CutOperations.Cartesian (C.inContext g) (D.inContext h) f)
+    (p : G.Cell n) (q : Pasting n H)
+    (hp : f.app p = evaluate (D.recursive M) h (GlobularSet.Map.id H) q) :
+    ∃! r : Pasting n G,
+      evaluate (C.recursive L) g (GlobularSet.Map.id G) r = p ∧ map f r = q := by
+  obtain ⟨r, hr, hq⟩ := evaluate_lift C D L M g h f K p q hp
+  refine ⟨r, ⟨hr, hq⟩, ?_⟩
+  intro s hs
+  exact evaluate_joint_injective C D L M g h f K s r
+    (hs.1.trans hr.symm) (hs.2.trans hq.symm)
+
 /-- A globular interpretation supplies canonical cut matching from the
 actual matching of its labelled diagrams. -/
 theorem map_cut_composable {G H : GlobularSet.{u}} (f : GlobularSet.Map (globular G) H)
@@ -4619,6 +4759,59 @@ theorem flatten_natural {G H : GlobularSet.{u}} (f : GlobularSet.Map G H)
     intro m c
     rfl
   exact hpost.trans ((_root_.congrArg (fun g => evaluate (recursiveComposition H) .root g p) he).trans hpre.symm)
+
+/-- Every naturality square of the implemented multiplication is cartesian.
+The unique lift retains the entire nested labelling in arbitrary dimension. -/
+theorem flatten_cartesian {G H : GlobularSet.{u}} (f : GlobularSet.Map G H)
+    {n : Nat} (p : Pasting n G) (q : Pasting n (globular H))
+    (h : map f p = (flattenGlobular H).app (n := n) q) :
+    ∃! r : Pasting n (globular G),
+      (flattenGlobular G).app (n := n) r = p ∧ map (mapGlobular f) r = q :=
+  evaluate_unique_lift (cutOperations G) (cutOperations H)
+    (cutOperations_compatible G) (cutOperations_compatible H) .root .root
+    (mapGlobular f) (mapGlobular_cartesian f) p q h
+
+/-- Multiplication naturality has the full unique globular cone lift.
+Cellwise uniqueness forces compatibility with both adjacent boundaries. -/
+theorem flatten_globular_pullback {G H X : GlobularSet.{u}}
+    (f : GlobularSet.Map G H) (p : GlobularSet.Map X (globular G))
+    (q : GlobularSet.Map X (globular (globular H)))
+    (h : GlobularSet.Map.comp (mapGlobular f) p =
+      GlobularSet.Map.comp (flattenGlobular H) q) :
+    ∃! d : GlobularSet.Map X (globular (globular G)),
+      GlobularSet.Map.comp (flattenGlobular G) d = p ∧
+      GlobularSet.Map.comp (mapGlobular (mapGlobular f)) d = q := by
+  have liftExists (n : Nat) (x : X.Cell n) := flatten_cartesian f (p.app x) (q.app x)
+    (_root_.congrArg (fun k : GlobularSet.Map X (globular H) => k.app x) h)
+  let d {n : Nat} (x : X.Cell n) := (liftExists n x).choose
+  have hd {n : Nat} (x : X.Cell n) :
+      (flattenGlobular G).app (d x) = p.app x ∧ map (mapGlobular f) (d x) = q.app x :=
+    (liftExists n x).choose_spec.1
+  let D : GlobularSet.Map X (globular (globular G)) := {
+    app := d
+    source_app := fun x => (liftExists _ (X.source x)).choose_spec.2 (source (d x)) ⟨
+      ((flattenGlobular G).source_app (d x)).symm.trans
+        ((_root_.congrArg source (hd x).1).trans (p.source_app x)),
+      ((mapGlobular (mapGlobular f)).source_app (d x)).symm.trans
+        ((_root_.congrArg source (hd x).2).trans (q.source_app x))⟩
+    target_app := fun x => (liftExists _ (X.target x)).choose_spec.2 (target (d x)) ⟨
+      ((flattenGlobular G).target_app (d x)).symm.trans
+        ((_root_.congrArg target (hd x).1).trans (p.target_app x)),
+      ((mapGlobular (mapGlobular f)).target_app (d x)).symm.trans
+        ((_root_.congrArg target (hd x).2).trans (q.target_app x))⟩ }
+  refine ⟨D, ⟨?_, ?_⟩, ?_⟩
+  · apply GlobularSet.Map.ext
+    intro n x
+    exact (hd x).1
+  · apply GlobularSet.Map.ext
+    intro n x
+    exact (hd x).2
+  · intro e he
+    apply GlobularSet.Map.ext
+    intro n x
+    exact (liftExists n x).choose_spec.2 (e.app x) ⟨
+      _root_.congrArg (fun k : GlobularSet.Map X (globular G) => k.app x) he.1,
+      _root_.congrArg (fun k : GlobularSet.Map X (globular (globular H)) => k.app x) he.2⟩
 
 /-- Concrete flattening preserves horizontal concatenation of nested
 diagrams at every dimension. This is the zero-cut case of preservation. -/
@@ -4969,6 +5162,16 @@ theorem homFlattenCartesianAt_zero {G H : GlobularSet.{u}} (f : GlobularSet.Map 
   refine ⟨p, ⟨rfl, h⟩, ?_⟩
   intro r hr
   exact hr.1
+
+/-- Every dimension of the actual hom evaluator has unique lifts. -/
+theorem homFlattenCartesianAt {G H : GlobularSet.{u}} (f : GlobularSet.Map G H) (n : Nat) :
+    HomFlattenCartesianAt f n := by
+  intro a b p q h
+  exact evaluate_unique_lift (cutOperations G) (cutOperations H)
+    (cutOperations_compatible G) (cutOperations_compatible H)
+    ((HomContext.root (H := globular G)).hom a b)
+    ((HomContext.root (H := globular H)).hom (f.app a) (f.app b))
+    ((mapGlobular f).hom a b) ((mapGlobular_cartesian f).hom a b) p q h
 
 /-- The native singleton inclusion factors through the actual hom-pasting
 inclusion; this is an equation of globular maps, including all boundaries. -/
