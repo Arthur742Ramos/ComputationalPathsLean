@@ -305,3 +305,21 @@ example {A : Type} (n : Nat) (p : NativeTower.Cell A (n + 1)) :
 #print axioms NativeTower.weaklyInvertible_coinduction
 #print axioms NativeTower.weaklyInvertible_unfold
 #print axioms NativeTower.all_cells_weaklyInvertible
+
+example {A : Type} {n : Nat} (p q r : NativeTower.Cell A (n + 1))
+    (hpq : NativeTower.target p = NativeTower.source q)
+    (hqr : NativeTower.target q = NativeTower.source r) :
+    NativeTower.WeaklyInvertible (n + 1) (NativeTower.composeAssociator p q r hpq hqr).val :=
+  NativeTower.all_cells_weaklyInvertible _ _
+
+example {A : Type} {n : Nat} (p : NativeTower.Cell A (n + 1)) :
+    NativeTower.WeaklyInvertible (n + 1) (NativeTower.leftUnitor p).val ∧
+    NativeTower.WeaklyInvertible (n + 1) (NativeTower.rightUnitor p).val :=
+  ⟨NativeTower.all_cells_weaklyInvertible _ _, NativeTower.all_cells_weaklyInvertible _ _⟩
+
+#print axioms NativeTower.composeAssociator
+#print axioms NativeTower.leftUnitor
+#print axioms NativeTower.rightUnitor
+#print axioms NativeTower.composeAssociator_paths
+#print axioms NativeTower.leftUnitor_paths
+#print axioms NativeTower.rightUnitor_paths

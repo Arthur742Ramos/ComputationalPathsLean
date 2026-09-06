@@ -63,8 +63,9 @@ proved. A finite-dimensional package does not complete this objective.
 - `RealizesPathSkeleton`, the required correspondence interface.
 
 These definitions and lemmas build without proof holes. The candidate native
-carrier described below now instantiates the correspondence interface; an
-operadic action and all-dimensional weak invertibility are still unproved.
+carrier described below now instantiates the correspondence interface and
+has coinductive invertibility for its specified adjacent operations; an
+operadic action and its compatibility with those operations remain unproved.
 
 ```sh
 lake build ComputationalPaths.Path.OmegaGroupoid.GlobularPasting
@@ -224,6 +225,17 @@ whose operator is defined already for omega-precategories. The theorem is
 about the specified native/coskeletal omega-precategory; its operations are
 not yet identified with those of a proved operadic action. That remains a
 required completion gate, not a consequence of invertibility alone.
+
+`composeAssociator`, `leftUnitor`, and `rightUnitor` supply correctly bounded
+coherence cells for adjacent composition in every positive dimension.
+`composeAssociator_paths` identifies its first-dimensional instance with the
+existing `associatorCell` literally; the unitor `_paths` equations expose the
+exact `Step.trans_refl_left` and `Step.trans_refl_right` derivations. Higher
+instances use the declared coskeletal extension. The audit checks that all
+these coherence cells are themselves coinductively weakly invertible, at an
+arbitrary dimension. These are actual operations of the candidate tower,
+but their operadic origin and the required pentagon/interchange comparison
+with the independent associativity certificate remain to be established.
 
 The current rewrite theory has a totality theorem for `RwEq` on parallel
 paths. A structural weak omega-groupoid theorem does not automatically give a

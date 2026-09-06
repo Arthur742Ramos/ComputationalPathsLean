@@ -287,6 +287,79 @@ theorem cancelLeft_paths {A : Type u} {a b : A} (p : Path a b) :
     (cancelLeft (A := A) (n := 0) (ULift.up (⟨a, b, p⟩ : PathOne A))).val.2.2.2.2 =
       RwEq.step (Step.symm_trans p) := rfl
 
+/-- Associativity is witnessed one dimension higher, not imposed as equality
+of the raw derivation syntax. At dimension one the witness is the primitive
+native associator. -/
+noncomputable def composeAssociator {A : Type u} {n : Nat}
+    (p q r : Cell A (n + 1)) (hpq : target p = source q) (hqr : target q = source r) :
+    { c : Cell A (n + 2) //
+      source c = compose (compose p q hpq) r ((target_compose p q hpq).trans hqr) ∧
+      target c = compose p (compose q r hqr) (hpq.trans (source_compose q r hqr).symm) } := by
+  cases n with
+  | zero =>
+    rcases p with ⟨a, b, p⟩
+    rcases q with ⟨c, d, q⟩
+    rcases r with ⟨e, f, r⟩
+    have hbc : b = c := _root_.congrArg ULift.down hpq
+    have hde : d = e := _root_.congrArg ULift.down hqr
+    cases hbc
+    cases hde
+    exact ⟨associatorCell p q r, rfl, rfl⟩
+  | succ n =>
+    let l := compose (compose p q hpq) r ((target_compose p q hpq).trans hqr)
+    let t := compose p (compose q r hqr) (hpq.trans (source_compose q r hqr).symm)
+    have hs : source l = source t :=
+      ((source_compose _ _ _).trans (source_compose p q hpq)).trans
+        (source_compose p (compose q r hqr) _).symm
+    have ht : target l = target t :=
+      (target_compose (compose p q hpq) r _).trans
+        ((target_compose _ _ _).trans (target_compose q r hqr)).symm
+    exact ⟨higherCell l t hs ht, source_higherCell _ _ _ _, target_higherCell _ _ _ _⟩
+
+noncomputable def leftUnitor {A : Type u} {n : Nat} (p : Cell A (n + 1)) :
+    { c : Cell A (n + 2) //
+      source c = compose (identity (source p)) p (target_identity (source p)) ∧ target c = p } := by
+  cases n with
+  | zero =>
+    rcases p with ⟨a, b, p⟩
+    exact ⟨⟨a, b, Path.trans (Path.refl a) p, p,
+      RwEq.step (Step.trans_refl_left p)⟩, rfl, rfl⟩
+  | succ n =>
+    let l := compose (identity (source p)) p (target_identity (source p))
+    have hs : source l = source p :=
+      (source_compose _ _ _).trans (source_identity (source p))
+    have ht : target l = target p := target_compose _ _ _
+    exact ⟨higherCell l p hs ht, source_higherCell _ _ _ _, target_higherCell _ _ _ _⟩
+
+noncomputable def rightUnitor {A : Type u} {n : Nat} (p : Cell A (n + 1)) :
+    { c : Cell A (n + 2) //
+      source c = compose p (identity (target p)) (source_identity (target p)).symm ∧ target c = p } := by
+  cases n with
+  | zero =>
+    rcases p with ⟨a, b, p⟩
+    exact ⟨⟨a, b, Path.trans p (Path.refl b), p,
+      RwEq.step (Step.trans_refl_right p)⟩, rfl, rfl⟩
+  | succ n =>
+    let l := compose p (identity (target p)) (source_identity (target p)).symm
+    have hs : source l = source p := source_compose _ _ _
+    have ht : target l = target p :=
+      (target_compose _ _ _).trans (target_identity (target p))
+    exact ⟨higherCell l p hs ht, source_higherCell _ _ _ _, target_higherCell _ _ _ _⟩
+
+theorem composeAssociator_paths {A : Type u} {a b c d : A}
+    (p : Path a b) (q : Path b c) (r : Path c d) :
+    (composeAssociator (A := A) (n := 0)
+      (ULift.up (⟨a, b, p⟩ : PathOne A)) (ULift.up (⟨b, c, q⟩ : PathOne A))
+      (ULift.up (⟨c, d, r⟩ : PathOne A)) rfl rfl).val = associatorCell p q r := rfl
+
+theorem leftUnitor_paths {A : Type u} {a b : A} (p : Path a b) :
+    (leftUnitor (A := A) (n := 0) (ULift.up (⟨a, b, p⟩ : PathOne A))).val.2.2.2.2 =
+      RwEq.step (Step.trans_refl_left p) := rfl
+
+theorem rightUnitor_paths {A : Type u} {a b : A} (p : Path a b) :
+    (rightUnitor (A := A) (n := 0) (ULift.up (⟨a, b, p⟩ : PathOne A))).val.2.2.2.2 =
+      RwEq.step (Step.trans_refl_right p) := rfl
+
 /-- A predicate on all positive-dimensional cells, with no finite depth bound. -/
 def CellPredicate (A : Type u) := ∀ n : Nat, Cell A (n + 1) → Prop
 
