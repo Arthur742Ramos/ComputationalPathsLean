@@ -175,8 +175,17 @@ dimension. `horizontal_unit_cartesian` reflects the actual empty-chain
 `cutUnit .bottom`, and `horizontal_cut_cartesian` reconstructs the original
 intermediate vertex and both horizontal factors from a specified factorization
 after relabelling. These proofs allow non-injective relabellings and preserve
-empty factors. Higher-cut lifting and the resulting positive-dimensional
-hom-evaluation lifting theorem remain open.
+empty factors. Higher-cut composition lifting and the resulting positive-
+dimensional hom-evaluation lifting theorem remain open.
+
+Unit lifting now extends to every cut. `cutUnit_retract_of_map` proves that
+if a relabelled diagram is a cut unit, the original diagram is the cut unit
+on its own cut source. It descends through actual hom globular sets using
+`Chain.map_retract_of_mapAlong`, including the matching endpoint equations.
+`cutUnit_cartesian` gives the unique prescribed lift for arbitrary `Cut n`,
+with `cutSource c p` as its explicit preimage. No injectivity hypothesis or
+general filler is assumed. This completes the primitive unit part, not the
+higher-cut composition or globular multiplication part.
 
 `evaluate` now evaluates labelled diagrams by dimension recursion into a
 target equipped with horizontal operations in all its iterated hom contexts

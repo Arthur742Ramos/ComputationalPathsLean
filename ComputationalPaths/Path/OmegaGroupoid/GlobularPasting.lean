@@ -870,6 +870,26 @@ theorem bind_cartesian {O P : Type u} {E : O → O → Type u} {F : P → P → 
   exact bind_mapAlong_joint_injective f e s r (hs.1.trans hr.symm)
     (hs.2.trans (eq_of_heq hq).symm)
 
+/-- Reflect a labelwise retraction from a relabelled chain. The target
+chain may have different vertices; matching endpoints are supplied per label. -/
+theorem map_retract_of_mapAlong {O P : Type u}
+    {E : O → O → Type u} {F D : P → P → Type u}
+    (f : O → P) (e : {x y : O} → E x y → F (f x) (f y))
+    (j : {x y : P} → D x y → F x y) (r : {x y : O} → E x y → E x y)
+    (law : ∀ {x y : O} {a b : P} (p : E x y) (q : D a b),
+      f x = a → f y = b → HEq (e p) (j q) → r p = p)
+    {x y : O} {a b : P} (p : Chain E x y) (q : Chain D a b)
+    (hx : f x = a) (hy : f y = b) (h : HEq (p.mapAlong f e) (q.map j)) :
+    p.map r = p := by
+  induction p generalizing a b with
+  | nil => rfl
+  | @cons x z y p ps ih =>
+    cases q with
+    | nil => exact False.elim (nil_not_heq_cons (e p) (ps.mapAlong f e) hx.symm hy.symm (HEq.symm h))
+    | @cons a c b q qs =>
+      have hc := cons_heq_components (e p) (ps.mapAlong f e) (j q) (qs.map j) hx hy h
+      exact _root_.congrArg₂ Chain.cons (law p q hx hc.1 hc.2.1) (ih qs hc.1 hy hc.2.2)
+
 end Chain
 
 /-- The dimension-recursive labelled pasting carrier. -/
@@ -3078,6 +3098,58 @@ theorem mapGlobular_preserves {G H : GlobularSet.{u}} (f : GlobularSet.Map G H) 
     CutOperations.Preserves (cutOperations G) (cutOperations H) (mapGlobular f) where
   compose c p q h h' := map_cutCompose c f p q _ _
   unit c p := map_cutUnit c f p
+
+theorem cutSource_map {n : Nat} (c : Cut n) {G H : GlobularSet.{u}}
+    (f : GlobularSet.Map G H) (p : Pasting n G) :
+    cutSource c (map f p) = map f (cutSource c p) :=
+  (canonical_source_eq_cutSource c (map f p)).symm.trans
+    ((CutBoundary.source_map c (mapGlobular f) p).trans
+      (_root_.congrArg (map f) (canonical_source_eq_cutSource c p)))
+
+theorem cutUnit_hom_heq {n : Nat} (c : Cut n) {H : GlobularSet.{u}}
+    {a b a' b' : H.Cell 0} (p : Pasting n (H.hom a b))
+    (q : Pasting c.height (H.hom a' b')) (ha : a = a') (hb : b = b')
+    (h : HEq p (cutUnit c q)) : ∃ q' : Pasting c.height (H.hom a b), p = cutUnit c q' := by
+  cases ha
+  cases hb
+  exact ⟨q, eq_of_heq h⟩
+
+/-- Relabelling reflects the iterated-unit retraction at every cut, not
+only at the horizontal boundary. The proof descends through genuine homs. -/
+theorem cutUnit_retract_of_map {n : Nat} (c : Cut n) {G H : GlobularSet.{u}}
+    (f : GlobularSet.Map G H) (p : Pasting n G) (q : Pasting c.height H)
+    (h : map f p = cutUnit c q) : cutUnit c (cutSource c p) = p := by
+  induction c generalizing G H with
+  | bottom =>
+    obtain ⟨a, ⟨ha, hf⟩, hu⟩ := horizontal_unit_cartesian f p q h
+    rw [← ha]
+    rfl
+  | @lift n c ih =>
+    rcases p with ⟨a, b, p⟩
+    rcases q with ⟨a', b', q⟩
+    have ha : f.app a = a' := _root_.congrArg Sigma.fst h
+    have hb : f.app b = b' := _root_.congrArg (fun z => z.2.1) h
+    have hc := Chain.packed_eq_heq _ _ h
+    have hr : p.map (fun e => cutUnit c (cutSource c e)) = p :=
+      Chain.map_retract_of_mapAlong (F := fun x y => Pasting n (H.hom x y))
+        (D := fun x y => Pasting c.height (H.hom x y)) f.app
+        (fun {x y} e => map (f.hom x y) e) (fun e => cutUnit c e)
+        (fun e => cutUnit c (cutSource c e)) (by
+          intro x y a b e d hx hy he
+          obtain ⟨d', hd⟩ := cutUnit_hom_heq c _ d hx hy he
+          exact ih (f.hom x y) e d' hd) p q ha hb hc
+    exact _root_.congrArg pack ((Chain.map_map _ _ p).trans hr)
+
+/-- The naturality square of every cut unit has a unique cell lift. -/
+theorem cutUnit_cartesian {n : Nat} (c : Cut n) {G H : GlobularSet.{u}}
+    (f : GlobularSet.Map G H) (p : Pasting n G) (q : Pasting c.height H)
+    (h : map f p = cutUnit c q) :
+    ∃! r : Pasting c.height G, cutUnit c r = p ∧ map f r = q := by
+  refine ⟨cutSource c p, ⟨cutUnit_retract_of_map c f p q h, ?_⟩, ?_⟩
+  · exact (cutSource_map c f p).symm.trans
+      ((_root_.congrArg (cutSource c) h).trans (cutSource_cutUnit c q))
+  · intro r hr
+    exact (cutSource_cutUnit c r).symm.trans (_root_.congrArg (cutSource c) hr.1)
 
 theorem cutSource_at (k n : Nat) {G : GlobularSet.{u}} (p : Pasting (n + k + 1) G) :
     HEq (cutSource (Cut.at k n) p) (sourceAt k n p) := by
