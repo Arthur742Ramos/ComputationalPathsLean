@@ -203,3 +203,20 @@ example {G : GlobularSet} (p : Pasting 9 G) : Pasting.dropTarget 4 3 p = Pasting
 #print axioms Pasting.dropTarget_composeAt_boundary
 #print axioms Pasting.dropSource_identityAt
 #print axioms Pasting.dropTarget_identityAt
+
+example {G : GlobularSet} (k : Nat) (p q : Pasting (0 + k + 1) G)
+    (h : Pasting.targetAt k 0 p = Pasting.sourceAt k 0 q)
+    (h' : Pasting.target p = Pasting.source q) :
+    Pasting.composeAt k 0 p q h = Pasting.vertical p q h' :=
+  Pasting.composeAt_adjacent k p q h h'
+
+example {G : GlobularSet} (p : Pasting 7 G) : HEq (Pasting.identityAt 7 0 p) (Pasting.identity p) :=
+  Pasting.identityAt_adjacent 7 p
+
+#print axioms Chain.zipOver_congr
+#print axioms Pasting.composeAt_horizontal
+#print axioms Pasting.composeAt_adjacent_eq
+#print axioms Pasting.identityAt_adjacent
+#print axioms Pasting.identityAt_step
+#print axioms Pasting.pack_composeAtFibre
+#print axioms Pasting.composeAt_horizontal_interchange

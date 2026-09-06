@@ -289,6 +289,22 @@ theorem map_zipOver {O : Type u} {E F D B : O → O → Type v}
       have hq' : (p.map f).map s' = (q.map f).map t' := hq
       exact _root_.congrArg₂ Chain.cons (law e d he' hf') (ih q hp' hq')
 
+/-- Comparison of two aligned compositions, even when their boundary
+carriers use different dimension expressions. No boundary reflection is needed. -/
+theorem zipOver_congr {O : Type u} {E D B : O → O → Type v}
+    (s t : {x y : O} → E x y → D x y)
+    (s' t' : {x y : O} → E x y → B x y)
+    (op : {x y : O} → (e d : E x y) → s e = t d → E x y)
+    (op' : {x y : O} → (e d : E x y) → s' e = t' d → E x y)
+    (law : ∀ {x y} (e d : E x y) (h : s e = t d) (h' : s' e = t' d),
+      op e d h = op' e d h')
+    {x y : O} (p q : Chain E x y) (h : p.map s = q.map t) (h' : p.map s' = q.map t') :
+    zipOver s t op p q h = zipOver s' t' op' p q h' := by
+  have hj : (p.map (fun e => e)).map s' = (q.map (fun e => e)).map t' := by
+    simpa only [map_id] using h'
+  have hm := map_zipOver s t s' t' op op' (fun e => e) law p q h hj
+  simpa only [map_id] using hm
+
 variable {O : Type u} {E : O → O → Type v} {F : O → O → Type w}
 
 def single {x y : O} (e : E x y) : Chain E x y := .cons e (.nil y)
@@ -1489,6 +1505,96 @@ theorem dropTarget_identityAt (k n : Nat) {G : GlobularSet.{u}} (p : Pasting k G
   | succ k ih =>
     rcases p with ⟨a, b, p⟩
     exact _root_.congrArg pack ((Chain.map_map _ _ p).trans (Chain.map_congr _ _ (fun e => ih e) p))
+
+/-- The general operation at the zero boundary is exactly horizontal
+concatenation on the existing endpoint fibre. -/
+theorem composeAt_horizontal (n : Nat) {G : GlobularSet.{u}} {a b c : G.Cell 0}
+    (p : Horizontal n G a b) (q : Horizontal n G b c) :
+    composeAt 0 n (pack p) (pack q) rfl = pack (horizontal p q) := rfl
+
+/-- At gap one, the general operation is the previously verified adjacent
+composition on the very same cells. -/
+theorem composeAt_adjacent (k : Nat) {G : GlobularSet.{u}} (p q : Pasting (0 + k + 1) G)
+    (h : targetAt k 0 p = sourceAt k 0 q) (h' : target p = source q) :
+    composeAt k 0 p q h = vertical p q h' := by
+  induction k generalizing G with
+  | zero =>
+    rcases p with ⟨a, b, p⟩
+    rcases q with ⟨c, d, q⟩
+    change b = c at h
+    cases h
+    rfl
+  | succ k ih =>
+    rcases p with ⟨a, b, p⟩
+    rcases q with ⟨c, d, q⟩
+    have ha : a = c := _root_.congrArg Sigma.fst h
+    have hb : b = d := _root_.congrArg (fun z => z.2.1) h
+    cases ha
+    cases hb
+    have hp : p.map (fun e => targetAt k 0 e) = q.map (fun e => sourceAt k 0 e) :=
+      eq_of_heq (Sigma.mk.inj (eq_of_heq (Sigma.mk.inj h).2)).2
+    have hp' : p.map (fun e => target e) = q.map (fun e => source e) :=
+      eq_of_heq (Sigma.mk.inj (eq_of_heq (Sigma.mk.inj h').2)).2
+    exact _root_.congrArg pack (Chain.zipOver_congr
+      (fun e => targetAt k 0 e) (fun e => sourceAt k 0 e)
+      (fun e => target e) (fun e => source e)
+      (fun e d h => composeAt k 0 e d h) (fun e d h => vertical e d h)
+      (fun e d h j => ih e d h j) p q hp hp')
+
+theorem composeAt_adjacent_eq (k : Nat) {G : GlobularSet.{u}} (p q : Pasting (0 + k + 1) G)
+    (h : targetAt k 0 p = sourceAt k 0 q) :
+    composeAt k 0 p q h = vertical p q
+      (eq_of_heq ((targetAt_adjacent k p).symm.trans ((heq_of_eq h).trans (sourceAt_adjacent k q)))) :=
+  composeAt_adjacent k p q h _
+
+theorem identityAt_adjacent (k : Nat) {G : GlobularSet.{u}} (p : Pasting k G) :
+    HEq (identityAt k 0 p) (identity p) := by
+  induction k generalizing G with
+  | zero => rfl
+  | succ k ih =>
+    rcases p with ⟨a, b, p⟩
+    exact pack_heq (_root_.congrArg Nat.succ (Nat.zero_add k)) _ _
+      (Chain.map_heq (by rw [Nat.zero_add]) _ _ (fun e => ih e) p)
+
+/-- The higher identities are iterates of the existing identity operation. -/
+theorem identityAt_step (k n : Nat) {G : GlobularSet.{u}} (p : Pasting k G) :
+    reindex (excess_succ_dimension k n) (identity (identityAt k n p)) = identityAt k (n + 1) p := by
+  induction k generalizing G with
+  | zero => rfl
+  | succ k ih =>
+    rcases p with ⟨a, b, p⟩
+    change reindex (_root_.congrArg Nat.succ (excess_succ_dimension k n))
+      (pack ((p.map (fun e => identityAt k n e)).map (fun e => identity e))) = _
+    rw [reindex_pack (excess_succ_dimension k n)]
+    apply _root_.congrArg pack
+    simp only [Chain.map_map]
+    exact Chain.map_congr _ _ (fun e => ih e) p
+
+/-- General composition with zero endpoints exposed. Packing recovers the
+same `composeAt` operation, now at boundary dimension `k+1`. -/
+noncomputable def composeAtFibre (k n : Nat) {G : GlobularSet.{u}} {a b : G.Cell 0}
+    (p q : Horizontal (n + k + 1) G a b)
+    (h : p.map (fun e => targetAt k n e) = q.map (fun e => sourceAt k n e)) :
+    Horizontal (n + k + 1) G a b :=
+  Chain.zipOver (fun e => targetAt k n e) (fun e => sourceAt k n e)
+    (fun e d h => composeAt k n e d h) p q h
+
+theorem pack_composeAtFibre (k n : Nat) {G : GlobularSet.{u}} {a b : G.Cell 0}
+    (p q : Horizontal (n + k + 1) G a b)
+    (h : p.map (fun e => targetAt k n e) = q.map (fun e => sourceAt k n e)) :
+    pack (composeAtFibre k n p q h) = composeAt (k + 1) n (pack p) (pack q) (_root_.congrArg pack h) := rfl
+
+/-- Interchange with the zero-boundary composition holds for every higher
+boundary, not only the adjacent one. -/
+theorem composeAt_horizontal_interchange (k n : Nat) {G : GlobularSet.{u}} {a b c : G.Cell 0}
+    (p q : Horizontal (n + k + 1) G a b) (r s : Horizontal (n + k + 1) G b c)
+    (h : p.map (fun e => targetAt k n e) = q.map (fun e => sourceAt k n e))
+    (j : r.map (fun e => targetAt k n e) = s.map (fun e => sourceAt k n e)) :
+    composeAtFibre k n (horizontal p r) (horizontal q s)
+      ((Chain.map_append _ p r).trans ((_root_.congrArg₂ Chain.append h j).trans
+        (Chain.map_append _ q s).symm)) =
+      horizontal (composeAtFibre k n p q h) (composeAtFibre k n r s j) :=
+  Chain.zipOver_append _ _ _ p q h r s j
 
 end Pasting
 

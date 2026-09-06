@@ -161,7 +161,14 @@ The dimension-indexed `dropSource`/`dropTarget` operations are proved equal to
 the existing source/target after arithmetic reindexing (`dropSource_eq`,
 `dropTarget_eq`), and preserve the corresponding identity diagrams. All four
 combinations of lower source/target with either adjacent boundary are checked.
-Full interchange, identification of special-case operations, monad construction,
+The special-case identifications are now proved: `composeAt_horizontal` recovers
+horizontal composition, `composeAt_adjacent_eq` recovers vertical composition
+with its composability proof derived from the general one, and
+`identityAt_adjacent`/`identityAt_step` identify the general identities with
+iterates of the existing identity operation. `composeAt_horizontal_interchange`
+extends interchange with the zero boundary to every higher boundary; its fibre
+operation packs to the same general composition (`pack_composeAtFibre`).
+Interchange between two positive boundary dimensions, monad construction,
 and the eventual weak-groupoid action and invertibility remain incomplete.
 
 ## Semantic audit and completion gates
