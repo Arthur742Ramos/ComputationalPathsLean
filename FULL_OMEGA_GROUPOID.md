@@ -108,6 +108,18 @@ concrete fold is precisely chain substitution in every dimension. Extending
 these operations through every nested hom context using higher cuts, then
 proving the resulting multiplication's monad laws, remains unfinished.
 
+The hom-restriction mechanism is now proved for all cuts on arbitrary
+globular sets. `CutBoundary` defines canonical boundaries by shifting the
+actual tower and proves their naturality and compatibility with hom
+inclusion. `CutOperations.hom` inherits composition and units one cut higher
+from the parent, with checked fixed endpoints; `hom_compose_val` and
+`hom_unit_val` show that the underlying cells are unchanged. `inContext`
+iterates this restriction to any hom depth. This interface currently includes
+cut-boundary laws only: adjacent-boundary compatibility still needs to be
+added, and the existing pasting operations still need to be identified with
+these canonical boundaries and instantiated. Thus this is not yet a
+`RecursiveComposition` instance for the pasting carrier or monad multiplication.
+
 Endpoint-indexed chain substitution now has proved left/right unit and
 associativity laws (`Chain.bind_single`, `Chain.bind_id`, `Chain.bind_assoc`).
 Its interpretation by actual computational paths respects substitution

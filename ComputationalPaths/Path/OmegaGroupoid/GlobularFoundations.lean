@@ -110,6 +110,26 @@ theorem Map.parallel {G : GlobularSet.{u}} {H : GlobularSet.{v}} (f : Map G H)
     exact .cells ((f.source_app _).trans ((_root_.congrArg f.app hs).trans (f.source_app _).symm))
       ((f.target_app _).trans ((_root_.congrArg f.app ht).trans (f.target_app _).symm))
 
+/-- Forget the object level, retaining all higher cells and adjacent maps. -/
+def shift (G : GlobularSet.{u}) : GlobularSet.{u} where
+  Cell n := G.Cell (n + 1)
+  source := G.source
+  target := G.target
+  source_source := G.source_source
+  target_source := G.target_source
+
+def Map.shift {G : GlobularSet.{u}} {H : GlobularSet.{v}} (f : Map G H) : Map G.shift H.shift where
+  app := f.app
+  source_app := f.source_app
+  target_app := f.target_app
+
+def constant (X : Type u) : GlobularSet.{u} where
+  Cell _ := X
+  source := id
+  target := id
+  source_source _ := rfl
+  target_source _ := rfl
+
 end GlobularSet
 
 namespace GlobularSet
@@ -283,6 +303,28 @@ theorem Map.hom_comp {G : GlobularSet.{u}} {H : GlobularSet.{v}} {K : GlobularSe
   apply Map.ext
   intro n c
   exact Subtype.ext rfl
+
+end GlobularSet
+
+namespace GlobularSet
+
+/-- The hom set is a boundary-defined sub-globular set of the shifted tower. -/
+def homInclusion (G : GlobularSet.{u}) (a b : G.Cell 0) : Map (G.hom a b) G.shift where
+  app := Subtype.val
+  source_app _ := rfl
+  target_app _ := rfl
+
+/-- The fixed zero-dimensional endpoints are globular maps on the shifted
+tower, so they can be used to restrict every higher-cut operation to homs. -/
+def sourceZeroMap (G : GlobularSet.{u}) : Map G.shift (constant (G.Cell 0)) where
+  app := G.sourceZero
+  source_app _ := rfl
+  target_app c := G.sourceZero_globular c
+
+def targetZeroMap (G : GlobularSet.{u}) : Map G.shift (constant (G.Cell 0)) where
+  app := G.targetZero
+  source_app c := (G.targetZero_globular c).symm
+  target_app _ := rfl
 
 end GlobularSet
 

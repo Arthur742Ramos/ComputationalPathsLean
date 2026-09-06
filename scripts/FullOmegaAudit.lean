@@ -332,6 +332,24 @@ example {A : Type} {n : Nat} (p : NativeTower.Cell A (n + 1)) :
 #print axioms Pasting.horizontalComposition_right_unit
 #print axioms Pasting.horizontalComposition_fold
 
+#print axioms GlobularSet.homInclusion
+#print axioms GlobularSet.sourceZeroMap
+#print axioms GlobularSet.targetZeroMap
+#print axioms Pasting.CutBoundary.source_map
+#print axioms Pasting.CutBoundary.target_map
+#print axioms Pasting.CutBoundary.source_hom
+#print axioms Pasting.CutBoundary.target_hom
+#print axioms Pasting.CutOperations.hom
+#print axioms Pasting.CutOperations.hom_compose_val
+#print axioms Pasting.CutOperations.hom_unit_val
+#print axioms Pasting.CutOperations.inContext
+
+example {G H : GlobularSet} (C : Pasting.CutOperations G)
+    (h : Pasting.HomContext G H) {n : Nat} (c : Pasting.Cut n)
+    (p q : H.Cell n) (hpq : Pasting.CutBoundary.target c H p = Pasting.CutBoundary.source c H q) :
+    Pasting.CutBoundary.source c H ((C.inContext h).compose c p q hpq) =
+      Pasting.CutBoundary.source c H p := (C.inContext h).source_compose c p q hpq
+
 example (G : GlobularSet) {n : Nat} {a b : G.Cell 0}
     (p : Chain (fun x y => Pasting.Horizontal n G x y) a b) :
     (Pasting.horizontalComposition G).fold (p.map (fun e => Pasting.packFibre e)) =

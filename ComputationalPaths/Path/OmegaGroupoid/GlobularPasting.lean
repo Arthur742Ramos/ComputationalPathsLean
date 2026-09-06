@@ -1744,6 +1744,148 @@ def Cut.at : (k n : Nat) → Cut (n + k + 1)
   | 0, _ => .bottom
   | k + 1, n => .lift (Cut.at k n)
 
+namespace CutBoundary
+
+/-- Canonical cut boundaries on any globular set. Lifting a cut forgets one
+object level; it does not replace the cells by formal pasting syntax. -/
+def source : {n : Nat} → (c : Cut n) → (G : GlobularSet.{u}) → G.Cell n → G.Cell c.height
+  | _, .bottom, G, p => G.sourceZero p
+  | _, .lift c, G, p => source c G.shift p
+
+def target : {n : Nat} → (c : Cut n) → (G : GlobularSet.{u}) → G.Cell n → G.Cell c.height
+  | _, .bottom, G, p => G.targetZero p
+  | _, .lift c, G, p => target c G.shift p
+
+theorem source_map {n : Nat} (c : Cut n) {G H : GlobularSet.{u}}
+    (f : GlobularSet.Map G H) (p : G.Cell n) : source c H (f.app p) = f.app (source c G p) := by
+  induction c generalizing G H with
+  | bottom => exact f.sourceZero p
+  | lift c ih => exact ih f.shift p
+
+theorem target_map {n : Nat} (c : Cut n) {G H : GlobularSet.{u}}
+    (f : GlobularSet.Map G H) (p : G.Cell n) : target c H (f.app p) = f.app (target c G p) := by
+  induction c generalizing G H with
+  | bottom => exact f.targetZero p
+  | lift c ih => exact ih f.shift p
+
+theorem source_constant {n : Nat} (c : Cut n) {X : Type u} (p : X) :
+    source c (GlobularSet.constant X) p = p := by
+  induction c with
+  | @bottom n =>
+    change (GlobularSet.constant X).sourceZero (n := n + 1) p = p
+    induction n with
+    | zero => rfl
+    | succ n ih => exact ih
+  | lift c ih => exact ih
+
+theorem target_constant {n : Nat} (c : Cut n) {X : Type u} (p : X) :
+    target c (GlobularSet.constant X) p = p := by
+  induction c with
+  | @bottom n =>
+    change (GlobularSet.constant X).targetZero (n := n + 1) p = p
+    induction n with
+    | zero => rfl
+    | succ n ih => exact ih
+  | lift c ih => exact ih
+
+theorem sourceZero_source_lift {n : Nat} (c : Cut n) (G : GlobularSet.{u}) (p : G.Cell (n + 1)) :
+    G.sourceZero (source (.lift c) G p) = G.sourceZero p :=
+  (source_map c G.sourceZeroMap p).symm.trans (source_constant c _)
+
+theorem targetZero_source_lift {n : Nat} (c : Cut n) (G : GlobularSet.{u}) (p : G.Cell (n + 1)) :
+    G.targetZero (source (.lift c) G p) = G.targetZero p :=
+  (source_map c G.targetZeroMap p).symm.trans (source_constant c _)
+
+theorem sourceZero_target_lift {n : Nat} (c : Cut n) (G : GlobularSet.{u}) (p : G.Cell (n + 1)) :
+    G.sourceZero (target (.lift c) G p) = G.sourceZero p :=
+  (target_map c G.sourceZeroMap p).symm.trans (target_constant c _)
+
+theorem targetZero_target_lift {n : Nat} (c : Cut n) (G : GlobularSet.{u}) (p : G.Cell (n + 1)) :
+    G.targetZero (target (.lift c) G p) = G.targetZero p :=
+  (target_map c G.targetZeroMap p).symm.trans (target_constant c _)
+
+/-- Restricting a canonical boundary to a hom set retains its actual
+underlying cell, with the cut shifted by one in the original tower. -/
+theorem source_hom {n : Nat} (c : Cut n) (G : GlobularSet.{u}) {a b : G.Cell 0}
+    (p : (G.hom a b).Cell n) : source (.lift c) G p.val = (source c (G.hom a b) p).val :=
+  source_map c (G.homInclusion a b) p
+
+theorem target_hom {n : Nat} (c : Cut n) (G : GlobularSet.{u}) {a b : G.Cell 0}
+    (p : (G.hom a b).Cell n) : target (.lift c) G p.val = (target c (G.hom a b) p).val :=
+  target_map c (G.homInclusion a b) p
+
+end CutBoundary
+
+/-- Operations at every canonical cut, with their actual cut-boundary laws.
+This is boundary data only, not a declaration of strict category laws. -/
+structure CutOperations (G : GlobularSet.{u}) where
+  compose : {n : Nat} → (c : Cut n) → (p q : G.Cell n) →
+    CutBoundary.target c G p = CutBoundary.source c G q → G.Cell n
+  source_compose : ∀ {n} (c : Cut n) (p q : G.Cell n) h,
+    CutBoundary.source c G (compose c p q h) = CutBoundary.source c G p
+  target_compose : ∀ {n} (c : Cut n) (p q : G.Cell n) h,
+    CutBoundary.target c G (compose c p q h) = CutBoundary.target c G q
+  unit : {n : Nat} → (c : Cut n) → G.Cell c.height → G.Cell n
+  source_unit : ∀ {n} (c : Cut n) (p : G.Cell c.height), CutBoundary.source c G (unit c p) = p
+  target_unit : ∀ {n} (c : Cut n) (p : G.Cell c.height), CutBoundary.target c G (unit c p) = p
+
+namespace CutOperations
+
+/-- All cuts restrict to each actual hom globular set. Composition is the
+parent operation one cut higher; no new cells or choices are introduced. -/
+def hom {G : GlobularSet.{u}} (C : CutOperations G) (a b : G.Cell 0) : CutOperations (G.hom a b) where
+  compose c p q h := by
+    have hh : CutBoundary.target (.lift c) G p.val = CutBoundary.source (.lift c) G q.val :=
+      (CutBoundary.target_hom c G p).trans
+        ((_root_.congrArg Subtype.val h).trans (CutBoundary.source_hom c G q).symm)
+    let r := C.compose (.lift c) p.val q.val hh
+    have hs : G.sourceZero r = a :=
+      (CutBoundary.sourceZero_source_lift c G r).symm.trans
+        ((_root_.congrArg G.sourceZero (C.source_compose (.lift c) p.val q.val hh)).trans
+          ((CutBoundary.sourceZero_source_lift c G p.val).trans p.property.1))
+    have ht : G.targetZero r = b :=
+      (CutBoundary.targetZero_target_lift c G r).symm.trans
+        ((_root_.congrArg G.targetZero (C.target_compose (.lift c) p.val q.val hh)).trans
+          ((CutBoundary.targetZero_target_lift c G q.val).trans q.property.2))
+    exact ⟨r, hs, ht⟩
+  source_compose c p q h := by
+    apply Subtype.ext
+    exact (CutBoundary.source_hom c G _).symm.trans
+      ((C.source_compose (.lift c) p.val q.val _).trans (CutBoundary.source_hom c G p))
+  target_compose c p q h := by
+    apply Subtype.ext
+    exact (CutBoundary.target_hom c G _).symm.trans
+      ((C.target_compose (.lift c) p.val q.val _).trans (CutBoundary.target_hom c G q))
+  unit c p := by
+    let r := C.unit (.lift c) p.val
+    have hs : G.sourceZero r = a :=
+      (CutBoundary.sourceZero_source_lift c G r).symm.trans
+        ((_root_.congrArg G.sourceZero (C.source_unit (.lift c) p.val)).trans p.property.1)
+    have ht : G.targetZero r = b :=
+      (CutBoundary.targetZero_target_lift c G r).symm.trans
+        ((_root_.congrArg G.targetZero (C.target_unit (.lift c) p.val)).trans p.property.2)
+    exact ⟨r, hs, ht⟩
+  source_unit c p := by
+    apply Subtype.ext
+    exact (CutBoundary.source_hom c G _).symm.trans (C.source_unit (.lift c) p.val)
+  target_unit c p := by
+    apply Subtype.ext
+    exact (CutBoundary.target_hom c G _).symm.trans (C.target_unit (.lift c) p.val)
+
+/-- Restriction preserves the underlying composite exactly. -/
+theorem hom_compose_val {G : GlobularSet.{u}} (C : CutOperations G) {a b : G.Cell 0}
+    {n : Nat} (c : Cut n) (p q : (G.hom a b).Cell n)
+    (h : CutBoundary.target c (G.hom a b) p = CutBoundary.source c (G.hom a b) q) :
+    ((C.hom a b).compose c p q h).val = C.compose (.lift c) p.val q.val
+      ((CutBoundary.target_hom c G p).trans
+        ((_root_.congrArg Subtype.val h).trans (CutBoundary.source_hom c G q).symm)) := rfl
+
+theorem hom_unit_val {G : GlobularSet.{u}} (C : CutOperations G) {a b : G.Cell 0}
+    {n : Nat} (c : Cut n) (p : (G.hom a b).Cell c.height) :
+    ((C.hom a b).unit c p).val = C.unit (.lift c) p.val := rfl
+
+end CutOperations
+
 theorem Cut.height_at (k n : Nat) : (Cut.at k n).height = k := by
   induction k with
   | zero => rfl
@@ -2017,6 +2159,17 @@ single evaluation recursion to descend into the actual target hom sets. -/
 inductive HomContext (H : GlobularSet.{u}) : GlobularSet.{u} → Type (u + 1) where
   | root : HomContext H H
   | hom {K : GlobularSet.{u}} : HomContext H K → (a b : K.Cell 0) → HomContext H (K.hom a b)
+
+/-- Iterate the proved restriction through an arbitrary hom context. There
+is no fixed maximum depth and every underlying operation is inherited. -/
+def CutOperations.inContext {H : GlobularSet.{u}} (C : CutOperations H) :
+    {K : GlobularSet.{u}} → HomContext H K → CutOperations K
+  | _, .root => C
+  | _, .hom h a b => (C.inContext h).hom a b
+
+theorem CutOperations.inContext_hom {H K : GlobularSet.{u}} (C : CutOperations H)
+    (h : HomContext H K) (a b : K.Cell 0) :
+    C.inContext (h.hom a b) = (C.inContext h).hom a b := rfl
 
 abbrev RecursiveComposition (H : GlobularSet.{u}) :=
   ∀ {K : GlobularSet.{u}}, HomContext H K → HorizontalComposition K
