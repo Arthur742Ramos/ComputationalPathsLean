@@ -22,6 +22,17 @@ completion gate for the full weak omega-groupoid theorem. -/
 #print axioms GlobularSet.pullback_universal
 #print axioms Pasting.pullbackComparison
 #print axioms Pasting.pullbackComparison_singleton
+#print axioms GlobularSet.pullbackHomForward
+#print axioms GlobularSet.pullbackHomBackward
+#print axioms GlobularSet.pullbackHom_backward_forward
+#print axioms GlobularSet.pullbackHom_forward_backward
+
+example {G H K : GlobularSet.{u}} (f : GlobularSet.Map G K) (g : GlobularSet.Map H K)
+    (a b : (GlobularSet.pullback f g).Cell 0) :
+    GlobularSet.Map.comp (GlobularSet.pullbackHomBackward f g a b)
+      (GlobularSet.pullbackHomForward f g a b) =
+      GlobularSet.Map.id ((GlobularSet.pullback f g).hom a b) :=
+  GlobularSet.pullbackHom_backward_forward f g a b
 
 example {G H K X : GlobularSet.{u}} (f : GlobularSet.Map G K) (g : GlobularSet.Map H K)
     (p : GlobularSet.Map X G) (q : GlobularSet.Map X H)

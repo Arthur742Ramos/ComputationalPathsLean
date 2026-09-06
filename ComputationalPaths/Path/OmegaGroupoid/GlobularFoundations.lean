@@ -386,6 +386,75 @@ def homInclusion (G : GlobularSet.{u}) (a b : G.Cell 0) : Map (G.hom a b) G.shif
   source_app _ := rfl
   target_app _ := rfl
 
+/-- The hom of a matched-cell pullback maps to the pullback of the two
+fixed-endpoint homs over the shifted common target. Using the shifted target
+avoids identifying endpoint fibres that are only propositionally equal. -/
+def pullbackHomForward {G H K : GlobularSet.{u}} (f : Map G K) (g : Map H K)
+    (a b : (pullback f g).Cell 0) :
+    Map ((pullback f g).hom a b)
+      (pullback (Map.comp f.shift (homInclusion G a.val.1 b.val.1))
+        (Map.comp g.shift (homInclusion H a.val.2 b.val.2))) :=
+  pullbackLift _ _ ((pullbackFst f g).hom a b) ((pullbackSnd f g).hom a b) (by
+    apply Map.ext
+    intro n c
+    exact c.val.property)
+
+/-- Reassemble matched hom cells, retaining both original cells and all four
+endpoint equations. This is the inverse needed for dimension recursion. -/
+def pullbackHomBackward {G H K : GlobularSet.{u}} (f : Map G K) (g : Map H K)
+    (a b : (pullback f g).Cell 0) :
+    Map (pullback (Map.comp f.shift (homInclusion G a.val.1 b.val.1))
+        (Map.comp g.shift (homInclusion H a.val.2 b.val.2)))
+      ((pullback f g).hom a b) where
+  app c := by
+    let r : (pullback f g).Cell _ := ⟨⟨c.val.1.val, c.val.2.val⟩, c.property⟩
+    refine ⟨r, ?_, ?_⟩
+    · apply Subtype.ext
+      exact Prod.ext
+        (((pullbackFst f g).sourceZero r).symm.trans c.val.1.property.1)
+        (((pullbackSnd f g).sourceZero r).symm.trans c.val.2.property.1)
+    · apply Subtype.ext
+      exact Prod.ext
+        (((pullbackFst f g).targetZero r).symm.trans c.val.1.property.2)
+        (((pullbackSnd f g).targetZero r).symm.trans c.val.2.property.2)
+  source_app c := Subtype.ext (Subtype.ext rfl)
+  target_app c := Subtype.ext (Subtype.ext rfl)
+
+theorem pullbackHom_backward_forward {G H K : GlobularSet.{u}}
+    (f : Map G K) (g : Map H K) (a b : (pullback f g).Cell 0) :
+    Map.comp (pullbackHomBackward f g a b) (pullbackHomForward f g a b) =
+      Map.id ((pullback f g).hom a b) := by
+  apply Map.ext
+  intro n c
+  exact Subtype.ext (Subtype.ext rfl)
+
+theorem pullbackHom_forward_backward {G H K : GlobularSet.{u}}
+    (f : Map G K) (g : Map H K) (a b : (pullback f g).Cell 0) :
+    Map.comp (pullbackHomForward f g a b) (pullbackHomBackward f g a b) =
+      Map.id (pullback (Map.comp f.shift (homInclusion G a.val.1 b.val.1))
+        (Map.comp g.shift (homInclusion H a.val.2 b.val.2))) := by
+  apply Map.ext
+  intro n c
+  exact Subtype.ext (Prod.ext (Subtype.ext rfl) (Subtype.ext rfl))
+
+theorem pullbackHomBackward_fst {G H K : GlobularSet.{u}}
+    (f : Map G K) (g : Map H K) (a b : (pullback f g).Cell 0) :
+    Map.comp ((pullbackFst f g).hom a b) (pullbackHomBackward f g a b) =
+      pullbackFst (Map.comp f.shift (homInclusion G a.val.1 b.val.1))
+        (Map.comp g.shift (homInclusion H a.val.2 b.val.2)) := by
+  apply Map.ext
+  intro n c
+  exact Subtype.ext rfl
+
+theorem pullbackHomBackward_snd {G H K : GlobularSet.{u}}
+    (f : Map G K) (g : Map H K) (a b : (pullback f g).Cell 0) :
+    Map.comp ((pullbackSnd f g).hom a b) (pullbackHomBackward f g a b) =
+      pullbackSnd (Map.comp f.shift (homInclusion G a.val.1 b.val.1))
+        (Map.comp g.shift (homInclusion H a.val.2 b.val.2)) := by
+  apply Map.ext
+  intro n c
+  exact Subtype.ext rfl
+
 /-- The fixed zero-dimensional endpoints are globular maps on the shifted
 tower, so they can be used to restrict every higher-cut operation to homs. -/
 def sourceZeroMap (G : GlobularSet.{u}) : Map G.shift (constant (G.Cell 0)) where

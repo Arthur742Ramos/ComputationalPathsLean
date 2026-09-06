@@ -118,6 +118,14 @@ projection equations and exact action on singleton labels are checked.
 The comparison has not yet been proved invertible. In particular, its
 existence and these equations alone do not prove functor pullback preservation.
 
+For the dimension-recursive inverse, `pullbackHomForward` and
+`pullbackHomBackward` now identify a fixed-endpoint hom of the pullback with
+the pullback of the two fixed-endpoint homs over the shifted common target.
+Both are globular maps; both inverse equations and the two backward
+projection equations are proved. The use of the shifted target avoids
+silently identifying distinct endpoint fibres. The remaining chain-matching
+and recursive reconstruction proof for `pullbackComparison` is not yet done.
+
 `evaluate` now evaluates labelled diagrams by dimension recursion into a
 target equipped with horizontal operations in all its iterated hom contexts
 (`RecursiveComposition`). The evaluator is implemented, not a field assumed
