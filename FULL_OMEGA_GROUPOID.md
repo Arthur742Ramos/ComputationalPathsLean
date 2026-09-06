@@ -324,8 +324,13 @@ the application comparison commutes with maps of both collections.
 `leftUnitIso` and `rightUnitIso` are now isomorphisms of collections, not just
 underlying carriers: the former uses the identity-application inverse and the
 latter terminal recovery, with their arity equations proved from the two
-pasting multiplication unit laws. The substitution associator, naturality
-of these unitors, and their triangle/pentagon coherence remain unproved.
+pasting multiplication unit laws. `Hom.leftUnit_natural` and
+`Hom.rightUnit_natural` prove naturality of both unitors. The arity-preserving
+`associatorIso` now reassociates three substituted collections; its arity
+equation uses `flatten_natural` and the actual `flatten_assoc` theorem.
+`Hom.application_faithful` proves that terminal-labelled applications detect
+equality of collection maps, providing a faithful check for future coherence
+proofs. Associator naturality and triangle/pentagon coherence remain unproved.
 
 `evaluate` now evaluates labelled diagrams by dimension recursion into a
 target equipped with horizontal operations in all its iterated hom contexts

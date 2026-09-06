@@ -112,6 +112,19 @@ completion gate for the full weak omega-groupoid theorem. -/
 #print axioms GlobularCollection.Hom.substitute_comparison
 #print axioms GlobularCollection.leftUnitIso
 #print axioms GlobularCollection.rightUnitIso
+#print axioms GlobularCollection.Hom.leftUnit_natural
+#print axioms GlobularCollection.Hom.rightUnit_natural
+#print axioms GlobularCollection.Hom.application_faithful
+#print axioms GlobularCollection.Hom.associateInv
+#print axioms GlobularCollection.associatorIso
+
+noncomputable example (C D E : GlobularCollection.{u}) :
+    CategoryTheory.Iso ((C.substitute D).substitute E) (C.substitute (D.substitute E)) :=
+  C.associatorIso D E
+
+example {C D : GlobularCollection.{u}} {f g : GlobularCollection.Hom C D}
+    (h : f.application GlobularSet.terminal = g.application GlobularSet.terminal) : f = g :=
+  GlobularCollection.Hom.application_faithful h
 
 noncomputable example (C : GlobularCollection.{u}) :
     CategoryTheory.Iso (GlobularCollection.identity.substitute C) C := C.leftUnitIso

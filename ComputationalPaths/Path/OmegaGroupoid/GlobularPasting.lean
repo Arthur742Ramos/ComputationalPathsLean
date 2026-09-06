@@ -5989,6 +5989,64 @@ def rightUnitInv (C : GlobularCollection.{u}) : Hom C (C.substitute identity) wh
     intro n p
     exact Pasting.flatten_map_singleton (C.arity.app p)
 
+/-- Left substitution units commute with every arity-preserving map. -/
+theorem leftUnit_natural {C D : GlobularCollection.{u}} (f : Hom C D) :
+    comp (leftUnit D) (substitute (id identity) f) = comp f (leftUnit C) := by
+  apply ext
+  exact identityApplicationOut_natural f.operations
+
+/-- Right substitution units commute with every arity-preserving map. -/
+theorem rightUnit_natural {C D : GlobularCollection.{u}} (f : Hom C D) :
+    comp (rightUnit D) (substitute f (id identity)) = comp f (rightUnit C) := by
+  apply ext
+  apply GlobularSet.Map.ext
+  intro n p
+  rfl
+
+/-- Terminal-labelled applications detect equality of collection maps.
+This uses the actual terminal recovery map, not an injectivity premise. -/
+theorem application_faithful {C D : GlobularCollection.{u}} {f g : Hom C D}
+    (h : f.application GlobularSet.terminal = g.application GlobularSet.terminal) : f = g := by
+  apply ext
+  apply GlobularSet.Map.ext
+  intro n p
+  exact _root_.congrArg (fun k : GlobularSet.Map (C.application GlobularSet.terminal)
+    (D.application GlobularSet.terminal) => (k.app (C.atTerminal.app p)).val.1) h
+
+/-- Reassociate substitution from right nesting to left nesting. The
+arity equation is the actual pasting multiplication associativity law. -/
+noncomputable def associateInv (C D E : GlobularCollection.{u}) :
+    Hom (C.substitute (D.substitute E)) ((C.substitute D).substitute E) where
+  operations := C.substitutionComparison D E.operations
+  arity := by
+    apply GlobularSet.Map.ext
+    intro n p
+    change (Pasting.flattenGlobular GlobularSet.terminal).app
+      (Pasting.map E.arity ((Pasting.flattenGlobular E.operations).app
+        (Pasting.map (D.inputs E.operations) p.val.2))) =
+      (Pasting.flattenGlobular GlobularSet.terminal).app (Pasting.map (D.substitute E).arity p.val.2)
+    refine (_root_.congrArg (Pasting.flattenGlobular GlobularSet.terminal).app
+      (Pasting.flatten_natural E.arity (Pasting.map (D.inputs E.operations) p.val.2))).trans ?_
+    refine (Pasting.flatten_assoc GlobularSet.terminal
+      (Pasting.map (Pasting.mapGlobular E.arity) (Pasting.map (D.inputs E.operations) p.val.2))).trans ?_
+    apply _root_.congrArg (Pasting.flattenGlobular GlobularSet.terminal).app
+    exact (Pasting.map_comp (Pasting.mapGlobular E.arity) (Pasting.flattenGlobular GlobularSet.terminal)
+      (Pasting.map (D.inputs E.operations) p.val.2)).trans
+        (Pasting.map_comp (D.inputs E.operations)
+          (GlobularSet.Map.comp (Pasting.flattenGlobular GlobularSet.terminal) (Pasting.mapGlobular E.arity)) p.val.2)
+
+noncomputable def associate (C D E : GlobularCollection.{u}) :
+    Hom ((C.substitute D).substitute E) (C.substitute (D.substitute E)) where
+  operations := C.substitutionComparisonInverse D E.operations
+  arity := by
+    apply GlobularSet.Map.ext
+    intro n p
+    have h := _root_.congrArg (fun k : GlobularSet.Map (C.substitute (D.substitute E)).operations
+      (Pasting.globular GlobularSet.terminal) =>
+        k.app ((C.substitutionComparisonInverse D E.operations).app p)) (associateInv C D E).arity
+    exact h.symm.trans (_root_.congrArg ((C.substitute D).substitute E).arity.app
+      ((C.substitutionComparison_unique_lift D E.operations p).choose_spec.1))
+
 end Hom
 
 instance : CategoryTheory.Category.{u} GlobularCollection.{u} where
@@ -6014,6 +6072,13 @@ def rightUnitIso (C : GlobularCollection.{u}) :
   inv := Hom.rightUnitInv C
   hom_inv_id := Hom.ext C.applicationTerminalIso.hom_inv_id
   inv_hom_id := Hom.ext C.applicationTerminalIso.inv_hom_id
+
+noncomputable def associatorIso (C D E : GlobularCollection.{u}) :
+    CategoryTheory.Iso ((C.substitute D).substitute E) (C.substitute (D.substitute E)) where
+  hom := Hom.associate C D E
+  inv := Hom.associateInv C D E
+  hom_inv_id := Hom.ext (C.substitutionComparisonIso D E.operations).inv_hom_id
+  inv_hom_id := Hom.ext (C.substitutionComparisonIso D E.operations).hom_inv_id
 
 end GlobularCollection
 
