@@ -35,5 +35,10 @@ lean_lib Challenge where
 lean_lib Solution where
   roots := #[`Solution]
 
+lean_lib CertifiedTorusPreimageTests where
+  roots := #[`Tests.CertifiedTorusPreimageFixtures,
+    `Tests.CertifiedTorusPreimageAdversarial,
+    `Tests.CertifiedTorusPreimageBenchmarks]
+
 lean_exe computational_paths where
   root := `Main

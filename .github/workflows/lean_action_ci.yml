@@ -23,3 +23,12 @@ jobs:
       - uses: leanprover/lean-action@v1
         with:
           use-mathlib-cache: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: scripts/requirements-torus-preimage.txt
+      - name: Install certified-preimage producer dependencies
+        run: python3 -m pip install -r scripts/requirements-torus-preimage.txt
+      - name: Check certified finite-torus preimages
+        run: scripts/check-torus-preimage.sh
