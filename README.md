@@ -57,6 +57,32 @@ lake build ComputationalPaths.Path.OmegaGroupoid.AssocHigherBridge
 lake env lean scripts/AssocHigherAudit.lean
 ```
 
+## Certified finite-torus preimages
+
+The library includes a certificate-driven solver for preimages of loop classes
+under continuous maps between finite tori induced by rectangular integer
+matrices. The topology-independent core checks finite integer data and returns
+one of three distinct outcomes: an invalid certificate, a concrete solution
+with the complete affine kernel lattice, or an explicit divisibility row that
+proves nonexistence. The torus bridge proves that the same answer is correct
+for the actual quotient fundamental groups and winding classifier.
+
+The optional SymPy producer is untrusted: Lean rechecks every certificate,
+literal answer, kernel projection, and obstruction used by the checked-in
+fixtures. The producer is not a verified Smith-normal-form implementation and
+no complexity bound is claimed.
+
+```bash
+python3 -m pip install -r scripts/requirements-torus-preimage.txt
+scripts/check-torus-preimage.sh
+python3 scripts/torus-preimage-certificate.py \
+  examples/torus-preimage-coupled.json --verify
+```
+
+See [the scope and verification note](docs/CERTIFIED_TORUS_PREIMAGES.md). The
+underlying winding and integer linear algebra are classical; the note makes no
+publication, priority, or independent-review claim for this research prototype.
+
 ## Project scope
 
 Representative results and modules include:
@@ -73,6 +99,11 @@ Representative results and modules include:
 - `ComputationalPaths/Path/TypeTheory/MetadataRepair.lean` (universal setoid
   repair, projection/kernel and `PathRwQuot`/K criteria, raw-vs-`RwEq` traces,
   and genuine-vs-synthetic circle/torus no-bridge theorems)
+- `ComputationalPaths/Path/Algebra/CertifiedIntegerMatrixPreimage.lean`
+  (validated integer-matrix certificates, complete affine solution sets, and
+  explicit obstructions)
+- `ComputationalPaths/Path/Topology/CertifiedTorusPreimage.lean` (transport of
+  the certified solver to actual finite-torus loop homotopy classes)
 
 The current `Circle` is a one-constructor Lean type and `Torus` is its product.
 Their genuine `PathRwQuot` loop fibers are therefore contractible.  The

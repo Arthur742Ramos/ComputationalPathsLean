@@ -23,6 +23,7 @@ import ComputationalPaths.Path.Algebra.TropicalGeometryPaths
 import ComputationalPaths.Path.Algebra.QuantumTopologyPaths
 import ComputationalPaths.Path.Algebra.BraveNewAlgebraPaths
 import ComputationalPaths.Path.Algebra.CobordismCategoryPaths
+import ComputationalPaths.Path.Algebra.CertifiedIntegerMatrixPreimage
 import ComputationalPaths.Path.Algebra.CrystallineCohomologyPaths
 import ComputationalPaths.Path.Algebra.DerivedAlgebraicGeometryPaths
 import ComputationalPaths.Path.Algebra.DifferentialGradedLiePaths

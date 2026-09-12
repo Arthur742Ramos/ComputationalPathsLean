@@ -62,6 +62,8 @@ import ComputationalPaths.Path.Topology.ScopedGeometricRewriteHawaiianEarring
 import ComputationalPaths.Path.Topology.ScopedGeometricRewriteCircle
 import ComputationalPaths.Path.Topology.TopologicalTorusScoped
 import ComputationalPaths.Path.Topology.FiniteCircleTorusPresentation
+import ComputationalPaths.Path.Topology.CertifiedTorusPreimageExistence
+import ComputationalPaths.Path.Topology.TorusConstraintApplication
 import ComputationalPaths.Path.OmegaGroupoidCompPaths
 import ComputationalPaths.Path.Rewriting
 import ComputationalPaths.Path.Transport
